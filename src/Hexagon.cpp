@@ -12,7 +12,7 @@
 *****************************************************************************/
 
 
-#include "Hexagon.hpp"
+#include <hexer/Hexagon.hpp>
 
 namespace Pshape
 {

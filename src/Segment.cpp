@@ -12,9 +12,9 @@
 *****************************************************************************/
 
 
-#include "Segment.hpp"
+#include <hexer/Segment.hpp>
 
-#include "HexGrid.hpp"
+#include <hexer/HexGrid.hpp>
 
 namespace Pshape
 {

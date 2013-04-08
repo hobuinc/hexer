@@ -21,13 +21,13 @@
 #include "HexGrid.hpp"
 **/
 
-#include "Processor.hpp"
+#include <hexer/Processor.hpp>
 
 #include <math.h>
 #include <vector>
 
-#include "GridInfo.hpp"
-#include "Mathpair.hpp"
+#include <hexer/GridInfo.hpp>
+#include <hexer/Mathpair.hpp>
 
 using namespace std;
 

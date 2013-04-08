@@ -13,9 +13,9 @@
 
 #include <iostream>
 
-#include "HexGrid.hpp"
-#include "Mathpair.hpp"
-#include "Segment.hpp"
+#include <hexer/HexGrid.hpp>
+#include <hexer/Mathpair.hpp>
+#include <hexer/Segment.hpp>
 
 using namespace std;
 
