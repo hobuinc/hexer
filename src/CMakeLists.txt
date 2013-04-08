@@ -3,7 +3,6 @@ set(HEXER_HEADERS_DIR ../include/laszip)
 set(HEXER_HPP
   ${HEXER_HEADERS_DIR}/Draw.hpp
   ${HEXER_HEADERS_DIR}/GridInfo.hpp
-  ${HEXER_HEADERS_DIR}/HexBin.hpp
   ${HEXER_HEADERS_DIR}/HexGrid.hpp
   ${HEXER_HEADERS_DIR}/Hexagon.hpp
   ${HEXER_HEADERS_DIR}/Mathpair.hpp
@@ -15,7 +14,6 @@ set(HEXER_HPP
 
 set(HEXER_CPP
     Draw.cpp
-    HexBin.cpp
     HexGrid.cpp
     Hexagon.cpp
     Paht.cpp
