@@ -67,6 +67,37 @@ if(WIN32)
   endif()
 endif()
 
+
+find_package(Boost 1.48 )
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+
+  # make these available for the user to set.
+  mark_as_advanced(CLEAR Boost_INCLUDE_DIR) 
+  mark_as_advanced(CLEAR Boost_LIBRARY_DIRS) 
+  link_directories(${Boost_LIBRARY_DIRS})
+
+  # Default to using static, multithreaded libraries for 
+  # linking under MSVC. 
+  if(WIN32)
+    if (MSVC)
+      set(Boost_USE_STATIC_LIBS   ON)
+      set(Boost_USE_MULTITHREADED ON)
+    endif(MSVC)
+  endif(WIN32)
+  
+
+  include_directories( ${Boost_INCLUDE_DIRS}/)
+
+endif(Boost_FOUND)
+
+set(WITH_DRAWING FALSE CACHE BOOL "Choose to build Cairo-based SVG drawing")
+
+if(WITH_DRAWING)
+    
+    find_package(cairo)
+endif(WITH_DRAWING)
+
 ###############################################################################
 # Installation settings
 
@@ -112,3 +143,7 @@ set(HEXER_INCLUDE_DIR ${HEXER_INCLUDE_SUBDIR})
 
 add_subdirectory(src)
 add_subdirectory(apps)
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/hexer_defines.h.in"
+  "${HEXER_INCLUDE_DIR}/hexer/hexer_defines.h")

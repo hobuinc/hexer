@@ -1,0 +1,38 @@
+/* 
+ * pdal_defines.h.in is used by cmake to generate hexer_defines.h
+ *
+ * Do not edit hexer_defines.h!
+ *
+ * Note this is a C-style header.  Do not use C++ syntax.
+ */
+#ifndef HEXER_DEFINES_H
+#define HEXER_DEFINES_H
+
+/*
+ * version settings
+ */
+#define HEXER_VERSION_MAJOR @HEXER_VERSION_MAJOR@
+#define HEXER_VERSION_MINOR @HEXER_VERSION_MINOR@
+#define HEXER_VERSION_PATCH @HEXER_VERSION_PATCH@
+
+#define HEXER_VERSION_STRING "@HEXER_VERSION_STRING@"
+
+
+/*
+ * availability of 3rd-party libraries
+ */
+#cmakedefine HEXER_HAVE_CAIRO
+
+/*
+ * Debug or Release build?
+ */
+#define HEXER_BUILD_TYPE "@HEXER_BUILD_TYPE@"
+
+#cmakedefine WITH_DRAWING
+
+/*
+ * platform compiler 
+ */
+#cmakedefine HEXER_COMPILER_MSVC
+
+#endif
