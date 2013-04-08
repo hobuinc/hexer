@@ -1,4 +1,4 @@
-set(HEXER_HEADERS_DIR ../include/laszip)
+set(HEXER_HEADERS_DIR ../include/hexer)
 
 set(HEXER_HPP
   ${HEXER_HEADERS_DIR}/Draw.hpp
@@ -16,7 +16,7 @@ set(HEXER_CPP
     Draw.cpp
     HexGrid.cpp
     Hexagon.cpp
-    Paht.cpp
+    Path.cpp
     Processor.cpp
     Segment.cpp
 )
@@ -37,7 +37,7 @@ source_group("CMake Files" FILES CMakeLists.txt)
 source_group("Header Files" FILES ${HEXER_HPP})
 source_group("Source Files" FILES ${HEXER_CPP})
 
-# Standard include directory of laszip library
+# Standard include directory of Hexer library
 include_directories(../include ../include/hexer .)
 
 

@@ -33,10 +33,10 @@ set(CMAKE_MODULE_PATH ${hexer_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 if(NOT MSVC_IDE)
   if(NOT CMAKE_BUILD_TYPE)
 
-  set(CMAKE_BUILD_TYPE Release CACHE STRING 
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING 
     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel" FORCE)
   endif()
-    message(STATUS "Setting LASzip build type - ${CMAKE_BUILD_TYPE}")
+    message(STATUS "Setting Hexer build type - ${CMAKE_BUILD_TYPE}")
 endif()
 
 # TODO: Still testing the output paths --mloskot
