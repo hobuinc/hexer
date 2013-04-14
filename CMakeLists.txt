@@ -52,7 +52,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY}) 
 
 
-set(BUILD_STATIC FALSE CACHE BOOL "Build LASzip statically" )
+set(BUILD_STATIC FALSE CACHE BOOL "Build Hexer statically" )
 ###############################################################################
 # Platform and compiler specific settings
 
@@ -118,7 +118,7 @@ else()
   set(DEFAULT_INCLUDE_SUBDIR include)
 endif()
 
-# Locations are changeable by user to customize layout of laszip installation
+# Locations are changeable by user to customize layout of Hexer installation
 # (default values are platform-specific)
 set(HEXER_BIN_SUBDIR ${DEFAULT_BIN_SUBDIR} CACHE STRING
   "Subdirectory where executables will be installed")
