@@ -13,19 +13,9 @@
 
 *****************************************************************************/
 
-#pragma once
 
-#include <boost/function.hpp>
-#include <vector>
+#define HEXER_VERSION_MAJOR    1
+#define HEXER_VERSION_MINOR    0
+#define HEXER_VERSION_REVISION 0
 
-#include "GridInfo.hpp"
-#include "Path.hpp"
-
-namespace Pshape
-{
-    typedef boost::function<bool(double&, double&)> PointReader;
-    typedef boost::function<bool(int&, int&)> HexReader;
-
-    void process(const std::vector<GridInfo *>& infos, PointReader);
-    void processHexes(const std::vector<GridInfo *>& infos, HexReader);
-} // namespace Pshape
+#include <hexer/hexer_defines.h>
