@@ -24,12 +24,12 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
-if (UNIX)
-  find_package(PkgConfig)
-  if (PKG_CONFIG_FOUND)
-    pkg_check_modules(_CAIRO cairo)
-  endif (PKG_CONFIG_FOUND)
-endif (UNIX)
+# if (UNIX)
+#   find_package(PkgConfig)
+#   if (PKG_CONFIG_FOUND)
+#     pkg_check_modules(_CAIRO cairo)
+#   endif (PKG_CONFIG_FOUND)
+# endif (UNIX)
 
 SET(_CAIRO_ROOT_HINTS
   $ENV{CAIRO}
@@ -139,13 +139,6 @@ ELSE(WIN32 AND NOT CYGWIN)
   SET(CAIRO_LIBRARIES ${CAIRO_LIBRARY})
 
 ENDIF(WIN32 AND NOT CYGWIN)
-
- # if (CAIRO_INCLUDE_DIR) 
-    # file(READ "${CAIRO_INCLUDE_DIR}/gcore/gdal_version.h" _wxgisgdal_VERSION_H_CONTENTS)
-    # string(REGEX REPLACE ".*#  define[ \t]+GDAL_RELEASE_NAME[ \t]+\"([0-9A-Za-z.]+)\".*"
-    # "\\1" CAIRO_VERSION ${_wxgisgdal_VERSION_H_CONTENTS})
-    # set(CAIRO_VERSION ${CAIRO_VERSION} CACHE INTERNAL "The version number for wxgisgdal libraries")
- # endif (CAIRO_INCLUDE_DIR)
 
 include(FindPackageHandleStandardArgs)
 

@@ -26,7 +26,7 @@
 /*
  * Debug or Release build?
  */
-#define HEXER_BUILD_TYPE "@HEXER_BUILD_TYPE@"
+#define HEXER_BUILD_TYPE "@CMAKE_BUILD_TYPE@"
 
 #cmakedefine WITH_DRAWING
 
