@@ -56,10 +56,8 @@ public:
 
 private:
     HexGrid *m_grid_p;
-    // Display *m_dpy_p;
-    // Window m_window;
-#ifdef HEXER_HAVE_CAIRO
-    
+
+#ifdef HEXER_HAVE_CAIRO    
     cairo_surface_t *m_surface_p;
     cairo_t *m_cairo_p;
 #endif
