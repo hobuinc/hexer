@@ -18,7 +18,7 @@ endif()
 
 
 if(HEXTEST)
-    add_executable(${HEXTEST} Tester.cpp)
+    add_executable(${HEXTEST} Tester.cpp lasfile.hpp)
     target_link_libraries(${HEXTEST} ${HEXER_LIB_NAME} )
 endif()
 

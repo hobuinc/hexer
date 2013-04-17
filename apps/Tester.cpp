@@ -9,62 +9,41 @@
 #include <fstream>
 
 #include <hexer/Processor.hpp>
+#include "lasfile.hpp"
 
 
 using namespace std;
-// 
-// bool readlas(double& x, double& y)
-// {
-//     using namespace pdal;
-// 
-//     static Stage *reader = NULL;
-//     static StageSequentialIterator *iter = NULL;
-//     static PointBuffer *buf = NULL;
-//     static int i = 0;
-//     static Dimension const *xdim;
-//     static Dimension const *ydim;
-// 
-//     if (!reader)
-//     {
-//         Options options;
-//         options.add<std::string>("filename", "serpent_mound.las");
-// 
-//         reader = AppSupport::makeReader(options);
-//         reader->initialize();
-//         const Schema& schema = reader->getSchema();
-//         buf = new PointBuffer(schema, 1);
-//         iter = reader->createSequentialIterator(*buf);
-// 
-//         schema::index_by_index const& dimensions =
-//             schema.getDimensions().get<schema::index>();
-//         for (int dim = 0; dim < dimensions.size(); ++dim)
-//         {
-//             const Dimension& dimension = dimensions[dim];
-//             if (dimension.getName() == "X")
-//             {
-//                 xdim = &dimension;
-//             }
-//             else if (dimension.getName() == "Y")
-//             {
-//                 ydim = &dimension;
-//             }
-//         }
-//     }
-//     if (!iter->read(*buf))
-//     {
-//         delete reader;
-//         delete buf;
-//         //ABELL - Must be deleted elsewhere.
-//         // delete iter;
-//         return false;
-//     }
-//     i++;
-//     int32_t xi = buf->getField<int32_t>(*xdim, 0);
-//     int32_t yi = buf->getField<int32_t>(*ydim, 0);
-//     x = xdim->applyScaling<int32_t>(xi);
-//     y = ydim->applyScaling<int32_t>(yi);
-//     return true;
-// }
+
+bool readlas(double& x, double& y)
+{
+
+    static int i(0);
+    static bool done = false;
+    static las_file las;
+
+    if (done)
+    {
+        return false;
+    }
+    if ( !las.is_open() )
+    {
+        las.open("serpent_mound.las");
+    }
+    
+    x = las.getX(i);
+    y = las.getY(i);
+    // in.read((char *)&x, sizeof(x));
+    // in.read((char *)&y, sizeof(y));
+    i++;
+    
+    if (i == las.points_count())
+    {
+        las.close();
+        done = true;
+    }
+    
+    return true;
+}
 
 // Read from simple file of doubles
 bool readpoint(double& x, double& y)
@@ -197,7 +176,7 @@ void pointtest()
     GridInfo *gi = new GridInfo;
 
     infos.push_back(gi);
-    process(infos, readpoint);
+    process(infos, readlas);
     for (int pi = 0; pi < gi->rootPaths().size(); ++pi)
     {
         Path *p = gi->rootPaths()[pi];
