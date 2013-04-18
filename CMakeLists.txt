@@ -40,7 +40,7 @@ if(NOT MSVC_IDE)
 endif()
 
 # TODO: Still testing the output paths --mloskot
-set(HEXER_BUILD_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE})
+set(HEXER_BUILD_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 # Output directory in which to build RUNTIME target files.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
@@ -85,7 +85,6 @@ if(Boost_FOUND)
       set(Boost_USE_MULTITHREADED ON)
     endif(MSVC)
   endif(WIN32)
-  
 
   include_directories( ${Boost_INCLUDE_DIRS}/)
 
@@ -94,7 +93,6 @@ endif(Boost_FOUND)
 set(WITH_DRAWING FALSE CACHE BOOL "Choose to build Cairo-based SVG drawing")
 
 if(WITH_DRAWING)
-    
     find_package(cairo)
     set(HEXER_HAVE_CAIRO 1)
 endif(WITH_DRAWING)
