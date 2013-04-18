@@ -36,6 +36,7 @@ vector<Point> Path::points()
         {
             points.push_back(m_segs[i].startPos(m_grid));
         }
+        points.push_back(m_segs[0].startPos(m_grid));
     }
     else
     {
@@ -44,6 +45,8 @@ vector<Point> Path::points()
         {
             points.push_back(m_segs[i].startPos(m_grid));
         }
+        points.push_back(m_segs[m_segs.size()-1].startPos(m_grid));
+
     }
     return points;
 }
