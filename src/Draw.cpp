@@ -32,7 +32,7 @@ double blue[] = { 0, 0, 1 };
 
 typedef double Color[];
 
-namespace Pshape
+namespace hexer
 {
 
 
@@ -105,8 +105,8 @@ void Draw::drawSegment(Segment s, Color c)
     cairo_set_line_width(m_cairo_p, 2);
     cairo_set_source_rgb(m_cairo_p, c.m_red, c.m_blue, c.m_green);
     
-    Pshape::Point startpoint = s.startPos(m_grid_p) - m_grid_p->origin();
-    Pshape::Point endpoint = s.endPos(m_grid_p) - m_grid_p->origin();
+    hexer::Point startpoint = s.startPos(m_grid_p) - m_grid_p->origin();
+    hexer::Point endpoint = s.endPos(m_grid_p) - m_grid_p->origin();
     cairo_move_to(m_cairo_p, startpoint.m_x, startpoint.m_y);
     cairo_line_to(m_cairo_p, endpoint.m_x, endpoint.m_y);
     cairo_stroke(m_cairo_p);
@@ -114,7 +114,7 @@ void Draw::drawSegment(Segment s, Color c)
 #endif    
 }
 
-void Draw::drawPoint(Pshape::Point p)
+void Draw::drawPoint(hexer::Point p)
 {
 #ifdef HEXER_HAVE_CAIRO    
     p -= m_grid_p->origin();

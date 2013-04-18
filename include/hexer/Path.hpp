@@ -21,7 +21,7 @@
 #include "Mathpair.hpp"
 #include "Segment.hpp"
 
-namespace Pshape
+namespace hexer
 {
 
 enum Orientation

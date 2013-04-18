@@ -23,7 +23,7 @@
 
 using namespace std;
 
-namespace Pshape
+namespace hexer
 {
 
 namespace
@@ -112,5 +112,5 @@ void processHexes(const std::vector<GridInfo *>& infos, HexReader reader)
     }
 }
 
-} //namespace Pshape
+} //namespace hexer
 

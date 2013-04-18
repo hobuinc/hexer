@@ -15,7 +15,7 @@
 
 #include <hexer/Hexagon.hpp>
 
-namespace Pshape
+namespace hexer
 {
 
 //

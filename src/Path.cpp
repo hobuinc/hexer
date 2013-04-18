@@ -17,7 +17,7 @@
 
 using namespace std;
 
-namespace Pshape
+namespace hexer
 {
 
 Point Path::getPoint(int pointnum)

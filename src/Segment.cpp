@@ -16,7 +16,7 @@
 #include <hexer/Segment.hpp>
 #include <hexer/HexGrid.hpp>
 
-namespace Pshape
+namespace hexer
 {
 
 // The segment is normalized if necessary.

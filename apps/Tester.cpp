@@ -120,9 +120,9 @@ std::string indent(int l)
     return tabs;
 }
 
-void dumpPath(Pshape::Path *p)
+void dumpPath(hexer::Path *p)
 {
-    using namespace Pshape;
+    using namespace hexer;
 
     static int level = 0;
     Orientation o = p->orientation();
@@ -141,7 +141,7 @@ void dumpPath(Pshape::Path *p)
 
 void hextest()
 {
-    using namespace Pshape;
+    using namespace hexer;
 
     vector<GridInfo *> infos;
     GridInfo *gi = new GridInfo;
@@ -170,7 +170,7 @@ void hextest()
 
 void pointtest()
 {
-    using namespace Pshape;
+    using namespace hexer;
 
     vector<GridInfo *> infos;
     GridInfo *gi = new GridInfo;

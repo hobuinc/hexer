@@ -21,7 +21,7 @@
 
 #include "Mathpair.hpp"
 
-namespace Pshape
+namespace hexer
 {
 
 class Hexagon

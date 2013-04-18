@@ -25,7 +25,7 @@
 #include "Path.hpp"
 #include "Segment.hpp"
 
-namespace Pshape
+namespace hexer
 {
 
 static const double SQRT_3 = 1.732050808; 

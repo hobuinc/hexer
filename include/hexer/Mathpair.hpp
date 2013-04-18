@@ -16,7 +16,7 @@
 #ifndef INCLUDED_PSHAPE_MATHPAIR_HPP
 #define INCLUDED_PSHAPE_MATHPAIR_HPP
 
-namespace Pshape
+namespace hexer
 {
 
 template <typename T>

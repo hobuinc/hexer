@@ -20,7 +20,7 @@
 
 #include "HexGrid.hpp"
 
-namespace Pshape
+namespace hexer
 {
 
 class HexInfo

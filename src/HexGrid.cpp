@@ -21,7 +21,7 @@
 
 using namespace std;
 
-namespace Pshape
+namespace hexer
 {
 
 bool HexGrid::dense(Hexagon *h)
