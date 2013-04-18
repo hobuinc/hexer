@@ -36,7 +36,7 @@ class Path
 {
 public:
     Path(HexGrid *m_grid, Orientation orient) :
-        m_parent(NULL), m_orientation(orient)
+        m_grid(m_grid), m_parent(NULL), m_orientation(orient)
     {}
 
     ~Path()
