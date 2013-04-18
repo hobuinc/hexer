@@ -61,8 +61,9 @@ void process(const std::vector<GridInfo *>& infos, PointReader reader)
 
     int cnt = 0;
     double x, y;
+    void* context;
 
-    while (reader(x, y) && (cnt < SAMPLE_COUNT))
+    while (reader(x, y, context) && (cnt < SAMPLE_COUNT))
     {
         samples.push_back(Point(x,y));
         cnt++;
@@ -81,7 +82,7 @@ void process(const std::vector<GridInfo *>& infos, PointReader reader)
         {
             grid->addPoint(samples[i]);
         }
-        while (reader(x, y))
+        while (reader(x, y, context))
         {
             grid->addPoint(Point(x, y));
         }
@@ -94,6 +95,7 @@ void processHexes(const std::vector<GridInfo *>& infos, HexReader reader)
 {
     int cnt = 0;
     int x, y;
+    void* ctx;
 
     for (size_t gi = 0; gi < infos.size(); ++gi)
     {
@@ -102,8 +104,8 @@ void processHexes(const std::vector<GridInfo *>& infos, HexReader reader)
         assert(info->m_density > 0);
         HexGrid *grid = new HexGrid(info->m_hexsize, info->m_density);
         info->m_grid = grid;
-
-        while (reader(x, y))
+        
+        while (reader(x, y, ctx))
         {
             grid->addDenseHexagon(x, y);
         }
