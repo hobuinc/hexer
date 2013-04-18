@@ -1,15 +1,23 @@
-/**
-#include <iomanip>
-#include <vector>
+/*****************************************************************************
 
-#include "HexGrid.hpp"
-#include "Mathpair.hpp"
-**/
+    (c) 2013 Hobu, Inc. hobu.inc@gmail.com
 
-#include <fstream>
+    Author: Andrew Bell andrew.bell.ia at gmail.com
+
+    This is free software; you can redistribute and/or modify it under the
+    terms of the GNU Lesser General Licence as published by the Free Software
+    Foundation. See the COPYING file for more information.
+
+    This software is distributed WITHOUT ANY WARRANTY and without even the
+    implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+*****************************************************************************/
 
 #include <hexer/Processor.hpp>
 #include "lasfile.hpp"
+
+#include <fstream>
+#include <sstream>
 
 
 using namespace std;
@@ -32,8 +40,7 @@ bool readlas(double& x, double& y)
     
     x = las.getX(i);
     y = las.getY(i);
-    // in.read((char *)&x, sizeof(x));
-    // in.read((char *)&y, sizeof(y));
+
     i++;
     
     if (i == las.points_count())
@@ -139,6 +146,54 @@ void dumpPath(hexer::Path *p)
     level--;
 }
 
+
+std::ostream& dumpBoundary(std::ostream& strm, hexer::Path *p)
+{
+    using namespace hexer;
+
+    static int level = 0;
+    Orientation o = p->orientation();
+    indent(level);
+    vector<Point> points = p->points();
+
+    strm << "(";
+    vector<Point>::const_iterator i;
+    bool bFirst(true);
+    for (i = points.begin(); i != points.end(); ++i)
+    {
+        if (!bFirst)
+        {
+            strm << ", ";
+        } else
+        {
+            bFirst = false;
+        }
+
+        strm << i->m_x << " " << i->m_y;
+    }
+    strm << ")";
+    
+
+    vector<Path *> paths = p->subPaths();
+    
+
+    if (paths.size())
+    {
+        // bFirst = true;
+        for (int pi = 0; pi != paths.size(); ++pi)
+        {
+            Path* p = paths[pi];
+            // if (!bFirst)
+            // {
+                strm <<",";
+                    // }
+            dumpBoundary(strm, p);
+        }
+    }
+    
+    return strm;
+}
+
 void hextest()
 {
     using namespace hexer;
@@ -151,11 +206,6 @@ void hextest()
     infos.push_back(gi);
 
     processHexes(infos, readHex);
-    for (int pi = 0; pi < gi->rootPaths().size(); ++pi)
-    {
-        Path *p = gi->rootPaths()[pi];
-        dumpPath(p);
-    }
 
     // Dump hexes.
     for (HexIter iter = gi->begin(); iter != gi->end(); ++iter)
@@ -168,7 +218,7 @@ void hextest()
     delete gi;
 }
 
-void pointtest()
+void pathtest()
 {
     using namespace hexer;
 
@@ -183,13 +233,51 @@ void pointtest()
         dumpPath(p);
     }
 
-    // // Dump hexes.
-    // for (HexIter iter = gi->begin(); iter != gi->end(); ++iter)
-    // {
-    //     HexInfo hi = *iter;
-    //     cerr << "Density/X/Y = " << hi.m_density << "/" <<
-    //         hi.m_center.m_x << "/" << hi.m_center.m_y << "!\n";
-    // }
+    delete gi;
+}
+
+void boundarytest()
+{
+    using namespace hexer;
+
+    vector<GridInfo *> infos;
+    GridInfo *gi = new GridInfo;
+
+    infos.push_back(gi);
+    process(infos, readlas);
+    
+
+    std::ostringstream multi;
+    multi.setf(std::ios::fixed);
+    multi.precision(8);
+    
+    multi << "MULTIPOLYGON (";
+    
+    bool bFirst(true);
+    for (int pi = 0; pi < gi->rootPaths().size(); ++pi)
+    {
+        Path *p = gi->rootPaths()[pi];
+
+        if (!bFirst)
+        {
+            multi << ",";
+        } else {
+            bFirst = false;
+        }
+            
+        multi << "(";
+        std::ostringstream poly;
+        poly.setf(std::ios::fixed);
+        poly.precision(8);
+        dumpBoundary(poly, p);
+        
+        multi << poly.str();
+        multi << ")";
+        
+    }
+    multi << ")";
+    
+    std::cout << multi.str() << std::endl;
 
     delete gi;
 }
@@ -197,7 +285,8 @@ void pointtest()
 int main()
 {
 //    hextest();
-    pointtest();
+    // pathtest();
+    boundarytest();
     return 0;
 }
 
