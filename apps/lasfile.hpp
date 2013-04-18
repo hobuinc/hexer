@@ -15,8 +15,8 @@
 
 
 
-#ifndef __HEXER_LAS_H__
-#define __HEXER_LAS_H__
+#ifndef INCLUDED_HEXER_LASFILE_HPP
+#define INCLUDED_HEXER_LASFILE_HPP
 
 #include <boost/noncopyable.hpp>
 #include <boost/interprocess/file_mapping.hpp>
@@ -65,7 +65,7 @@ public:
 		points_struct_size_ = readAs<unsigned short>(32*3 + 8 + 1);
 		points_count_ = readAs<unsigned int>(32*3 + 11);
 
-		std::cerr << "points count: " << points_count_ << std::endl;
+        // std::cerr << "points count: " << points_count_ << std::endl;
 
 		size_t start = 32*3 + 35;
 		readN(start, scale_, 3); start += sizeof(double) * 3;
@@ -75,8 +75,8 @@ public:
 		maxs_[1] = readAs<double>(start); mins_[1] = readAs<double>(start + sizeof(double)); start += 2*sizeof(double);
 		maxs_[2] = readAs<double>(start); mins_[2] = readAs<double>(start + sizeof(double)); start += 2*sizeof(double);
 
-		std::cerr << "region size: " << pregion_->get_size() << std::endl;
-		std::cerr << "points offset: " << points_offset_ << std::endl;
+        // std::cerr << "region size: " << pregion_->get_size() << std::endl;
+        // std::cerr << "points offset: " << points_offset_ << std::endl;
 
 
 		uint64_t diff = pregion_->get_size() - points_offset_;

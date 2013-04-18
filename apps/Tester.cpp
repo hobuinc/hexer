@@ -14,72 +14,17 @@
 *****************************************************************************/
 
 #include <hexer/Processor.hpp>
-#include "lasfile.hpp"
+#include "las.hpp"
 
 #include <fstream>
 #include <sstream>
 
+#include <boost/algorithm/string/compare.hpp>
 
 using namespace std;
 
-bool readlas(double& x, double& y)
-{
 
-    static int i(0);
-    static bool done = false;
-    static las_file las;
-
-    if (done)
-    {
-        return false;
-    }
-    if ( !las.is_open() )
-    {
-        las.open("serpent_mound.las");
-    }
-    
-    x = las.getX(i);
-    y = las.getY(i);
-
-    i++;
-    
-    if (i == las.points_count())
-    {
-        las.close();
-        done = true;
-    }
-    
-    return true;
-}
-
-// Read from simple file of doubles
-bool readpoint(double& x, double& y)
-{
-    static ifstream in;
-    static bool done = false;
-    static int i = 0;
-
-    if (done)
-    {
-        return false;
-    }
-    if ( !in.is_open() )
-    {
-        in.open("fastpoints.small");
-    }
-    if (in.eof() || i == 500000)
-    {
-        in.close();
-        done = true;
-        return false;
-    }
-    in.read((char *)&x, sizeof(x));
-    in.read((char *)&y, sizeof(y));
-    i++;
-    return true;
-}
-
-bool readHex(int& x, int& y)
+bool readHex(int& x, int& y, void* ctx)
 {
     static int pos = 0;
 
@@ -175,18 +120,12 @@ std::ostream& dumpBoundary(std::ostream& strm, hexer::Path *p)
     
 
     vector<Path *> paths = p->subPaths();
-    
-
     if (paths.size())
     {
-        // bFirst = true;
         for (int pi = 0; pi != paths.size(); ++pi)
         {
             Path* p = paths[pi];
-            // if (!bFirst)
-            // {
-                strm <<",";
-                    // }
+            strm <<",";
             dumpBoundary(strm, p);
         }
     }
@@ -194,7 +133,7 @@ std::ostream& dumpBoundary(std::ostream& strm, hexer::Path *p)
     return strm;
 }
 
-void hextest()
+void hextest(std::string filename)
 {
     using namespace hexer;
 
@@ -205,6 +144,10 @@ void hextest()
     gi->m_density = 10;
     infos.push_back(gi);
 
+    // LAS l(filename);
+    // l.open();
+    // process(infos, l.reader);
+    
     processHexes(infos, readHex);
 
     // Dump hexes.
@@ -218,7 +161,7 @@ void hextest()
     delete gi;
 }
 
-void pathtest()
+void pathtest(std::string filename)
 {
     using namespace hexer;
 
@@ -226,7 +169,10 @@ void pathtest()
     GridInfo *gi = new GridInfo;
 
     infos.push_back(gi);
-    process(infos, readlas);
+    LAS l(filename);
+    l.open();
+    process(infos, l.reader);
+
     for (int pi = 0; pi < gi->rootPaths().size(); ++pi)
     {
         Path *p = gi->rootPaths()[pi];
@@ -236,7 +182,7 @@ void pathtest()
     delete gi;
 }
 
-void boundarytest()
+void boundarytest(std::string filename)
 {
     using namespace hexer;
 
@@ -244,8 +190,10 @@ void boundarytest()
     GridInfo *gi = new GridInfo;
 
     infos.push_back(gi);
-    process(infos, readlas);
     
+    LAS l(filename);
+    l.open();
+    process(infos, l.reader);
 
     std::ostringstream multi;
     multi.setf(std::ios::fixed);
@@ -282,11 +230,35 @@ void boundarytest()
     delete gi;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-//    hextest();
-    // pathtest();
-    boundarytest();
-    return 0;
+
+    
+    if (argc < 3)
+    {
+        std::cerr << "please specify a command and a filename. $ hextest PATH filename.las" << std::endl;
+    }
+    
+    std::string command(argv[1], strlen(argv[1]));
+    std::string filename(argv[2], strlen(argv[2]));
+    
+    if (boost::iequals(command, "BOUNDARY"))
+    {
+        boundarytest(filename);
+        return 0;
+    }
+    
+    if (boost::iequals(command, "PATH"))
+    {
+        pathtest(filename);
+        return 0;
+    }
+
+    if (boost::iequals(command, "HEX"))
+    {
+        hextest(filename);
+        return 0;
+    }    
+    
 }
 
