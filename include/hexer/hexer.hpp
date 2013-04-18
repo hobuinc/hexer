@@ -19,3 +19,18 @@
 #define HEXER_VERSION_REVISION 0
 
 #include <hexer/hexer_defines.h>
+
+#include <stdexcept>
+
+namespace hexer
+{
+    
+class hexer_error : public std::runtime_error
+{
+public:
+    hexer_error(std::string const& msg)
+        : std::runtime_error(msg)
+    {}
+};
+
+}
