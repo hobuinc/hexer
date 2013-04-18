@@ -221,9 +221,7 @@ void HexGrid::findShapes()
 {
     if (m_pos_roots.empty())
     {
-        cerr << "No areas of sufficient density - no shapes.\n"
-            "Decrease density or area size.";
-        return;
+        throw hexer_error( "No areas of sufficient density - no shapes. Decrease density or area size.");
     }
 
     while (m_pos_roots.size())
@@ -278,6 +276,9 @@ void HexGrid::findParentPath(Path *p)
 
 void HexGrid::findShape(Hexagon *hex)
 {
+    if (!hex)
+        throw hexer_error("hexagon was null!");
+    
     Path *p = new Path(this, CLOCKWISE);
     Segment first(hex, 0);
     Segment cur(first);
