@@ -121,7 +121,7 @@ public:
 		throw std::runtime_error("Unknown point format");
 	}
 
-	size_t points_count() {
+	size_t points_count() const {
         if (count_ == -1)
             return points_count_;
         
