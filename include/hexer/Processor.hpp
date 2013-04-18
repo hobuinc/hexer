@@ -23,8 +23,8 @@
 
 namespace hexer
 {
-    typedef boost::function<bool(double&, double&)> PointReader;
-    typedef boost::function<bool(int&, int&)> HexReader;
+    typedef boost::function<bool(double&, double&, void*)> PointReader;
+    typedef boost::function<bool(int&, int&, void*)> HexReader;
 
     void process(const std::vector<GridInfo *>& infos, PointReader);
     void processHexes(const std::vector<GridInfo *>& infos, HexReader);
