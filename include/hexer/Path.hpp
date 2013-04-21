@@ -17,6 +17,7 @@
 #define INCLUDED_PSHAPE_PATH_HPP
 
 #include <vector>
+#include <ostream>
 
 #include "Mathpair.hpp"
 #include "Segment.hpp"
@@ -61,14 +62,15 @@ public:
         for (size_t i = 0; i < m_children.size(); ++i)
             m_children[i]->finalize(o == CLOCKWISE ? ANTICLOCKWISE : CLOCKWISE);
     }
-    int pathLength()
+    int pathLength() const
         { return m_segs.size(); }
-    Point getPoint(int pointnum);
+    Point getPoint(int pointnum) const;
     Orientation orientation() const
         { return m_orientation; }
-    std::vector<Point> points();
-    std::vector<Path *> subPaths()
+    std::vector<Point> points() const;
+    std::vector<Path *> subPaths() const
         { return m_children; }
+    void toWKT( std::ostream& output) const;
 
 private:
     /// Grid that owns the path.

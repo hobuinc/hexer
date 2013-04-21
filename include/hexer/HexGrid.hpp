@@ -78,7 +78,7 @@ public:
         { return m_origin; }
     int denseLimit()
         { return m_dense_limit; }
-    std::vector<Path *> rootPaths()
+    std::vector<Path *> const& rootPaths() const
         { return m_paths; }
 
 private:

@@ -53,15 +53,15 @@ public:
     Segment leftAntiClockwise(HexGrid *grid);
     Segment rightClockwise(HexGrid *grid);
     Segment leftClockwise(HexGrid *grid);
-    Point startPos(HexGrid *grid);
-    Point endPos(HexGrid *grid);
+    Point startPos(HexGrid *grid) const;
+    Point endPos(HexGrid *grid) const;
 
     friend bool operator == (const Segment& s1, const Segment &s2);
     friend bool operator != (const Segment& s1, const Segment &s2);
     friend std::ostream& operator << (std::ostream& os, const Segment &s);
 
 private:
-    Point pos(HexGrid *grid, const Point& offset);
+    Point pos(HexGrid *grid, const Point& offset) const;
 
     /// Hexagon who's side is the segment.
     Hexagon *m_hex;

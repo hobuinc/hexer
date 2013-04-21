@@ -14,6 +14,7 @@ set(HEXER_HPP
 
 set(HEXER_CPP
     Draw.cpp
+    GridInfo.cpp
     HexGrid.cpp
     Hexagon.cpp
     Path.cpp

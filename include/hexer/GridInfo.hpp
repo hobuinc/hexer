@@ -17,6 +17,7 @@
 #define INCLUDED_PSHAPE_GRID_INFO_HPP
 
 #include <vector>
+#include <ostream>
 
 #include "HexGrid.hpp"
 
@@ -95,7 +96,7 @@ public:
     double m_hexsize;
     int m_density;
 
-    std::vector<Path *> rootPaths()
+    std::vector<Path *> const& rootPaths() const
         { return m_grid->rootPaths(); }
 
 
@@ -113,7 +114,9 @@ public:
 
     HexIter end()
         { return HexIter(m_grid->m_hexes.end(), m_grid); }
-
+    
+    void toWKT(std::ostream&) const;
+    
     HexGrid *m_grid;
 };
 

@@ -93,19 +93,19 @@ void Segment::normalize(HexGrid *grid)
     }
 }
 
-Point Segment::startPos(HexGrid *grid)
+Point Segment::startPos(HexGrid *grid) const
 {
     int side = m_side - 1;
     side = side < 0 ? 5 : side;
     return pos(grid, grid->offset(side));
 }
 
-Point Segment::endPos(HexGrid *grid)
+Point Segment::endPos(HexGrid *grid) const
 {
     return pos(grid, grid->offset(m_side));
 }
 
-Point Segment::pos(HexGrid *grid, const Point& offset)
+Point Segment::pos(HexGrid *grid, const Point& offset) const
 {
     Point pos;
     pos.m_x = m_hex->x() * grid->width();

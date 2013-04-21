@@ -20,14 +20,14 @@ using namespace std;
 namespace hexer
 {
 
-Point Path::getPoint(int pointnum)
+Point Path::getPoint(int pointnum) const
 {
     pointnum = (m_orientation == ANTICLOCKWISE) ?
         m_segs.size() - pointnum - 1 : pointnum;
     return m_segs[pointnum].startPos(m_grid);
 }
 
-vector<Point> Path::points()
+vector<Point> Path::points() const
 {
     vector<Point> points;
     if (m_orientation == CLOCKWISE)
@@ -49,6 +49,38 @@ vector<Point> Path::points()
 
     }
     return points;
+}
+
+void Path::toWKT( std::ostream& output) const
+{
+    vector<Point> pts = points();
+
+    output << "(";
+    vector<Point>::const_iterator i;
+    bool bFirst(true);
+    for (i = pts.begin(); i != pts.end(); ++i)
+    {
+        if (!bFirst)
+        {
+            output << ", ";
+        } else
+        {
+            bFirst = false;
+        }
+
+        output << i->m_x << " " << i->m_y;
+    }
+    output << ")";
+
+
+    vector<Path *> paths = subPaths();
+    for (int pi = 0; pi != paths.size(); ++pi)
+    {
+        Path* p = paths[pi];
+        output <<",";
+        p->toWKT(output);
+    }
+    
 }
 
 } // namespace
