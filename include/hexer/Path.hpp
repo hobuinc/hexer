@@ -33,7 +33,7 @@ enum Orientation
 
 class HexGrid;
 
-class Path
+class HEXER_DLL Path
 {
 public:
     Path(HexGrid *m_grid, Orientation orient) :

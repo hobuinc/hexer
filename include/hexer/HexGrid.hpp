@@ -29,7 +29,7 @@
 namespace hexer
 {
 
-static const double SQRT_3 = 1.732050808; 
+static HEXER_DLL const double SQRT_3 = 1.732050808; 
 
 class HexGrid
 {

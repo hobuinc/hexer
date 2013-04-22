@@ -33,7 +33,7 @@ class HexGrid;
 class Hexagon;
 class Segment;
 
-struct Color
+struct HEXER_DLL Color
 {
     Color(double red, double blue, double green) :
         m_red(red), m_blue(blue), m_green(green)
@@ -44,7 +44,7 @@ struct Color
     double m_green;
 };
 
-class Draw
+class HEXER_DLL Draw
 {
 public:
     Draw(HexGrid *grid_p);

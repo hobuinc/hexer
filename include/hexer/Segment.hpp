@@ -28,7 +28,7 @@ namespace hexer
 class Hexagon;
 class HexGrid;
 
-class Segment
+class HEXER_DLL Segment
 {
 public:
     Segment() : m_hex(NULL), m_side(0)

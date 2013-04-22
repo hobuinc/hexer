@@ -24,14 +24,14 @@
 namespace hexer
 {
 
-class HexInfo
+class HEXER_DLL HexInfo
 {
 public:
     Point m_center;
     int m_density;
 };
 
-class HexIter
+class HEXER_DLL HexIter
 {
 public:
     HexIter(HexGrid::HexMap::iterator iter, HexGrid *grid) :
@@ -85,7 +85,7 @@ private:
     HexGrid *m_grid;
 };
 
-class GridInfo
+class HEXER_DLL GridInfo
 {
 public:
     GridInfo() : m_hexsize(-1), m_density(10)

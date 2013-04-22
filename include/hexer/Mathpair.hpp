@@ -16,11 +16,13 @@
 #ifndef INCLUDED_PSHAPE_MATHPAIR_HPP
 #define INCLUDED_PSHAPE_MATHPAIR_HPP
 
+#include <hexer/hexer.hpp>
+
 namespace hexer
 {
 
 template <typename T>
-struct Mathpair
+struct HEXER_DLL Mathpair
 {
 public:
     Mathpair() : m_x(0.0), m_y(0.0)
