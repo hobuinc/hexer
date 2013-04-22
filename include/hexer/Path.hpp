@@ -42,7 +42,7 @@ public:
 
     ~Path()
     {
-        for (int i = 0; i < m_children.size(); ++i)
+        for (std::vector<Path*>::size_type i = 0; i < m_children.size(); ++i)
             delete m_children[i];
     }
 

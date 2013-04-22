@@ -25,6 +25,7 @@
 #include "Path.hpp"
 #include "Segment.hpp"
 
+
 namespace hexer
 {
 
@@ -50,7 +51,7 @@ public:
 
     ~HexGrid()
     {
-        for (int i = 0; i < m_paths.size(); i++)
+        for (std::vector<Path*>::size_type i = 0; i < m_paths.size(); i++)
             delete m_paths[i];
     }
 
@@ -80,7 +81,9 @@ public:
         { return m_dense_limit; }
     std::vector<Path *> const& rootPaths() const
         { return m_paths; }
-
+    
+    void toWKT(std::ostream&) const;
+    
 private:
     Hexagon *findHexagon(Point p);
     void findShape(Hexagon *hex);
