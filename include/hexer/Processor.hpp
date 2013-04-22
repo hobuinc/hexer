@@ -28,4 +28,6 @@ namespace hexer
 
     void process(const std::vector<GridInfo *>& infos, PointReader);
     void processHexes(const std::vector<GridInfo *>& infos, HexReader);
+    
+    double computeHexSize(const std::vector<Point>& samples, int density);
 } // namespace hexer

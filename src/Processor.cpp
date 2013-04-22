@@ -26,34 +26,27 @@ using namespace std;
 namespace hexer
 {
 
-namespace
-{
-
-// Max number of points to read to determine grid spacing.
-const int SAMPLE_COUNT = 5000;
-
-double distance(const Point& p1, const Point& p2)
-{
-    double xdist = p2.m_x - p1.m_x;
-    double ydist = p2.m_y - p1.m_y;
-    return sqrt(xdist * xdist + ydist * ydist);
-}
-
-// Compute hex size based on distance between consecutive points and density.
-// The probably needs some work based on more data.
-double computeHexSize(const vector<Point>& samples, int density)
-{
-    double dist = 0;
-    for (int i = 0; i < samples.size() - 1; ++i)
+    double distance(const Point& p1, const Point& p2)
     {
-       Point p1 = samples[i];
-       Point p2 = samples[i + 1];
-       dist += distance(p1, p2);
+        double xdist = p2.m_x - p1.m_x;
+        double ydist = p2.m_y - p1.m_y;
+        return sqrt(xdist * xdist + ydist * ydist);
     }
-    return ((density * dist) / samples.size());
-}
 
-} // unnamed namespace
+    // Compute hex size based on distance between consecutive points and density.
+    // The probably needs some work based on more data.
+    double computeHexSize(const vector<Point>& samples, int density)
+    {
+        double dist = 0;
+        for (int i = 0; i < samples.size() - 1; ++i)
+        {
+           Point p1 = samples[i];
+           Point p2 = samples[i + 1];
+           dist += distance(p1, p2);
+        }
+        return ((density * dist) / samples.size());
+    }
+
 
 void process(const std::vector<GridInfo *>& infos, PointReader reader)
 {
@@ -63,6 +56,9 @@ void process(const std::vector<GridInfo *>& infos, PointReader reader)
     double x, y;
     void* context;
 
+    // Max number of points to read to determine grid spacing.
+    const int SAMPLE_COUNT = 5000;
+    
     while (reader(x, y, context) && (cnt < SAMPLE_COUNT))
     {
         samples.push_back(Point(x,y));
