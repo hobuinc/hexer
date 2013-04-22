@@ -319,4 +319,30 @@ void HexGrid::dumpInfo()
     }
 }
 
+void HexGrid::toWKT(std::ostream& output) const
+{
+
+    output << "MULTIPOLYGON (";
+    
+    bool bFirst(true);
+    for (int pi = 0; pi < rootPaths().size(); ++pi)
+    {
+        Path *p = rootPaths()[pi];
+
+        if (!bFirst)
+        {
+            output << ",";
+        } else {
+            bFirst = false;
+        }
+            
+        output << "(";
+        p->toWKT(output);
+        
+        output << ")";
+        
+    }
+    output << ")";
+    
+}
 } //namespace
