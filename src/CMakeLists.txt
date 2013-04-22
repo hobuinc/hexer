@@ -48,6 +48,8 @@ else()
     add_library(${HEXER_LIB_NAME} SHARED ${HEXER_SOURCES})
 endif()
 
+
+target_link_libraries( ${HEXER_LIB_NAME} ${Boost_LIBRARIES})
 target_link_libraries( ${HEXER_LIB_NAME} ${CAIRO_LIBRARIES})
 
 set_target_properties(${HEXER_LIB_NAME}

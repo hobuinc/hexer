@@ -68,27 +68,34 @@ if(WIN32)
 endif()
 
 
-find_package(Boost 1.48 )
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
 
-  # make these available for the user to set.
-  mark_as_advanced(CLEAR Boost_INCLUDE_DIR) 
-  mark_as_advanced(CLEAR Boost_LIBRARY_DIRS) 
-  link_directories(${Boost_LIBRARY_DIRS})
+set(BOOST_ROOT ${PROJECT_SOURCE_DIR}/boost)
 
-  # Default to using static, multithreaded libraries for 
-  # linking under MSVC. 
-  if(WIN32)
-    if (MSVC)
-      set(Boost_USE_STATIC_LIBS   ON)
-      set(Boost_USE_MULTITHREADED ON)
-    endif(MSVC)
-  endif(WIN32)
+# find_package would normally set the following variables
+set(Boost_FOUND TRUE)
+set(Boost_INCLUDE_DIRS ${BOOST_ROOT})
 
-  include_directories( ${Boost_INCLUDE_DIRS}/)
+set(HEXERBOOST_LIB_NAME "pdalboost" CACHE STRING "use embedded boost")
+mark_as_advanced(FORCE HEXERBOOST_LIB_NAME)
 
-endif(Boost_FOUND)
+if (WIN32)
+  set(Boost_LIBRARIES "${HEXERBOOST_LIB_NAME}.lib")
+  link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+else()
+  # Some Cmake versions are borken here. See
+  # http://www.cmake.org/Bug/view.php?id=12258#c26851
+  # set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem")
+  # include_directories(BEFORE SYSTEM ${Boost_INCLUDE_DIRS}/)
+  set(Boost_LIBRARIES "${HEXERBOOST_LIB_NAME}")
+endif()
+
+# this prevents auto-linking pragmas from depending on wrong lib names
+add_definitions(-DBOOST_ALL_NO_LIB)
+
+include_directories( ${Boost_INCLUDE_DIRS}/)
+add_subdirectory(boost)
+message(STATUS "Using embedded boost tree")
+
 
 set(WITH_DRAWING FALSE CACHE BOOL "Choose to build Cairo-based SVG drawing")
 
