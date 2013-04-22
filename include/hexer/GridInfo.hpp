@@ -98,7 +98,11 @@ public:
 
     std::vector<Path *> const& rootPaths() const
         { return m_grid->rootPaths(); }
-
+    
+    inline void addPoint(Point const& p)
+        {
+            m_grid->addPoint(p);
+        };
 
     Point offset(int idx)
         { return m_grid->centerOffset(idx); }
@@ -115,7 +119,8 @@ public:
     HexIter end()
         { return HexIter(m_grid->m_hexes.end(), m_grid); }
     
-    void toWKT(std::ostream&) const;
+    void toWKT(std::ostream& strm) const 
+        { m_grid->toWKT(strm); }
     
     HexGrid *m_grid;
 };
