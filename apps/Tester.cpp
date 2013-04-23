@@ -171,28 +171,40 @@ int main(int argc, char* argv[])
     if (argc < 3)
     {
         std::cerr << "please specify a command and a filename. $ hextest PATH filename.las" << std::endl;
+		return 1;
     }
     
     std::string command(argv[1], strlen(argv[1]));
     std::string filename(argv[2], strlen(argv[2]));
     
-    if (boost::iequals(command, "BOUNDARY"))
-    {
-        boundarytest(filename);
-        return 0;
-    }
-    
-    if (boost::iequals(command, "PATH"))
-    {
-        pathtest(filename);
-        return 0;
-    }
+	try
+	{
 
-    if (boost::iequals(command, "HEX"))
-    {
-        hextest(filename);
-        return 0;
-    }    
+		if (boost::iequals(command, "BOUNDARY"))
+		{
+			boundarytest(filename);
+			return 0;
+		}
+    
+		if (boost::iequals(command, "PATH"))
+		{
+			pathtest(filename);
+			return 0;
+		}
+
+		if (boost::iequals(command, "HEX"))
+		{
+			hextest(filename);
+			return 0;
+		}    
+
+		std::cout << "Command '" << command << "' not recognized" << std::endl;
+		return 1;
+	} catch (hexer::hexer_error const& e)
+	{
+		std::cout << "Hexer failed with error: '" << e.what() << "'" << std::endl;
+		return 1;
+	}
     
 }
 

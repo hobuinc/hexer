@@ -33,10 +33,6 @@ if(NOT BUILD_STATIC)
 endif()
 endif()
 
-# Group source files for IDE source explorers (e.g. Visual Studio)
-source_group("CMake Files" FILES CMakeLists.txt)
-source_group("Header Files" FILES ${HEXER_HPP})
-source_group("Source Files" FILES ${HEXER_CPP})
 
 # Standard include directory of Hexer library
 include_directories(../include ../include/hexer .)
