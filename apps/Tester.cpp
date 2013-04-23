@@ -131,7 +131,7 @@ void pathtest(std::string filename)
     l.open();
     process(infos, l.reader);
 
-    for (int pi = 0; pi < gi->rootPaths().size(); ++pi)
+    for (std::vector<Path*>::size_type pi = 0; pi < gi->rootPaths().size(); ++pi)
     {
         Path *p = gi->rootPaths()[pi];
         dumpPath(p);

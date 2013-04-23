@@ -19,6 +19,7 @@
 #include <vector>
 #include <ostream>
 
+#include "export.hpp"
 #include "HexGrid.hpp"
 
 namespace hexer

@@ -22,42 +22,6 @@
 #define HEXER_VERSION_REVISION 0
 
 #include <hexer/hexer_defines.h>
-
-#include <stdexcept>
-
-namespace hexer
-{
-    
-class hexer_error : public std::runtime_error
-{
-public:
-    hexer_error(std::string const& msg)
-        : std::runtime_error(msg)
-    {}
-};
-
-}
-
-#ifndef HEXER_DLL
-#if defined(HEXER_COMPILER_MSVC) && !defined(HEXER_DISABLE_DLL)
-#if defined(HEXER_DLL_EXPORT)
-#   define HEXER_DLL   __declspec(dllexport)
-#elif defined(HEXER_DLL_IMPORT)
-#   define HEXER_DLL   __declspec(dllimport)
-#else
-#   define HEXER_DLL
-#endif
-#else
-#  if defined(USE_GCC_VISIBILITY_FLAG)
-#    define HEXER_DLL     __attribute__ ((visibility("default")))
-#  else
-#    define HEXER_DLL
-#  endif
-#endif
-#endif
-
-#ifdef HEXER_COMPILER_MSVC
-#pragma warning(disable:4251)// [templated class] needs to have dll-interface...
-#endif
+#include <hexer/exception.hpp>
 
 #endif

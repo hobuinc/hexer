@@ -21,6 +21,7 @@
 
 #include "Mathpair.hpp"
 #include "Segment.hpp"
+#include "export.hpp"
 
 namespace hexer
 {

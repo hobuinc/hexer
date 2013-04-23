@@ -38,7 +38,7 @@ namespace hexer
     double computeHexSize(const vector<Point>& samples, int density)
     {
         double dist = 0;
-        for (int i = 0; i < samples.size() - 1; ++i)
+        for (std::vector<Point>::size_type i = 0; i < samples.size() - 1; ++i)
         {
            Point p1 = samples[i];
            Point p2 = samples[i + 1];
@@ -74,7 +74,7 @@ void process(const std::vector<GridInfo *>& infos, PointReader reader)
         HexGrid *grid = new HexGrid(hexsize, info->m_density);
         info->m_grid = grid;
 
-        for (int i = 0; i < samples.size(); ++i)
+        for (std::vector<Point>::size_type i = 0; i < samples.size(); ++i)
         {
             grid->addPoint(samples[i]);
         }

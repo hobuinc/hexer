@@ -13,22 +13,22 @@
 
 *****************************************************************************/
 
-#pragma once
+#ifndef INCLUDED_HEXER_EXCEPTION_HPP
+#define INCLUDED_HEXER_EXCEPTION_HPP
 
-#include <boost/function.hpp>
-#include <vector>
-
-#include "GridInfo.hpp"
-#include "Path.hpp"
-#include "export.hpp"
+#include <stdexcept>
 
 namespace hexer
 {
-    typedef boost::function<bool(double&, double&, void*&)> PointReader;
-    typedef boost::function<bool(int&, int&, void*&)> HexReader;
-
-    HEXER_DLL void process(const std::vector<GridInfo *>& infos, PointReader);
-    HEXER_DLL void processHexes(const std::vector<GridInfo *>& infos, HexReader);
     
-    HEXER_DLL double computeHexSize(const std::vector<Point>& samples, int density);
-} // namespace hexer
+class hexer_error : public std::runtime_error
+{
+public:
+    hexer_error(std::string const& msg)
+        : std::runtime_error(msg)
+    {}
+};
+
+}
+
+#endif

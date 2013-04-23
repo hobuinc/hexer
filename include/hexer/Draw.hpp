@@ -16,7 +16,6 @@
 #ifndef INCLUDED_PSHAPE_DRAW_HPP
 #define INCLUDED_PSHAPE_DRAW_HPP
 
-#include <hexer/hexer.hpp>
 
 
 #ifdef HEXER_HAVE_CAIRO
@@ -25,6 +24,7 @@
 #endif
 
 #include "Mathpair.hpp"
+#include "export.hpp"
 
 namespace hexer
 {

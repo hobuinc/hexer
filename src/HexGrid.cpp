@@ -18,6 +18,7 @@
 #include <hexer/HexGrid.hpp>
 #include <hexer/Mathpair.hpp>
 #include <hexer/Segment.hpp>
+#include <hexer/exception.hpp>
 
 using namespace std;
 
@@ -136,11 +137,11 @@ Hexagon *HexGrid::findHexagon(Point p)
     x = (int)floor(col);
     if (x % 2 == 0)
     {
-        y = floor(p.m_y / m_height);
+        y = static_cast<int>(floor(p.m_y / m_height));
     }
     else
     {
-        y = floor((p.m_y - (m_height / 2)) / m_height);
+        y = static_cast<int>(floor((p.m_y - (m_height / 2)) / m_height));
     }
 
     // Compute the column remainder to determine if we are in a strip where
@@ -325,7 +326,8 @@ void HexGrid::toWKT(std::ostream& output) const
     output << "MULTIPOLYGON (";
     
     bool bFirst(true);
-    for (int pi = 0; pi < rootPaths().size(); ++pi)
+	typedef std::vector<hexer::Path*>::size_type st;
+    for (st pi = 0; pi < rootPaths().size(); ++pi)
     {
         Path *p = rootPaths()[pi];
 

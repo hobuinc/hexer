@@ -19,12 +19,13 @@
 //ABELL - Assertions that int isn't bigger than int32_t
 #include <stdint.h>
 
+#include "export.hpp"
 #include "Mathpair.hpp"
 
 namespace hexer
 {
 
-class Hexagon
+class HEXER_DLL Hexagon
 {
 public:
     Hexagon(int x, int y) : m_x(x), m_y(y), m_count(0), m_dense(false),

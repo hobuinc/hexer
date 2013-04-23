@@ -24,12 +24,12 @@
 #include "Mathpair.hpp"
 #include "Path.hpp"
 #include "Segment.hpp"
-
+#include "export.hpp"
 
 namespace hexer
 {
 
-static HEXER_DLL const double SQRT_3 = 1.732050808; 
+static const double SQRT_3 = 1.732050808; 
 
 class HexGrid
 {

@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "Mathpair.hpp"
+#include "export.hpp"
 
 namespace hexer
 {

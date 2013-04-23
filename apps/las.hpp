@@ -62,6 +62,7 @@ public:
     
     inline static bool read(double&x, double& y, void* ctx)
     {
+
         LAS* l = static_cast<LAS*>(ctx);
         if (l->getIndex() == l->count())
         {

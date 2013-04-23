@@ -49,7 +49,12 @@ else()
 endif()
 
 
-target_link_libraries( ${HEXER_LIB_NAME} ${Boost_LIBRARIES})
+if (WIN32)
+	target_link_libraries( ${HEXER_LIB_NAME} LINK_PRIVATE general ${Boost_LIBRARIES})
+else()
+	target_link_libraries( ${HEXER_LIB_NAME} ${Boost_LIBRARIES})
+endif()
+
 target_link_libraries( ${HEXER_LIB_NAME} ${CAIRO_LIBRARIES})
 
 set_target_properties(${HEXER_LIB_NAME}

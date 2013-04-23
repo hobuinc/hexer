@@ -11,7 +11,7 @@ if(WIN32)
     #add_definitions(-DBOOST_TEST_NO_MAIN)
 	
 	# disable compiler warnings
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w")
 	
 else()
     
@@ -27,12 +27,10 @@ set(HEXERBOOST_SOURCES
     ./libs/regex/src/cpp_regex_traits.cpp
     ./libs/regex/src/cregex.cpp
     ./libs/regex/src/fileiter.cpp
-    ./libs/regex/src/icu.cpp
     ./libs/regex/src/instances.cpp
     ./libs/regex/src/internals.hpp
     ./libs/regex/src/posix_api.cpp
     ./libs/regex/src/regex.cpp
-    ./libs/regex/src/regex_debug.cpp
     ./libs/regex/src/regex_raw_buffer.cpp
     ./libs/regex/src/regex_traits_defaults.cpp
     ./libs/regex/src/static_mutex.cpp
@@ -56,7 +54,6 @@ set(HEXERBOOST_SOURCES
     ./libs/date_time/src/gregorian/gregorian_types.cpp
     ./libs/date_time/src/posix_time/posix_time_types.cpp
     ./libs/test/src/compiler_log_formatter.cpp
-    ./libs/test/src/cpp_main.cpp
     ./libs/test/src/debug.cpp
     ./libs/test/src/exception_safety.cpp
     ./libs/test/src/execution_monitor.cpp
@@ -81,7 +78,6 @@ if(WIN32)
   list(APPEND HEXERBOOST_SOURCES
        ./libs/regex/src/w32_regex_traits.cpp
        ./libs/thread/src/future.cpp
-       ./libs/thread/src/win32/tss_dll.cpp
        ./libs/thread/src/win32/tss_pe.cpp)
 else()
   list(APPEND HEXERBOOST_SOURCES 
