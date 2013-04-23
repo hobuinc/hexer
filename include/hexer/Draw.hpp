@@ -16,7 +16,8 @@
 #ifndef INCLUDED_PSHAPE_DRAW_HPP
 #define INCLUDED_PSHAPE_DRAW_HPP
 
-
+#include <hexer/hexer.hpp>
+#include <hexer/hexer_defines.h>
 
 #ifdef HEXER_HAVE_CAIRO
 #include <cairo/cairo.h>
