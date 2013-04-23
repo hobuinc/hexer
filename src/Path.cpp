@@ -20,7 +20,7 @@ using namespace std;
 namespace hexer
 {
 
-Point Path::getPoint(int pointnum) const
+Point Path::getPoint(size_t pointnum) const
 {
     pointnum = (m_orientation == ANTICLOCKWISE) ?
         m_segs.size() - pointnum - 1 : pointnum;

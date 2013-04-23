@@ -164,7 +164,7 @@ void boundarytest(std::string filename)
     delete gi;
 }
 
-std::size_t main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 
     

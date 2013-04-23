@@ -63,9 +63,9 @@ public:
         for (size_t i = 0; i < m_children.size(); ++i)
             m_children[i]->finalize(o == CLOCKWISE ? ANTICLOCKWISE : CLOCKWISE);
     }
-    int pathLength() const
+    size_t pathLength() const
         { return m_segs.size(); }
-    Point getPoint(int pointnum) const;
+    Point getPoint(size_t pointnum) const;
     Orientation orientation() const
         { return m_orientation; }
     std::vector<Point> points() const;

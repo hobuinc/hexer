@@ -92,7 +92,7 @@ public:
         is_open_ = true;
 	}
 
-	long size() {
+	size_t size() {
 		return pregion_->get_size();
 	}
 
