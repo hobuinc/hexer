@@ -4,12 +4,8 @@ include_directories(
     ../include
     ../include/hexer)
 
-set(HEXTEST hextest)
+set(CURSE curse)
 
-set(HEXER_UTILITIES
-    ${HEXER} 
-    )
-    
 if(WIN32)
 if(NOT BUILD_STATIC)
     add_definitions("-DHEXER_DLL_IMPORT=1")
@@ -17,9 +13,9 @@ endif()
 endif()
 
 
-if(HEXTEST)
-    add_executable(${HEXTEST} Tester.cpp lasfile.hpp las.hpp las.cpp)
-    target_link_libraries(${HEXTEST} ${HEXER_LIB_NAME} )
+if(CURSE)
+    add_executable(${CURSE} curse.cpp lasfile.hpp las.hpp las.cpp )
+    target_link_libraries(${CURSE} ${HEXER_LIB_NAME} )
 endif()
 
 install(TARGETS ${HEXER_UTILITIES}

@@ -66,6 +66,9 @@ if(WIN32)
 	  set(HEXER_COMPILER_MSVC 1)
     endif()
   endif()
+else()
+    include(GetGitRevisionDescription)
+    get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 endif()
 
 
@@ -158,3 +161,7 @@ add_subdirectory(apps)
 configure_file(
   "${PROJECT_SOURCE_DIR}/hexer_defines.h.in"
   "${HEXER_INCLUDE_DIR}/hexer/hexer_defines.h")
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/gitsha.cpp.in"
+  "${PROJECT_SOURCE_DIR}/src/gitsha.cpp")  

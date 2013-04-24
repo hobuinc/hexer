@@ -13,13 +13,16 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_GDAL_HPP
-#define INCLUDED_PSHAPE_GDAL_HPP
+#ifndef INCLUDED_PSHAPE_OGR_HPP
+#define INCLUDED_PSHAPE_OGR_HPP
 
 #include <hexer/hexer.hpp>
 #include <hexer/hexer_defines.h>
 
 #ifdef HEXER_HAVE_GDAL
+
+#include "ogr_api.h"
+#include "gdal.h"
 
 #endif
 
@@ -34,11 +37,11 @@ class Hexagon;
 class Segment;
 
 
-class HEXER_DLL GDAL
+class HEXER_DLL OGR
 {
 public:
-    GDAL(HexGrid *grid_p, std::string const& filename);
-    ~GDAL();
+    OGR(HexGrid *grid_p, std::string const& filename);
+    ~OGR();
 
     void drawHexagon(Hexagon *hex_p, bool fill = false);
     void drawSegment(Segment s);

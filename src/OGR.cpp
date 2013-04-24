@@ -17,12 +17,9 @@
 #include <iostream>
 
 #include <hexer/OGR.hpp>
-
-#include <hexer/Hexagon.hpp>
 #include <hexer/HexGrid.hpp>
-#include <hexer/Mathpair.hpp>
-#include <hexer/Segment.hpp>
-#include <hexer/hexer_defines.h>
+
+#include <boost/program_options.hpp>
 
 using namespace std;
 
@@ -32,7 +29,7 @@ namespace hexer
 {
 
 
-GDAL::GDAL( HexGrid *grid_p, 
+OGR::OGR( HexGrid *grid_p, 
             std::string const& filename) 
     : m_grid_p(grid_p)
     , m_filename(filename)
@@ -40,11 +37,12 @@ GDAL::GDAL( HexGrid *grid_p,
 
 #ifdef HEXER_HAVE_GDAL
 
+    OGRRegisterAll();
 #endif
     
 }
 
-GDAL::~GDAL()
+OGR::~OGR()
 {
 #ifdef HEXER_HAVE_GDAL
 
@@ -52,21 +50,21 @@ GDAL::~GDAL()
 
 }
 
-void GDAL::drawHexagon(Hexagon *hex_p, bool fill)
+void OGR::drawHexagon(Hexagon *hex_p, bool fill)
 {
 #ifdef HEXER_HAVE_GDAL
   
 #endif    
 }
 
-void GDAL::drawSegment(Segment s)
+void OGR::drawSegment(Segment s)
 {
 #ifdef HEXER_HAVE_GDAL
 
 #endif    
 }
 
-void GDAL::drawPoint(hexer::Point p)
+void OGR::drawPoint(hexer::Point p)
 {
 #ifdef HEXER_HAVE_GDAL
 #endif

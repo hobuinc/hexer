@@ -23,5 +23,6 @@
 
 #include <hexer/hexer_defines.h>
 #include <hexer/exception.hpp>
+#include <hexer/gitsha.h>
 
 #endif

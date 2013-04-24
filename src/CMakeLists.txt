@@ -10,6 +10,7 @@ set(HEXER_HPP
   ${HEXER_HEADERS_DIR}/Path.hpp
   ${HEXER_HEADERS_DIR}/Processor.hpp
   ${HEXER_HEADERS_DIR}/Segment.hpp
+  ${HEXER_HEADERS_DIR}/gitsha.h
   
  )
 
@@ -22,6 +23,7 @@ set(HEXER_CPP
     Path.cpp
     Processor.cpp
     Segment.cpp
+    gitsha.cpp
 )
 
 set(HEXER_SOURCES

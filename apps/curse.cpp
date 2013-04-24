@@ -14,12 +14,18 @@
 *****************************************************************************/
 
 #include <hexer/Processor.hpp>
+#include <hexer/OGR.hpp>
+#include <hexer/hexer.hpp>
 #include "las.hpp"
+
 
 #include <fstream>
 #include <sstream>
 
 #include <boost/algorithm/string/compare.hpp>
+#include <boost/program_options.hpp>
+
+namespace po = boost::program_options;
 
 using namespace std;
 
@@ -162,6 +168,62 @@ void boundarytest(std::string filename)
     std::cout << multi.str() << std::endl;
 
     delete gi;
+}
+
+std::string GetFullVersion( void )
+{
+
+
+        std::ostringstream os;
+
+        os << " hexer " 
+           << HEXER_VERSION_MAJOR << "."
+           << HEXER_VERSION_MINOR << "."
+           << HEXER_VERSION_REVISION;
+        
+        os << " at git revision ", std::string(g_GIT_SHA1,strlen(g_GIT_SHA1));
+
+
+    #ifdef HEXER_HAVE_GDAL
+        os << " with GDAL " << GDALVersionInfo("RELEASE_NAME");
+    #endif
+
+
+        return os.str();
+    
+}
+
+void OutputHelp( std::ostream & oss, po::options_description const& options)
+{
+    oss << "--------------------------------------------------------------------" << std::endl;
+    oss << "    curse (" << GetFullVersion() << ")" << std::endl;
+    oss << "--------------------------------------------------------------------" << std::endl;
+
+    oss << options << std::endl;
+
+    oss <<"For more information, see the full documentation for hexer at:" << std::endl;
+    
+    oss << " http://github.com/hobu/hexer" << std::endl;
+    oss << "----------------------------------------------------------" << std::endl;
+
+}
+
+
+po::options_description* getOptions()
+{
+
+    // po::options_description* basic_options = new po::options_description("basic options");
+    // 
+    // basic_options->add_options()
+    //     ("help,h", po::value<bool>->zero_tokens()->implicit_value(true), "produce help message")
+    //     ("debug,d", po::value<bool>->zero_tokens()->implicit_value(true), "Enable debug mode")
+    //     ("verbose,v", po::value<boost::uint32_t>->default_value(0), "Set verbose message level")
+    //     ("version", po::value<bool>->zero_tokens()->implicit_value(true), "Show version info")
+    // ;
+    //  
+
+ 
+    
 }
 
 int main(int argc, char* argv[])
