@@ -19,7 +19,7 @@
 #include <hexer/OGR.hpp>
 #include <hexer/HexGrid.hpp>
 
-#include <boost/program_options.hpp>
+#include <boost/bind.hpp>
 
 using namespace std;
 
@@ -29,15 +29,18 @@ namespace hexer
 {
 
 
-OGR::OGR( HexGrid *grid_p, 
-            std::string const& filename) 
-    : m_grid_p(grid_p)
-    , m_filename(filename)
+OGR::OGR(std::string filename) 
+    : m_filename(filename)
+    , m_index(0)
+	, m_ds(0)
+	, m_layer(0)
+	, m_current_feature(0)
+	, m_current_geometry(0)
 {
-
 #ifdef HEXER_HAVE_GDAL
 
     OGRRegisterAll();
+	reader = boost::bind(&OGR::read, _1, _2, this);
 #endif
     
 }
@@ -45,30 +48,18 @@ OGR::OGR( HexGrid *grid_p,
 OGR::~OGR()
 {
 #ifdef HEXER_HAVE_GDAL
-
+	
+	if (m_current_feature)
+		OGR_F_Destroy(m_current_feature);
+	
+	if (m_ds)
+		OGR_DS_Destroy(m_ds);
+	
+	OGRCleanupAll();
 #endif
 
 }
 
-void OGR::drawHexagon(Hexagon *hex_p, bool fill)
-{
-#ifdef HEXER_HAVE_GDAL
-  
-#endif    
-}
-
-void OGR::drawSegment(Segment s)
-{
-#ifdef HEXER_HAVE_GDAL
-
-#endif    
-}
-
-void OGR::drawPoint(hexer::Point p)
-{
-#ifdef HEXER_HAVE_GDAL
-#endif
-}
 
 
 } //namespace

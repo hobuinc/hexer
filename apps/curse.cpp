@@ -181,9 +181,9 @@ void boundary(std::string filename)
         l.open();
         process(infos, l.reader);
     } else {
-        // OGR o(filename);
-        // o.open();
-        // process(infos, o.reader);
+        OGR o(filename);
+        o.open();
+        process(infos, o.reader);
     }
     
  
