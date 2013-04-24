@@ -35,6 +35,12 @@ set(HEXERBOOST_SOURCES
     ./libs/regex/src/regex_traits_defaults.cpp
     ./libs/regex/src/static_mutex.cpp
     ./libs/regex/src/usinstances.cpp
+    ./libs/filesystem/src/path_traits.cpp
+    ./libs/filesystem/src/unique_path.cpp
+    ./libs/filesystem/src/codecvt_error_category.cpp
+    ./libs/filesystem/src/path.cpp
+    ./libs/filesystem/src/operations.cpp
+    ./libs/filesystem/src/utf8_codecvt_facet.cpp    
     ./libs/program_options/src/cmdline.cpp
     ./libs/program_options/src/config_file.cpp
     ./libs/program_options/src/convert.cpp
