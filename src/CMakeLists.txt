@@ -2,6 +2,7 @@ set(HEXER_HEADERS_DIR ../include/hexer)
 
 set(HEXER_HPP
   ${HEXER_HEADERS_DIR}/Draw.hpp
+  ${HEXER_HEADERS_DIR}/GDAL.hpp
   ${HEXER_HEADERS_DIR}/GridInfo.hpp
   ${HEXER_HEADERS_DIR}/HexGrid.hpp
   ${HEXER_HEADERS_DIR}/Hexagon.hpp
@@ -14,6 +15,7 @@ set(HEXER_HPP
 
 set(HEXER_CPP
     Draw.cpp
+    GDAL.cpp
     GridInfo.cpp
     HexGrid.cpp
     Hexagon.cpp
@@ -35,7 +37,7 @@ endif()
 
 
 # Standard include directory of Hexer library
-include_directories(../include ../include/hexer .)
+include_directories(../include ../include/hexer . ${GDAL_INCLUDE_DIR} ${CAIRO_INCLUDE_DIR})
 
 
 if(BUILD_STATIC)
@@ -51,7 +53,10 @@ else()
 	target_link_libraries( ${HEXER_LIB_NAME} ${Boost_LIBRARIES})
 endif()
 
-target_link_libraries( ${HEXER_LIB_NAME} ${CAIRO_LIBRARIES})
+target_link_libraries(  ${HEXER_LIB_NAME} 
+                        ${CAIRO_LIBRARIES} 
+                        ${GDAL_LIBRARY})
+
 
 set_target_properties(${HEXER_LIB_NAME}
   PROPERTIES SOVERSION "${HEXER_LIB_SOVERSION}" )

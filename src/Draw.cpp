@@ -43,7 +43,7 @@ Draw::Draw( HexGrid *grid_p,
 {
 
 #ifdef HEXER_HAVE_CAIRO    
-    m_surface_p = cairo_svg_surface_create(m_filename, 750, 1000);
+    m_surface_p = cairo_svg_surface_create(m_filename.c_str(), 750, 1000);
     m_cairo_p = cairo_create(m_surface_p);
 
     // Move things to the center.

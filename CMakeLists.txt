@@ -76,7 +76,7 @@ set(BOOST_ROOT ${PROJECT_SOURCE_DIR}/boost)
 set(Boost_FOUND TRUE)
 set(Boost_INCLUDE_DIRS ${BOOST_ROOT})
 
-set(HEXERBOOST_LIB_NAME "pdalboost" CACHE STRING "use embedded boost")
+set(HEXERBOOST_LIB_NAME "hexerboost" CACHE STRING "use embedded boost")
 mark_as_advanced(FORCE HEXERBOOST_LIB_NAME)
 
 if (WIN32)
@@ -95,15 +95,19 @@ add_definitions(-DBOOST_ALL_NO_LIB)
 
 include_directories( ${Boost_INCLUDE_DIRS}/)
 add_subdirectory(boost)
-message(STATUS "Using embedded boost tree")
 
 
 set(WITH_DRAWING FALSE CACHE BOOL "Choose to build Cairo-based SVG drawing")
-
 if(WITH_DRAWING)
     find_package(cairo)
     set(HEXER_HAVE_CAIRO 1)
 endif(WITH_DRAWING)
+
+set(WITH_GDAL FALSE CACHE BOOL "Use GDAL/OGR to export hexagon density surfaces and/or paths")
+if(WITH_GDAL)
+    find_package(GDAL 1.9)
+    set(HEXER_HAVE_GDAL 1)
+endif(WITH_GDAL)
 
 ###############################################################################
 # Installation settings

@@ -22,6 +22,7 @@
  * availability of 3rd-party libraries
  */
 #cmakedefine HEXER_HAVE_CAIRO
+#cmakedefine HEXER_HAVE_GDAL
 
 /*
  * Debug or Release build?
