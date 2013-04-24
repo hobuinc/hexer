@@ -16,6 +16,7 @@
 #include <hexer/Processor.hpp>
 #include <hexer/OGR.hpp>
 #include <hexer/hexer.hpp>
+#include <hexer/Utils.hpp>
 #include "las.hpp"
 
 
@@ -165,23 +166,32 @@ FormatType getDriver(std::string filename)
         return Format_OGR;
 }
 
-void boundary(std::string filename)
+void boundary(	std::string const& input, 
+				std::string const& output,
+				double edge,
+				int density)
 {
     using namespace hexer;
 
     vector<GridInfo *> infos;
     GridInfo *gi = new GridInfo;
+	
+	if (!hexer::compare_distance(edge, 0.0))
+		gi->m_hexsize = edge;
+	
+	if (!density == 0)
+		gi->m_density = density;
 
     infos.push_back(gi);
     
-    FormatType t = getDriver(filename);
+    FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        LAS l(filename);
+        LAS l(input);
         l.open();
         process(infos, l.reader);
     } else {
-        OGR o(filename);
+        OGR o(input);
         o.open();
         process(infos, o.reader);
     }
@@ -234,11 +244,20 @@ po::options_description getOptions()
     command.add_options()
         ("input", po::value<std::string>(), "Input point set to curse")
         ("command", po::value<std::string>(), "Command to run on points ('boundary' or 'density')")
-    ;
+        ("output", po::value<std::string>(), "Specify an OGR-compatible output filename to write boundary. stdout used if none specified.")
+     ;
+
+    po::options_description boundary = po::options_description("Boundary");
+    boundary.add_options()
+        ("edge", po::value<double>()->default_value(0.0), "Edge distance of hexagon")
+        ("count", po::value<boost::uint32_t>()->default_value(0), "Number of points that must be in polygon for it to be positive space")
+   ;
+    
+	
 
     po::options_description options;
     
-    options.add(command).add(basic);
+    options.add(command).add(basic).add(boundary);
     return options;
     
 }
@@ -259,7 +278,7 @@ int main(int argc, char* argv[])
 
         po::notify(vm);
     }     
-    catch (boost::program_options::error e)
+    catch (boost::program_options::error& e)
     {
         std::cout << "validation error: " << e.what() << std::endl;
         OutputHelp(std::cout, options);
@@ -292,26 +311,32 @@ int main(int argc, char* argv[])
     } 
 
     std::string command = vm["command"].as<std::string>();
-    std::string filename = vm["input"].as<std::string>();
+    std::string input = vm["input"].as<std::string>();
     
 	try
 	{
-
+		std::string output("");
+		if (vm.count("output"))
+			output = vm["output"].as<std::string>();
+		
+		double edge = vm["edge"].as<double>();
+		double density = vm["count"].as<boost::uint32_t>();
+		
 		if (boost::iequals(command, "BOUNDARY"))
 		{
-			boundary(filename);
+			boundary(input, output, edge, density);
 			return 0;
 		}
     
 		if (boost::iequals(command, "PATH"))
 		{
-			pathtest(filename);
+			pathtest(input);
 			return 0;
 		}
 
 		if (boost::iequals(command, "HEX"))
 		{
-			hextest(filename);
+			hextest(input);
 			return 0;
 		}    
 

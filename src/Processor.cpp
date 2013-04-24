@@ -14,13 +14,16 @@
 *****************************************************************************/
 
 #include <hexer/Processor.hpp>
+#include <hexer/GridInfo.hpp>
+#include <hexer/Mathpair.hpp>
 
 #include <math.h>
 #include <vector>
 
-#include <hexer/GridInfo.hpp>
-#include <hexer/Mathpair.hpp>
-#include <hexer/OGR.hpp>
+
+#ifdef HEXER_HAVE_GDAL
+#include "gdal.h"
+#endif
 
 using namespace std;
 
