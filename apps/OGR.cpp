@@ -28,6 +28,8 @@ using namespace std;
 namespace hexer
 {
 
+namespace reader
+{
 
 OGR::OGR(std::string filename) 
     : m_filename(filename)
@@ -60,6 +62,13 @@ OGR::~OGR()
 
 }
 
+} // reader
+
+namespace writer
+{
+
+
+} // writer
 
 
 } //namespace

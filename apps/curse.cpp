@@ -191,7 +191,7 @@ void boundary(	std::string const& input,
         l.open();
         process(infos, l.reader);
     } else {
-        OGR o(input);
+        reader::OGR o(input);
         o.open();
         process(infos, o.reader);
     }

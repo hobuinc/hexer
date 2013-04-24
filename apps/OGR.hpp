@@ -33,6 +33,9 @@
 namespace hexer
 {
 
+namespace reader
+{
+
 class HEXER_DLL OGR
 {
 public:
@@ -130,6 +133,12 @@ public:
 	~OGR();
 };
 
+} // reader
+
+namespace writer 
+{
+
+} // writer
 
 } // namespace
 
