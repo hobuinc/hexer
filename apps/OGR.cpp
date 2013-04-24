@@ -2,7 +2,7 @@
 
     (c) 2013 Hobu, Inc. hobu.inc@gmail.com
 
-    Author: Andrew Bell andrew.bell.ia at gmail.com
+    Author: Howard Butler, hobu.inc@gmail.com
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include <hexer/OGR.hpp>
+#include "OGR.hpp"
 #include <hexer/HexGrid.hpp>
 
 #include <boost/bind.hpp>

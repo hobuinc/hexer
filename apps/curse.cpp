@@ -14,10 +14,10 @@
 *****************************************************************************/
 
 #include <hexer/Processor.hpp>
-#include <hexer/OGR.hpp>
 #include <hexer/hexer.hpp>
 #include <hexer/Utils.hpp>
 #include "las.hpp"
+#include "OGR.hpp"
 
 
 #include <fstream>

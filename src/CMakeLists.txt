@@ -6,7 +6,6 @@ set(HEXER_HPP
   ${HEXER_HEADERS_DIR}/HexGrid.hpp
   ${HEXER_HEADERS_DIR}/Hexagon.hpp
   ${HEXER_HEADERS_DIR}/Mathpair.hpp
-  ${HEXER_HEADERS_DIR}/OGR.hpp
   ${HEXER_HEADERS_DIR}/Path.hpp
   ${HEXER_HEADERS_DIR}/Processor.hpp
   ${HEXER_HEADERS_DIR}/Segment.hpp
@@ -19,7 +18,6 @@ set(HEXER_CPP
     GridInfo.cpp
     HexGrid.cpp
     Hexagon.cpp
-    OGR.cpp
     Path.cpp
     Processor.cpp
     Segment.cpp
