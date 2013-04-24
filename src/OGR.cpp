@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include <hexer/GDAL.hpp>
+#include <hexer/OGR.hpp>
 
 #include <hexer/Hexagon.hpp>
 #include <hexer/HexGrid.hpp>
