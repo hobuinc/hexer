@@ -67,10 +67,11 @@ if(WIN32)
     endif()
   endif()
 else()
-    include(GetGitRevisionDescription)
-    get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 endif()
 
+# from http://stackoverflow.com/questions/1435953/how-can-i-pass-git-sha1-to-compiler-as-definition-using-cmake
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
 
 set(BOOST_ROOT ${PROJECT_SOURCE_DIR}/boost)

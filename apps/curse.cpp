@@ -209,20 +209,21 @@ void OutputHelp( std::ostream & oss, po::options_description const& options)
 }
 
 
-po::options_description* getOptions()
+po::options_description getOptions()
 {
 
-    // po::options_description* basic_options = new po::options_description("basic options");
-    // 
-    // basic_options->add_options()
-    //     ("help,h", po::value<bool>->zero_tokens()->implicit_value(true), "produce help message")
-    //     ("debug,d", po::value<bool>->zero_tokens()->implicit_value(true), "Enable debug mode")
-    //     ("verbose,v", po::value<boost::uint32_t>->default_value(0), "Set verbose message level")
-    //     ("version", po::value<bool>->zero_tokens()->implicit_value(true), "Show version info")
-    // ;
-    //  
+    po::options_description basic_options = npo::options_description("basic options");
+    
+    basic_options->add_options()
+        ("help,h", po::value<bool>->zero_tokens()->implicit_value(true), "produce help message")
+        ("debug,d", po::value<bool>->zero_tokens()->implicit_value(true), "Enable debug mode")
+        ("verbose,v", po::value<boost::uint32_t>->default_value(0), "Set verbose message level")
+        ("version", po::value<bool>->zero_tokens()->implicit_value(true), "Show version info")
+    ;
+     
 
- 
+    
+    return basic_options;
     
 }
 
