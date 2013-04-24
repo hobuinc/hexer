@@ -48,7 +48,7 @@ struct HEXER_DLL Color
 class HEXER_DLL Draw
 {
 public:
-    Draw(HexGrid *grid_p);
+    Draw(HexGrid *grid_p, std::string const& filename);
     ~Draw();
 
     void drawHexagon(Hexagon *hex_p, bool fill = false);
@@ -57,6 +57,7 @@ public:
 
 private:
     HexGrid *m_grid_p;
+    std::string m_filename;
 
 #ifdef HEXER_HAVE_CAIRO    
     cairo_surface_t *m_surface_p;

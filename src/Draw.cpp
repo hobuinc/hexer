@@ -36,11 +36,14 @@ namespace hexer
 {
 
 
-Draw::Draw(HexGrid *grid_p) : m_grid_p(grid_p)
+Draw::Draw( HexGrid *grid_p, 
+            std::string const& filename) 
+    : m_grid_p(grid_p)
+    , m_filename(filename)
 {
 
 #ifdef HEXER_HAVE_CAIRO    
-    m_surface_p = cairo_svg_surface_create("svgfile.svg", 750, 1000);
+    m_surface_p = cairo_svg_surface_create(m_filename, 750, 1000);
     m_cairo_p = cairo_create(m_surface_p);
 
     // Move things to the center.
