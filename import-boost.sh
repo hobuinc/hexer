@@ -59,7 +59,5 @@ $BOOST_HOME/bin.v2/tools/bcp/darwin-4.2.1/release/link-static/bcp --namespace=$N
                          boost \
                          --boost=$BOOST_HOME
 
-#put back our boost-specific patches
-#git cherry-pick 285ac1bc226c90deae027ae548559b1f5870cad5
-#git cherry-pick 22422680a000e4ff1534a3c5ff117f8f967b86f0
+
 git checkout boost/CMakeLists.txt
