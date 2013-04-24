@@ -54,7 +54,7 @@ echo $BOOST_HEADERS
 $BOOST_HOME/bin.v2/tools/bcp/darwin-4.2.1/release/link-static/bcp --namespace=$NAMESPACE \
                          --namespace-alias \
                           \
-                         program_options unordered interprocess algorithm \
+                         program_options unordered interprocess algorithm filesystem \
                          build \
                          boost \
                          --boost=$BOOST_HOME

@@ -20,6 +20,7 @@
 
 #include <hexer/GridInfo.hpp>
 #include <hexer/Mathpair.hpp>
+#include <hexer/OGR.hpp>
 
 using namespace std;
 
@@ -112,3 +113,23 @@ void processHexes(const std::vector<GridInfo *>& infos, HexReader reader)
 
 } //namespace hexer
 
+std::string GetFullVersion( void )
+{
+    std::ostringstream os;
+
+    os << "hexer " 
+       << HEXER_VERSION_MAJOR << "."
+       << HEXER_VERSION_MINOR << "."
+       << HEXER_VERSION_REVISION;
+
+    std::ostringstream revs;
+    revs << g_GIT_SHA1;
+
+    os << " at revision " << revs.str().substr(0, 6);
+
+#ifdef HEXER_HAVE_GDAL
+    os << " with GDAL " << GDALVersionInfo("RELEASE_NAME");
+#endif
+
+    return os.str();
+}

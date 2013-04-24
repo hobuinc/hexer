@@ -24,6 +24,7 @@
 
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 namespace po = boost::program_options;
 
@@ -97,6 +98,7 @@ void dumpPath(hexer::Path *p)
     level--;
 }
 
+
 void hextest(std::string filename)
 {
     using namespace hexer;
@@ -146,7 +148,24 @@ void pathtest(std::string filename)
     delete gi;
 }
 
-void boundarytest(std::string filename)
+enum FormatType
+{
+    Format_LAS = 0,
+    Format_OGR = 1,
+    Format_Unknown = 128
+
+};
+
+FormatType getDriver(std::string filename)
+{
+    std::string ext = boost::filesystem::extension(filename);
+    if (boost::iequals(ext, ".LAS"))
+        return Format_LAS;
+    else
+        return Format_OGR;
+}
+
+void boundary(std::string filename)
 {
     using namespace hexer;
 
@@ -155,9 +174,19 @@ void boundarytest(std::string filename)
 
     infos.push_back(gi);
     
-    LAS l(filename);
-    l.open();
-    process(infos, l.reader);
+    FormatType t = getDriver(filename);
+    if (t == Format_LAS)
+    {
+        LAS l(filename);
+        l.open();
+        process(infos, l.reader);
+    } else {
+        // OGR o(filename);
+        // o.open();
+        // process(infos, o.reader);
+    }
+    
+ 
 
     std::ostringstream multi;
     multi.setf(std::ios::fixed);
@@ -170,28 +199,7 @@ void boundarytest(std::string filename)
     delete gi;
 }
 
-std::string GetFullVersion( void )
-{
 
-
-        std::ostringstream os;
-
-        os << " hexer " 
-           << HEXER_VERSION_MAJOR << "."
-           << HEXER_VERSION_MINOR << "."
-           << HEXER_VERSION_REVISION;
-        
-        os << " at git revision ", std::string(g_GIT_SHA1,strlen(g_GIT_SHA1));
-
-
-    #ifdef HEXER_HAVE_GDAL
-        os << " with GDAL " << GDALVersionInfo("RELEASE_NAME");
-    #endif
-
-
-        return os.str();
-    
-}
 
 void OutputHelp( std::ostream & oss, po::options_description const& options)
 {
@@ -212,40 +220,86 @@ void OutputHelp( std::ostream & oss, po::options_description const& options)
 po::options_description getOptions()
 {
 
-    po::options_description basic_options = npo::options_description("basic options");
+    po::options_description basic = po::options_description("Basic");
     
-    basic_options->add_options()
-        ("help,h", po::value<bool>->zero_tokens()->implicit_value(true), "produce help message")
-        ("debug,d", po::value<bool>->zero_tokens()->implicit_value(true), "Enable debug mode")
-        ("verbose,v", po::value<boost::uint32_t>->default_value(0), "Set verbose message level")
-        ("version", po::value<bool>->zero_tokens()->implicit_value(true), "Show version info")
+    basic.add_options()
+        ("help,h", po::value<bool>()->zero_tokens()->implicit_value(true), "This help message")
+        // ("debug,d", po::value<bool>()->zero_tokens()->implicit_value(true), "Enable debug mode")
+        // ("verbose,v", po::value<boost::uint32_t>()->default_value(0), "Set verbose message level")
+        ("version", po::value<bool>()->zero_tokens()->implicit_value(true), "Show version info")
     ;
-     
 
+    po::options_description command = po::options_description("Command");
     
-    return basic_options;
+    command.add_options()
+        ("input", po::value<std::string>(), "Input point set to curse")
+        ("command", po::value<std::string>(), "Command to run on points ('boundary' or 'density')")
+    ;
+
+    po::options_description options;
+    
+    options.add(command).add(basic);
+    return options;
     
 }
 
 int main(int argc, char* argv[])
 {
-
-    
-    if (argc < 3)
+    bool bVerbose(false);
+    po::variables_map vm;    
+    po::options_description options = getOptions();
+    po::positional_options_description p;
+    p.add("command", 1);
+    p.add("input", 1);
+     
+    try
     {
-        std::cerr << "please specify a command and a filename. $ hextest PATH filename.las" << std::endl;
-		return 1;
+        po::store(po::command_line_parser(argc, argv).
+            options(options).positional(p).run(), vm);
+
+        po::notify(vm);
+    }     
+    catch (boost::program_options::error e)
+    {
+        std::cout << "validation error: " << e.what() << std::endl;
+        OutputHelp(std::cout, options);
+        return 1;
     }
     
-    std::string command(argv[1], strlen(argv[1]));
-    std::string filename(argv[2], strlen(argv[2]));
+    if (vm.count("help")) 
+    {
+        OutputHelp(std::cout, options);
+        return 1;
+    }
+
+    if (vm.count("version")) 
+    {
+        std::cout << GetFullVersion() << std::endl;
+        return 0;
+    }
+
+    if (!vm.count("command") ) 
+    {
+        std::cerr << "Command not specified!\n";
+        OutputHelp(std::cout, options);
+        return 1;
+    }
+    if (!vm.count("input") ) 
+    {
+        std::cerr << "Input not specified!\n";
+        OutputHelp(std::cout, options);
+        return 1;
+    } 
+
+    std::string command = vm["command"].as<std::string>();
+    std::string filename = vm["input"].as<std::string>();
     
 	try
 	{
 
 		if (boost::iequals(command, "BOUNDARY"))
 		{
-			boundarytest(filename);
+			boundary(filename);
 			return 0;
 		}
     
@@ -261,11 +315,10 @@ int main(int argc, char* argv[])
 			return 0;
 		}    
 
-		std::cout << "Command '" << command << "' not recognized" << std::endl;
 		return 1;
 	} catch (hexer::hexer_error const& e)
 	{
-		std::cout << "Hexer failed with error: '" << e.what() << "'" << std::endl;
+		std::cout << "Curse failed with error: '" << e.what() << "'" << std::endl;
 		return 1;
 	}
     
