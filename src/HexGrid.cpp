@@ -46,7 +46,10 @@ void HexGrid::addPoint(Point p)
             }
             markNeighborBelow(h);
         }
-    }
+    } else
+	{
+		h->increment();
+	}
 }
 
 // A debugging function that can be used to make a particular hexagon
