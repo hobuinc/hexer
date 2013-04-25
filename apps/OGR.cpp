@@ -18,13 +18,12 @@
 
 #include "OGR.hpp"
 #include <hexer/HexGrid.hpp>
+#include <hexer/GridInfo.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 
 using namespace std;
-
-
 
 namespace hexer
 {
@@ -41,8 +40,6 @@ OGR::OGR(std::string filename)
 	, m_current_geometry(0)
 {
 #ifdef HEXER_HAVE_GDAL
-
-    // OGRRegisterAll();
 	reader = boost::bind(&OGR::read, _1, _2, this);
 #endif
     
@@ -57,8 +54,7 @@ OGR::~OGR()
 	
 	if (m_ds)
 		OGR_DS_Destroy(m_ds);
-	
-    // OGRCleanupAll();
+
 #endif
 
 }
@@ -73,9 +69,6 @@ OGR::OGR(std::string const& filename)
 	, m_ds(0)
 	, m_layer(0)
 {
-// #ifdef HEXER_HAVE_GDAL
-//     OGRRegisterAll();
-// #endif
     createLayer();
 }
 
@@ -106,7 +99,6 @@ void OGR::createLayer()
         }
     }
     
-    std::cout << "basename: " << basename << std::endl;
     m_layer = OGR_DS_CreateLayer(m_ds, basename.c_str(), NULL, wkbMultiPolygon, NULL);
     if (m_layer == NULL)
     {
@@ -117,45 +109,89 @@ void OGR::createLayer()
     hFieldDefn = OGR_Fld_Create("ID", OFTInteger);
     if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
     {
-        throw hexer_error("Could not create ID field on layer!");
+        std::ostringstream oss;
+        oss << "Could not create ID field on layer with error '" 
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
     }
     
     OGR_Fld_Destroy(hFieldDefn);
 }
 
-void OGR::writeWKT(std::string const& wkt) const
+void OGR::writeBoundary(std::vector<GridInfo*> const& infos)
 {
-    OGRFeatureH hFeature;
-    
-    hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
-    OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"), 1);
-    OGRGeometryH hPoly;
-    
-    const char* text = wkt.c_str();
-    if( OGR_G_CreateFromWkt((char**)&text, NULL, &hPoly) != OGRERR_NONE )
+    typedef std::vector<GridInfo*>::const_iterator it;
+    int counter(0);
+    for (it i = infos.begin(); i != infos.end(); ++i)
     {
-        throw hexer_error("Unable to create geometry from WKT!");
+        OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
+
+    	typedef std::vector<hexer::Path*>::size_type st;
+        for (st pi = 0; pi < (*i)->rootPaths().size(); ++pi)
+        {
+            OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
+            Path *p = (*i)->rootPaths()[pi];
+            collectGeometry(p, polygon);
+
+            if( OGR_G_AddGeometryDirectly(multi, polygon ) != OGRERR_NONE )
+            {
+                std::ostringstream oss;
+                oss << "Unable to add polygon to multipolygon with error '" 
+                    << CPLGetLastErrorMsg() << "'";
+                throw hexer_error(oss.str());
+            }
+        }
+        
+        OGRFeatureH hFeature;
+    
+        hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
+        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"), counter);
+
+        OGR_F_SetGeometry(hFeature, multi);
+        OGR_G_DestroyGeometry(multi);
+
+        if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
+        {
+            std::ostringstream oss;
+            oss << "Unable to create feature for multipolygon with error '" 
+                << CPLGetLastErrorMsg() << "'";
+            throw hexer_error(oss.str());
+        }
+        OGR_F_Destroy( hFeature );                
+        counter++;
+    }
+}
+
+void OGR::collectGeometry(Path* path, OGRGeometryH polygon)
+{
+    OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
+    
+    vector<Point> pts = path->points();
+
+    vector<Point>::const_iterator i;
+    for (i = pts.begin(); i != pts.end(); ++i)
+    {
+        OGR_G_AddPoint_2D(ring, i->m_x, i->m_y);
     }
 
-    OGR_F_SetGeometry(hFeature, hPoly);
-    OGR_G_DestroyGeometry(hPoly);
-
-    if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
+    if( OGR_G_AddGeometryDirectly(polygon, ring) != OGRERR_NONE )
     {
-        throw hexer_error("Unable to create feature for WKT!");
+        std::ostringstream oss;
+        oss << "Unable to add geometry with error '" << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
     }
-    
-    OGR_F_Destroy( hFeature );
-    
-    
+
+    vector<Path *> paths = path->subPaths();
+    for (int pi = 0; pi != paths.size(); ++pi)
+    {
+        Path* p = paths[pi];
+        collectGeometry(p, polygon);
+    }
 }
 
 OGR::~OGR()
 {
     OGR_DS_Destroy(m_ds);
-// #ifdef HEXER_HAVE_GDAL
-//     OGRCleanupAll();
-// #endif
 
 }
 

@@ -209,7 +209,7 @@ void boundary(	std::string const& input,
     else
     {
         writer::OGR o(output);
-        o.writeWKT(multi.str());        
+        o.writeBoundary(infos);
     }
     delete gi;
 }

@@ -19,6 +19,7 @@
 #include <hexer/hexer.hpp>
 #include <hexer/hexer_defines.h>
 #include <hexer/Processor.hpp>
+#include <hexer/GridInfo.hpp>
 
 #ifdef HEXER_HAVE_GDAL
 
@@ -142,6 +143,13 @@ namespace writer
 class HEXER_DLL OGR
 {
 
+    
+public:
+    OGR(std::string const& filename);
+	~OGR();
+
+    void writeBoundary(std::vector<GridInfo*> const& infos);
+
 private:
     std::string m_filename;
 
@@ -152,12 +160,8 @@ private:
 
 #endif
     void createLayer();
-    
-public:
-    OGR(std::string const& filename);
-	~OGR();
-    
-    void writeWKT(std::string const& wkt) const;
+    void collectGeometry(Path* path, OGRGeometryH polygon);
+
 };
 
 } // writer
