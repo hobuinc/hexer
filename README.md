@@ -38,7 +38,7 @@ $ curse boundary mypointfile.shp --output myboundary.shp
 $ curse density mylasfile.las --output myhexagons.shp --edge 100
 ```
 
-<img src="https://github.com/hobu/hexer/raw/master/images/serpent.png?raw=true" href="http://a.tiles.mapbox.com/v3/hobu.serpent-mound.html#16.00/39.0346/-83.4353" alt="Serpent Mound Hexbins" />
+<a href="href="http://a.tiles.mapbox.com/v3/hobu.serpent-mound.html#16.00/39.0346/-83.4353""><img src="https://github.com/hobu/hexer/raw/master/images/serpent.png?raw=true"  alt="Serpent Mound Hexbins" /></a>
 
 [LGPL]: http://www.gnu.org/licenses/lgpl-2.1.html
 [LiDAR]: https://en.wikipedia.org/wiki/LIDAR
