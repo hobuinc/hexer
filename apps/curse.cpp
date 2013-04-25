@@ -203,9 +203,14 @@ void boundary(	std::string const& input,
     multi.precision(8);
     
     gi->toWKT(multi);
-
-    std::cout << multi.str() << std::endl;
-
+    
+    if (output.empty() || boost::iequals(output, "STDOUT"))
+        std::cout << multi.str() << std::endl;
+    else
+    {
+        writer::OGR o(output);
+        o.writeWKT(multi.str());        
+    }
     delete gi;
 }
 
@@ -264,6 +269,11 @@ po::options_description getOptions()
 
 int main(int argc, char* argv[])
 {
+
+#ifdef HEXER_HAVE_GDAL
+    OGRRegisterAll();
+#endif
+        
     bool bVerbose(false);
     po::variables_map vm;    
     po::options_description options = getOptions();
@@ -346,6 +356,10 @@ int main(int argc, char* argv[])
 		std::cout << "Curse failed with error: '" << e.what() << "'" << std::endl;
 		return 1;
 	}
+
+#ifdef HEXER_HAVE_GDAL
+	OGRCleanupAll();
+#endif    
     
 }
 

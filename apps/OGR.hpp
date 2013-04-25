@@ -138,6 +138,28 @@ public:
 namespace writer 
 {
 
+
+class HEXER_DLL OGR
+{
+
+private:
+    std::string m_filename;
+
+
+#ifdef HEXER_HAVE_GDAL
+    OGRDataSourceH m_ds;
+	OGRLayerH m_layer;
+
+#endif
+    void createLayer();
+    
+public:
+    OGR(std::string const& filename);
+	~OGR();
+    
+    void writeWKT(std::string const& wkt) const;
+};
+
 } // writer
 
 } // namespace
