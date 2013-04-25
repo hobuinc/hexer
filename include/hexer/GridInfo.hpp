@@ -105,13 +105,13 @@ public:
             m_grid->addPoint(p);
         };
 
-    Point offset(int idx)
+    Point offset(int idx) const
         { return m_grid->centerOffset(idx); }
 
-    double width()
+    double width() const
         { return m_grid->width(); }
 
-    double height()
+    double height() const
         { return m_grid->height(); }
 
     HexIter begin()

@@ -114,8 +114,19 @@ void OGR::createLayer()
             << CPLGetLastErrorMsg() << "'";
         throw hexer_error(oss.str());
     }
-    
     OGR_Fld_Destroy(hFieldDefn);
+
+    hFieldDefn = OGR_Fld_Create("COUNT", OFTInteger);
+    if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
+    {
+        std::ostringstream oss;
+        oss << "Could not create COUNT field on layer with error '" 
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_Fld_Destroy(hFieldDefn);
+
+
 }
 
 void OGR::writeBoundary(std::vector<GridInfo*> const& infos)
@@ -131,7 +142,7 @@ void OGR::writeBoundary(std::vector<GridInfo*> const& infos)
         {
             OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
             Path *p = (*i)->rootPaths()[pi];
-            collectGeometry(p, polygon);
+            collectPath(p, polygon);
 
             if( OGR_G_AddGeometryDirectly(multi, polygon ) != OGRERR_NONE )
             {
@@ -162,7 +173,7 @@ void OGR::writeBoundary(std::vector<GridInfo*> const& infos)
     }
 }
 
-void OGR::collectGeometry(Path* path, OGRGeometryH polygon)
+void OGR::collectPath(Path* path, OGRGeometryH polygon)
 {
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
     
@@ -185,9 +196,74 @@ void OGR::collectGeometry(Path* path, OGRGeometryH polygon)
     for (int pi = 0; pi != paths.size(); ++pi)
     {
         Path* p = paths[pi];
-        collectGeometry(p, polygon);
+        collectPath(p, polygon);
     }
 }
+
+OGRGeometryH OGR::collectHexagon(HexInfo const& info, HexGrid const* grid)
+{
+    OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
+	
+    Point pos = info.m_center;
+	pos += grid->origin();
+
+	
+    OGR_G_AddPoint_2D(ring, pos.m_x, pos.m_y);		
+    for (int i = 1; i <= 5; ++i)
+    {
+        Point p = pos + grid->offset(i);
+        OGR_G_AddPoint_2D(ring, p.m_x, p.m_y);		
+    }
+    OGR_G_AddPoint_2D(ring, pos.m_x, pos.m_y);		
+
+    OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
+    if( OGR_G_AddGeometryDirectly(polygon, ring ) != OGRERR_NONE )
+    {
+        std::ostringstream oss;
+        oss << "Unable to add ring to polygon in collectHexagon '" 
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+	
+	return polygon;
+	
+}
+
+
+void OGR::writeDensity(std::vector<GridInfo*> const& infos)
+{
+    typedef std::vector<GridInfo*>::const_iterator it;
+    
+    for (it gi = infos.begin(); gi != infos.end(); ++gi)
+    {
+		int counter(0);
+	    for (HexIter iter = (*gi)->begin(); iter != (*gi)->end(); ++iter)
+	    {
+
+	        HexInfo hi = *iter;
+			OGRGeometryH polygon = collectHexagon(hi, (*gi)->m_grid);
+	        OGRFeatureH hFeature;
+    
+	        hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
+	        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"), counter);
+	        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"), hi.m_density);
+
+	        OGR_F_SetGeometry(hFeature, polygon);
+	        OGR_G_DestroyGeometry(polygon);
+
+	        if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
+	        {
+	            std::ostringstream oss;
+	            oss << "Unable to create feature for multipolygon with error '" 
+	                << CPLGetLastErrorMsg() << "'";
+	            throw hexer_error(oss.str());
+	        }
+	        OGR_F_Destroy( hFeature );                
+	        counter++;
+	    }
+    }
+}
+
 
 OGR::~OGR()
 {

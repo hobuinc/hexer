@@ -149,7 +149,8 @@ public:
 	~OGR();
 
     void writeBoundary(std::vector<GridInfo*> const& infos);
-
+	void writeDensity(std::vector<GridInfo*> const& infos);
+	
 private:
     std::string m_filename;
 
@@ -160,7 +161,8 @@ private:
 
 #endif
     void createLayer();
-    void collectGeometry(Path* path, OGRGeometryH polygon);
+    void collectPath(Path* path, OGRGeometryH polygon);
+	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
 
 };
 

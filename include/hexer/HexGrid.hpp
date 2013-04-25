@@ -67,17 +67,17 @@ public:
         { return getHexagon(c.m_x, c.m_y); }
     void addDenseHexagon(int x, int y);
 
-    double width()
+    double width() const
         { return m_width; }
-    double height()
+    double height() const
         { return m_height; }
-    Point offset(int idx)
+    Point const& offset(int idx) const
         { return m_offsets[idx]; }
-    Point centerOffset(int idx)
+    Point centerOffset(int idx) const
         { return (m_offsets[idx] - m_center_offset); }
-    Point origin()
+    Point const& origin() const 
         { return m_origin; }
-    int denseLimit()
+    int denseLimit() const
         { return m_dense_limit; }
     std::vector<Path *> const& rootPaths() const
         { return m_paths; }

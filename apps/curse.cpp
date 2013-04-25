@@ -195,17 +195,16 @@ void boundary(	std::string const& input,
         o.open();
         process(infos, o.reader);
     }
-    
- 
-
-    std::ostringstream multi;
-    multi.setf(std::ios::fixed);
-    multi.precision(8);
-    
-    gi->toWKT(multi);
-    
+	   
     if (output.empty() || boost::iequals(output, "STDOUT"))
+	{
+	    std::ostringstream multi;
+	    multi.setf(std::ios::fixed);
+	    multi.precision(8);
+    
+	    gi->toWKT(multi);
         std::cout << multi.str() << std::endl;
+	}
     else
     {
         writer::OGR o(output);
@@ -214,6 +213,41 @@ void boundary(	std::string const& input,
     delete gi;
 }
 
+
+void density(	std::string const& input, 
+				std::string const& output,
+				double edge,
+				int density)
+{
+    using namespace hexer;
+
+    vector<GridInfo *> infos;
+    GridInfo *gi = new GridInfo;
+	
+	if (!hexer::compare_distance(edge, 0.0))
+		gi->m_hexsize = edge;
+	
+	if (!density == 0)
+		gi->m_density = density;
+
+    infos.push_back(gi);
+    
+    FormatType t = getDriver(input);
+    if (t == Format_LAS)
+    {
+        LAS l(input);
+        l.open();
+        process(infos, l.reader);
+    } else {
+        reader::OGR o(input);
+        o.open();
+        process(infos, o.reader);
+    }
+
+    writer::OGR o(output);
+    o.writeDensity(infos);
+	delete gi;
+}
 
 
 void OutputHelp( std::ostream & oss, po::options_description const& options)
@@ -330,14 +364,20 @@ int main(int argc, char* argv[])
 			output = vm["output"].as<std::string>();
 		
 		double edge = vm["edge"].as<double>();
-		double density = vm["count"].as<boost::uint32_t>();
+		boost::uint32_t count = vm["count"].as<boost::uint32_t>();
 		
 		if (boost::iequals(command, "BOUNDARY"))
 		{
-			boundary(input, output, edge, density);
+			boundary(input, output, edge, count);
 			return 0;
 		}
-    
+
+		if (boost::iequals(command, "DENSITY"))
+		{
+			density(input, output, edge, count);
+			return 0;
+		}
+
 		if (boost::iequals(command, "PATH"))
 		{
 			pathtest(input);
