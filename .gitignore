@@ -1,3 +1,5 @@
+build
+
 syntax: glob
 
 CMakeFiles/
