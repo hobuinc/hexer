@@ -13,6 +13,7 @@
 
 *****************************************************************************/
 
+#ifdef HEXER_HAVE_GDAL
 
 #include <iostream>
 
@@ -275,3 +276,5 @@ OGR::~OGR()
 
 
 } //namespace
+
+#endif // HEXER_HAVE_GDAL
