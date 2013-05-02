@@ -1,10 +1,14 @@
 project(hexer)
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
+include(${hexer_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
-SET(HEXER_VERSION_MAJOR "1")
-SET(HEXER_VERSION_MINOR "0")
-SET(HEXER_VERSION_PATCH "0")
-set(VERSION "${HEXER_VERSION_MAJOR}.${HEXER_VERSION_MINOR}.${HEXER_VERSION_PATCH}")
+set(VERSION 1.0.0 CACHE STRING "Hexer version")
+
+DISSECT_VERSION()
+GET_OS_INFO()
+SET_INSTALL_DIRS()
+
 SET(HEXER_LIB_SOVERSION "1.0.0")
 
 # Name of C++ library
@@ -116,53 +120,36 @@ endif(WITH_GDAL)
 ###############################################################################
 # Installation settings
 
+set(HEXER_OUTPUT_LIB_DIR ${hexer_BINARY_DIR}/${LIB_INSTALL_DIR})
+set(HEXER_OUTPUT_BIN_DIR ${hexer_BINARY_DIR}/${BIN_INSTALL_DIR})
+make_directory(${HEXER_OUTPUT_LIB_DIR})
+make_directory(${HEXER_OUTPUT_BIN_DIR})
 if(WIN32)
-  set(DEFAULT_LIB_SUBDIR lib)
-  set(DEFAULT_DATA_SUBDIR .)
-  set(DEFAULT_INCLUDE_SUBDIR include)
-
-  if (MSVC)
-    set(DEFAULT_BIN_SUBDIR bin)
-  else()
-    set(DEFAULT_BIN_SUBDIR .)
-  endif()
-else()
-  # Common locations for Unix and Mac OS X
-  set(DEFAULT_BIN_SUBDIR bin)
-  set(DEFAULT_LIB_SUBDIR lib)
-  set(DEFAULT_INCLUDE_SUBDIR include)
-endif()
-
-# Locations are changeable by user to customize layout of Hexer installation
-# (default values are platform-specific)
-set(HEXER_BIN_SUBDIR ${DEFAULT_BIN_SUBDIR} CACHE STRING
-  "Subdirectory where executables will be installed")
-set(HEXER_LIB_SUBDIR ${DEFAULT_LIB_SUBDIR} CACHE STRING
-  "Subdirectory where libraries will be installed")
-set(HEXER_INCLUDE_SUBDIR ${DEFAULT_INCLUDE_SUBDIR} CACHE STRING
-  "Subdirectory where header files will be installed")
-set(HEXER_DATA_SUBDIR ${DEFAULT_DATA_SUBDIR} CACHE STRING
-  "Subdirectory where data will be installed")
-
-# Mark *_SUBDIR variables as advanced and dedicated to use by power-users only.
-mark_as_advanced(HEXER_BIN_SUBDIR
-  HEXER_LIB_SUBDIR HEXER_INCLUDE_SUBDIR HEXER_DATA_SUBDIR)
-
-# Full paths for the installation
-set(HEXER_BIN_DIR ${HEXER_BIN_SUBDIR})
-set(HEXER_LIB_DIR ${HEXER_LIB_SUBDIR})
-set(HEXER_INCLUDE_DIR ${HEXER_INCLUDE_SUBDIR})
+  foreach(config ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${config} CONFIG)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONFIG} "${HEXER_OUTPUT_LIB_DIR}")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG} "${HEXER_OUTPUT_BIN_DIR}")
+    # ---[ Windows requires DLLs (shared libraries) to be installed in the same directory as executables
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG} "${HEXER_OUTPUT_BIN_DIR}")
+  endforeach(config)
+else(WIN32)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${HEXER_OUTPUT_LIB_DIR}")
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${HEXER_OUTPUT_BIN_DIR}")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTOYR "${HEXER_OUTPUT_LIB_DIR}")
+endif(WIN32)
 
 ###############################################################################
 # Processing of project directories
 
-add_subdirectory(src)
-add_subdirectory(apps)
-
-configure_file(
-  "${PROJECT_SOURCE_DIR}/hexer_defines.h.in"
-  "${HEXER_INCLUDE_DIR}/hexer/hexer_defines.h")
+set(hexer_defines_h_in "${CMAKE_CURRENT_SOURCE_DIR}/hexer_defines.h.in")
+set(hexer_defines_h "${CMAKE_CURRENT_BINARY_DIR}/include/hexer/hexer_defines.h")
+configure_file(${hexer_defines_h_in} ${hexer_defines_h})
+HEXER_ADD_INCLUDES("" "" ${hexer_defines_h})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/gitsha.cpp.in"
-  "${PROJECT_SOURCE_DIR}/src/gitsha.cpp")  
+  "${PROJECT_SOURCE_DIR}/src/gitsha.cpp")
+
+add_subdirectory(src)
+add_subdirectory(apps)
