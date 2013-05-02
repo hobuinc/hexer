@@ -18,6 +18,7 @@
 #include <hexer/Mathpair.hpp>
 
 #include <math.h>
+#include <sstream>
 #include <vector>
 
 
