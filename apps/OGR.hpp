@@ -16,17 +16,15 @@
 #ifndef INCLUDED_PSHAPE_OGR_HPP
 #define INCLUDED_PSHAPE_OGR_HPP
 
+#ifdef HEXER_HAVE_GDAL
+
 #include <hexer/hexer.hpp>
 #include <hexer/hexer_defines.h>
 #include <hexer/Processor.hpp>
 #include <hexer/GridInfo.hpp>
 
-#ifdef HEXER_HAVE_GDAL
-
 #include "ogr_api.h"
 #include "gdal.h"
-
-#endif
 
 #include "Mathpair.hpp"
 #include "export.hpp"
@@ -121,12 +119,10 @@ private:
     std::string m_filename;
     size_t m_index;
 
-#ifdef HEXER_HAVE_GDAL
     OGRDataSourceH m_ds;
 	OGRLayerH m_layer;
 	OGRFeatureH m_current_feature;
 	OGRGeometryH m_current_geometry;
-#endif
 
 
 public:
@@ -155,11 +151,9 @@ private:
     std::string m_filename;
 
 
-#ifdef HEXER_HAVE_GDAL
     OGRDataSourceH m_ds;
 	OGRLayerH m_layer;
 
-#endif
     void createLayer();
     void collectPath(Path* path, OGRGeometryH polygon);
 	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
@@ -169,5 +163,7 @@ private:
 } // writer
 
 } // namespace
+
+#endif // HEXER_HAVE_GDAL
 
 #endif // file guard
