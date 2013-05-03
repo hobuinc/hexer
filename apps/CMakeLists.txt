@@ -15,7 +15,7 @@ endif()
 
 if(CURSE)
     add_executable(${CURSE} curse.cpp lasfile.hpp las.hpp las.cpp OGR.hpp OGR.cpp)
-    target_link_libraries(${CURSE} ${HEXER_LIB_NAME})
+    target_link_libraries(${CURSE} ${HEXER_LIB_NAME} ${Boost_LIBRARIES})
 endif()
 
 install(TARGETS ${HEXER_UTILITIES}

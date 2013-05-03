@@ -83,6 +83,9 @@ set(HEXERBOOST_SOURCES
 if(WIN32)
   list(APPEND HEXERBOOST_SOURCES
        ./libs/regex/src/w32_regex_traits.cpp
+       ./libs/filesystem/src/windows_file_codecvt.hpp
+       ./libs/filesystem/src/windows_file_codecvt.cpp
+       ./libs/filesystem/src/codecvt_error_category.cpp
        ./libs/thread/src/future.cpp
        ./libs/thread/src/win32/tss_pe.cpp)
 else()
