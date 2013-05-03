@@ -14,19 +14,18 @@
 *****************************************************************************/
 
 #include <hexer/Processor.hpp>
-#include <hexer/GridInfo.hpp>
-#include <hexer/Mathpair.hpp>
 
 #include <math.h>
 #include <sstream>
+#include <string>
 #include <vector>
-
 
 #ifdef HEXER_HAVE_GDAL
 #include "gdal.h"
 #endif
 
-using namespace std;
+#include <hexer/GridInfo.hpp>
+#include <hexer/Mathpair.hpp>
 
 namespace hexer
 {
@@ -40,7 +39,7 @@ namespace hexer
 
     // Compute hex size based on distance between consecutive points and density.
     // The probably needs some work based on more data.
-    double computeHexSize(const vector<Point>& samples, int density)
+    double computeHexSize(const std::vector<Point>& samples, int density)
     {
         double dist = 0;
         for (std::vector<Point>::size_type i = 0; i < samples.size() - 1; ++i)
@@ -55,7 +54,7 @@ namespace hexer
 
 void process(const std::vector<GridInfo *>& infos, PointReader reader)
 {
-    vector<Point> samples;
+    std::vector<Point> samples;
 
     int cnt = 0;
     double x, y;
@@ -115,8 +114,6 @@ void processHexes(const std::vector<GridInfo *>& infos, HexReader reader)
     }
 }
 
-} //namespace hexer
-
 std::string GetFullVersion( void )
 {
     std::ostringstream os;
@@ -137,3 +134,5 @@ std::string GetFullVersion( void )
 
     return os.str();
 }
+
+} //namespace hexer

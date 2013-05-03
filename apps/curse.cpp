@@ -13,26 +13,26 @@
 
 *****************************************************************************/
 
-#include <hexer/Processor.hpp>
-#include <hexer/hexer.hpp>
-#include <hexer/Utils.hpp>
-#include "las.hpp"
-
-#ifdef HEXER_HAVE_GDAL
-#include "OGR.hpp"
-#endif
-
 #include <fstream>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
+#ifdef HEXER_HAVE_GDAL
+#include "OGR.hpp"
+#endif
+
+#include <hexer/hexer.hpp>
+#include <hexer/Processor.hpp>
+#include <hexer/Utils.hpp>
+#include "las.hpp"
+
 namespace po = boost::program_options;
-
-using namespace std;
-
 
 bool readHex(int& x, int& y, void* ctx)
 {
@@ -90,9 +90,9 @@ void dumpPath(hexer::Path *p)
     Orientation o = p->orientation();
     std::string ostring = ((o == CLOCKWISE) ? "CLOCKWISE" : "ANTICLOCKWISE");
     indent(level);
-    cerr << indent(level) << "Path length = " << p->pathLength() << "!\n";
-    cerr << indent(level) << "Orientation = " << ostring << "!\n";
-    vector<Path *> paths = p->subPaths();
+    std::cerr << indent(level) << "Path length = " << p->pathLength() << "!\n";
+    std::cerr << indent(level) << "Orientation = " << ostring << "!\n";
+    std::vector<Path *> paths = p->subPaths();
     level++;
     for (int pi = 0; pi != paths.size(); ++pi)
     {
@@ -106,7 +106,7 @@ void hextest(std::string filename)
 {
     using namespace hexer;
 
-    vector<GridInfo *> infos;
+    std::vector<GridInfo *> infos;
     GridInfo *gi = new GridInfo;
 
     gi->m_hexsize = 10;
@@ -123,7 +123,7 @@ void hextest(std::string filename)
     for (HexIter iter = gi->begin(); iter != gi->end(); ++iter)
     {
         HexInfo hi = *iter;
-        cerr << "Density/X/Y = " << hi.m_density << "/" <<
+        std::cerr << "Density/X/Y = " << hi.m_density << "/" <<
             hi.m_center.m_x << "/" << hi.m_center.m_y << "!\n";
     }
 
@@ -134,7 +134,7 @@ void pathtest(std::string filename)
 {
     using namespace hexer;
 
-    vector<GridInfo *> infos;
+    std::vector<GridInfo *> infos;
     GridInfo *gi = new GridInfo;
 
     infos.push_back(gi);
@@ -175,7 +175,7 @@ void boundary(	std::string const& input,
 {
     using namespace hexer;
 
-    vector<GridInfo *> infos;
+    std::vector<GridInfo *> infos;
     GridInfo *gi = new GridInfo;
 	
 	if (!hexer::compare_distance(edge, 0.0))
@@ -227,7 +227,7 @@ void density(	std::string const& input,
 {
     using namespace hexer;
 
-    vector<GridInfo *> infos;
+    std::vector<GridInfo *> infos;
     GridInfo *gi = new GridInfo;
 	
 	if (!hexer::compare_distance(edge, 0.0))
@@ -264,7 +264,7 @@ void density(	std::string const& input,
 void OutputHelp( std::ostream & oss, po::options_description const& options)
 {
     oss << "--------------------------------------------------------------------" << std::endl;
-    oss << "    curse (" << GetFullVersion() << ")" << std::endl;
+    oss << "    curse (" << hexer::GetFullVersion() << ")" << std::endl;
     oss << "--------------------------------------------------------------------" << std::endl;
 
     oss << options << std::endl;
@@ -348,7 +348,7 @@ int main(int argc, char* argv[])
 
     if (vm.count("version")) 
     {
-        std::cout << GetFullVersion() << std::endl;
+        std::cout << hexer::GetFullVersion() << std::endl;
         return 0;
     }
 
