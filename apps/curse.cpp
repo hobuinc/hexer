@@ -17,8 +17,10 @@
 #include <hexer/hexer.hpp>
 #include <hexer/Utils.hpp>
 #include "las.hpp"
-#include "OGR.hpp"
 
+#ifdef HEXER_HAVE_GDAL
+#include "OGR.hpp"
+#endif
 
 #include <fstream>
 #include <sstream>
@@ -191,9 +193,11 @@ void boundary(	std::string const& input,
         l.open();
         process(infos, l.reader);
     } else {
+#ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
         o.open();
         process(infos, o.reader);
+#endif
     }
 	   
     if (output.empty() || boost::iequals(output, "STDOUT"))
@@ -207,8 +211,10 @@ void boundary(	std::string const& input,
 	}
     else
     {
+#ifdef HEXER_HAVE_GDAL
         writer::OGR o(output);
         o.writeBoundary(infos);
+#endif
     }
     delete gi;
 }
@@ -239,13 +245,18 @@ void density(	std::string const& input,
         l.open();
         process(infos, l.reader);
     } else {
+#ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
         o.open();
         process(infos, o.reader);
+#endif
     }
 
+#ifdef HEXER_HAVE_GDAL
     writer::OGR o(output);
     o.writeDensity(infos);
+#endif
+
 	delete gi;
 }
 
