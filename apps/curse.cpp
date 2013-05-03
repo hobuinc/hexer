@@ -23,15 +23,16 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
-#ifdef HEXER_HAVE_GDAL
-#include "OGR.hpp"
-#endif
+
 
 #include <hexer/hexer.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
 #include "las.hpp"
 
+#ifdef HEXER_HAVE_GDAL
+#include "OGR.hpp"
+#endif
 namespace po = boost::program_options;
 
 bool readHex(int& x, int& y, void* ctx)
