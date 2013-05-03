@@ -13,11 +13,12 @@
 
 *****************************************************************************/
 
+#include "OGR.hpp"
+
 #ifdef HEXER_HAVE_GDAL
 
 #include <iostream>
 
-#include "OGR.hpp"
 #include <hexer/HexGrid.hpp>
 #include <hexer/GridInfo.hpp>
 
