@@ -16,8 +16,6 @@
 #ifndef INCLUDED_HEXER_HPP
 #define INCLUDED_HEXER_HPP
 
-#include <string>
-
 #define HEXER_VERSION_MAJOR    1
 #define HEXER_VERSION_MINOR    0
 #define HEXER_VERSION_REVISION 0
@@ -25,7 +23,5 @@
 #include <hexer/hexer_defines.h>
 #include <hexer/exception.hpp>
 #include <hexer/gitsha.h>
-
-std::string GetFullVersion( void );
 
 #endif

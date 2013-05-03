@@ -13,14 +13,17 @@
 
 *****************************************************************************/
 
-#pragma once
+#ifndef INCLUDED_PROCESSOR_HPP
+#define INCLUDED_PROCESSOR_HPP
 
-#include <boost/function.hpp>
+#include <string>
 #include <vector>
 
-#include "GridInfo.hpp"
-#include "Path.hpp"
-#include "export.hpp"
+#include <boost/function.hpp>
+
+#include <hexer/GridInfo.hpp>
+#include <hexer/Path.hpp>
+#include <hexer/export.hpp>
 
 namespace hexer
 {
@@ -31,4 +34,8 @@ namespace hexer
     HEXER_DLL void processHexes(const std::vector<GridInfo *>& infos, HexReader);
     
     HEXER_DLL double computeHexSize(const std::vector<Point>& samples, int density);
+
+    HEXER_DLL std::string GetFullVersion( void );
 } // namespace hexer
+
+#endif // INCLUDED_PROCESSOR_HPP
