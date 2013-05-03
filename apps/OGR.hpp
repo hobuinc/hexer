@@ -16,18 +16,22 @@
 #ifndef INCLUDED_PSHAPE_OGR_HPP
 #define INCLUDED_PSHAPE_OGR_HPP
 
-#ifdef HEXER_HAVE_GDAL
-
 #include <hexer/hexer.hpp>
-#include <hexer/hexer_defines.h>
+
 #include <hexer/Processor.hpp>
 #include <hexer/GridInfo.hpp>
+
+#include <hexer/hexer_defines.h>
+#include <hexer/Mathpair.hpp>
+#include <hexer/export.hpp>
+
+
+#ifdef HEXER_HAVE_GDAL
+
 
 #include "ogr_api.h"
 #include "gdal.h"
 
-#include "Mathpair.hpp"
-#include "export.hpp"
 
 namespace hexer
 {
