@@ -2,7 +2,8 @@
 include_directories(
     .
     ../include
-    ../include/hexer)
+    ../include/hexer
+    ${GDAL_INCLUDE_DIR})
 
 set(CURSE curse)
 
@@ -15,7 +16,7 @@ endif()
 
 if(CURSE)
     add_executable(${CURSE} curse.cpp lasfile.hpp las.hpp las.cpp OGR.hpp OGR.cpp)
-    target_link_libraries(${CURSE} ${HEXER_LIB_NAME} ${Boost_LIBRARIES})
+    target_link_libraries(${CURSE} ${HEXER_LIB_NAME} ${Boost_LIBRARIES} ${GDAL_LIBRARY})
 endif()
 
 install(TARGETS ${HEXER_UTILITIES}

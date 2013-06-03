@@ -18,6 +18,7 @@
 #ifdef HEXER_HAVE_GDAL
 
 #include <iostream>
+#include <sstream>
 
 #include <hexer/HexGrid.hpp>
 #include <hexer/GridInfo.hpp>

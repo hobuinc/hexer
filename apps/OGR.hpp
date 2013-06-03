@@ -39,7 +39,7 @@ namespace hexer
 namespace reader
 {
 
-class HEXER_DLL OGR
+class OGR
 {
 public:
     
@@ -140,7 +140,7 @@ namespace writer
 {
 
 
-class HEXER_DLL OGR
+class OGR
 {
 
     
