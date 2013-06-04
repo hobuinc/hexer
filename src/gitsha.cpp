@@ -1,3 +1,3 @@
 #include <hexer/gitsha.h>
-#define GIT_SHA1 "5aa2282d9fc48558e3b90237baf5dedc01c355f9"
+#define GIT_SHA1 "586009304a60e7cd24bcaebe90f6121206a7e58c"
 const char g_GIT_SHA1[] = GIT_SHA1;

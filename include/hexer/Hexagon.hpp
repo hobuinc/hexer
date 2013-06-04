@@ -16,8 +16,7 @@
 #ifndef INCLUDED_PSHAPE_HEXAGON_HPP
 #define INCLUDED_PSHAPE_HEXAGON_HPP
 
-//ABELL - Assertions that int isn't bigger than int32_t
-#include <stdint.h>
+#include <boost/cstdint.hpp>
 
 #include "export.hpp"
 #include "Mathpair.hpp"
@@ -32,7 +31,7 @@ public:
         m_dense_neighbors(0)
         {}
 
-    uint64_t key()
+    boost::uint64_t key()
     {
         return key(m_x, m_y);
     }
@@ -40,11 +39,11 @@ public:
     void increment()
        { m_count++; }
 
-    static uint64_t key(int32_t x, int32_t y)
+    static boost::uint64_t key(boost::int32_t x, boost::int32_t y)
     {
-        uint32_t ux = (uint32_t)x;
-        uint32_t uy = (uint32_t)y;
-        return (ux | ((uint64_t)uy << 32));
+        boost::uint32_t ux = (boost::uint32_t)x;
+        boost::uint32_t uy = (boost::uint32_t)y;
+        return (ux | ((boost::uint64_t)uy << 32));
     }
 
     int x() const
@@ -89,8 +88,8 @@ public:
     Coord neighborCoord(int dir) const;
 
 private:
-    int32_t m_x;
-    int32_t m_y;
+    boost::int32_t m_x;
+    boost::int32_t m_y;
     int m_count;
     bool m_dense;
     int m_dense_neighbors;
