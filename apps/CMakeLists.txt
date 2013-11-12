@@ -6,6 +6,8 @@ include_directories(
     ${GDAL_INCLUDE_DIR})
 
 set(CURSE curse)
+set(HEXER_UTILITIES
+  ${CURSE})
 
 if(WIN32)
 if(NOT BUILD_STATIC)
