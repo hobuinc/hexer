@@ -3,7 +3,7 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 include(${hexer_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
-set(VERSION 1.0.0 CACHE STRING "Hexer version")
+set(HEXER_VERSION 1.0.1 CACHE STRING "Hexer version")
 
 DISSECT_VERSION()
 GET_OS_INFO()
@@ -111,11 +111,10 @@ if(WITH_DRAWING)
     set(HEXER_HAVE_CAIRO 1)
 endif(WITH_DRAWING)
 
-set(WITH_GDAL FALSE CACHE BOOL "Use GDAL/OGR to export hexagon density surfaces and/or paths")
-if(WITH_GDAL)
-    find_package(GDAL 1.9)
+find_package(GDAL 1.9.0)
+if (GDAL_FOUND)
     set(HEXER_HAVE_GDAL 1)
-endif(WITH_GDAL)
+endif()
 
 ###############################################################################
 # Installation settings

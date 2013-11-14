@@ -44,13 +44,13 @@
 macro(DISSECT_VERSION)
     # Find version components
     string(REGEX REPLACE "^([0-9]+).*" "\\1"
-        HEXER_VERSION_MAJOR "${VERSION}")
+        HEXER_VERSION_MAJOR "${HEXER_VERSION}")
     string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
-        HEXER_VERSION_MINOR "${VERSION}")
+        HEXER_VERSION_MINOR "${HEXER_VERSION}")
     string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+)" "\\1"
-        HEXER_VERSION_PATCH "${VERSION}")
+        HEXER_VERSION_PATCH "${HEXER_VERSION}")
     string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1"
-        HEXER_CANDIDATE_VERSION "${VERSION}")
+        HEXER_CANDIDATE_VERSION "${HEXER_VERSION}")
 endmacro(DISSECT_VERSION)
 
 ###############################################################################
