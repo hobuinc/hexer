@@ -158,6 +158,16 @@ public:
         return y;
     }
 
+    inline double getZ(size_t point)
+    {
+        char *position = (char *)points_offset() + stride() * point + sizeof(int) + sizeof(int);
+        
+        int *zi = (int *)position;
+        
+        double z = *zi * scale_[2] + offset_[2];
+        
+        return z;
+    }
     
 private:
     void updateMinsMaxes() {
