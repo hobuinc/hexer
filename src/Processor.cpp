@@ -121,7 +121,7 @@ std::string GetFullVersion( void )
     os << "hexer " 
        << HEXER_VERSION_MAJOR << "."
        << HEXER_VERSION_MINOR << "."
-       << HEXER_VERSION_REVISION;
+       << HEXER_VERSION_PATCH;
 
     std::ostringstream revs;
     revs << g_GIT_SHA1;
