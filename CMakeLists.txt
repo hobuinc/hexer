@@ -55,8 +55,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
 # Output directory in which to build ARCHIVE target files.
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY}) 
 
+option(HEXER_EMBED_BOOST "Use embedded rather than system boost" FALSE)
 
 set(BUILD_STATIC FALSE CACHE BOOL "Build Hexer statically" )
+
 ###############################################################################
 # Platform and compiler specific settings
 
@@ -77,32 +79,45 @@ endif()
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-
-set(BOOST_ROOT ${PROJECT_SOURCE_DIR}/boost)
-
-# find_package would normally set the following variables
-set(Boost_FOUND TRUE)
-set(Boost_INCLUDE_DIRS ${BOOST_ROOT})
-
-set(HEXERBOOST_LIB_NAME "hexerboost" CACHE STRING "use embedded boost")
-mark_as_advanced(FORCE HEXERBOOST_LIB_NAME)
-
-if (WIN32)
-  set(Boost_LIBRARIES "${HEXERBOOST_LIB_NAME}.lib")
-  link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-else()
-  # Some Cmake versions are borken here. See
-  # http://www.cmake.org/Bug/view.php?id=12258#c26851
-  # set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem")
-  # include_directories(BEFORE SYSTEM ${Boost_INCLUDE_DIRS}/)
-  set(Boost_LIBRARIES "${HEXERBOOST_LIB_NAME}")
+if (NOT HEXER_EMBED_BOOST)
+	find_package(Boost 1.52 COMPONENTS program_options thread iostreams filesystem system unit_test_framework random)
 endif()
 
-# this prevents auto-linking pragmas from depending on wrong lib names
-add_definitions(-DBOOST_ALL_NO_LIB)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
 
-include_directories( ${Boost_INCLUDE_DIRS}/)
-add_subdirectory(boost)
+    # make these available for the user to set.
+    mark_as_advanced(CLEAR Boost_INCLUDE_DIR) 
+    mark_as_advanced(CLEAR Boost_LIBRARY_DIRS) 
+    link_directories(${Boost_LIBRARY_DIRS})
+else()
+	set(BOOST_ROOT "${PROJECT_SOURCE_DIR}/boost")
+
+	# find_package would normally set the following variables
+	set(Boost_FOUND TRUE)
+	set(Boost_INCLUDE_DIRS ${BOOST_ROOT})
+
+	set(HEXERBOOST_LIB_NAME "hexerboost" CACHE STRING "use embedded boost")
+	mark_as_advanced(FORCE HEXERBOOST_LIB_NAME)
+
+	if (WIN32)
+	  set(Boost_LIBRARIES "${HEXERBOOST_LIB_NAME}.lib")
+	  link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+	else()
+	  # Some Cmake versions are borken here. See
+	  # http://www.cmake.org/Bug/view.php?id=12258#c26851
+	  # set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem")
+	  # include_directories(BEFORE SYSTEM ${Boost_INCLUDE_DIRS}/)
+	  set(Boost_LIBRARIES "${HEXERBOOST_LIB_NAME}")
+	endif()
+
+	# this prevents auto-linking pragmas from depending on wrong lib names
+	add_definitions(-DBOOST_ALL_NO_LIB)
+
+	include_directories("${Boost_INCLUDE_DIRS}/")
+	add_subdirectory(boost)
+    message(STATUS "External boost not found, using embedded boost tree")
+endif()
 
 
 set(WITH_DRAWING FALSE CACHE BOOL "Choose to build Cairo-based SVG drawing")
