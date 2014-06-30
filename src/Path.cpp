@@ -33,18 +33,14 @@ vector<Point> Path::points() const
     if (m_orientation == CLOCKWISE)
     {
         for (size_t i = 0; i < m_segs.size(); ++i)
-        {
             points.push_back(m_segs[i].startPos(m_grid));
-        }
         points.push_back(m_segs[0].startPos(m_grid));
     }
     else
     {
         // Note that i will wrap to max of size_t when decrementing 0.
         for (size_t i = m_segs.size() - 1; i < m_segs.size(); --i)
-        {
             points.push_back(m_segs[i].startPos(m_grid));
-        }
         points.push_back(m_segs[m_segs.size()-1].startPos(m_grid));
 
     }
@@ -55,23 +51,23 @@ void Path::toWKT( std::ostream& output) const
 {
     vector<Point> pts = points();
 
-    output << "(";
-    vector<Point>::const_iterator i;
-    bool bFirst(true);
-    for (i = pts.begin(); i != pts.end(); ++i)
+    auto outputPoint = [&output](Point& p)
     {
-        if (!bFirst)
-        {
-            output << ", ";
-        } else
-        {
-            bFirst = false;
-        }
+        output << p.m_x << " " << p.m_y;
+    };
 
-        output << i->m_x << " " << i->m_y;
+    output << "(";
+
+    auto pi = pts.begin();
+    if (pi != pts.end())
+        outputPoint(*pi++);
+    for (; pi != pts.end(); ++pi)
+    {
+        output << ", ";
+        outputPoint(*pi);
     }
-    output << ")";
 
+    output << ")";
 
     vector<Path *> paths = subPaths();
     for (int pi = 0; pi != paths.size(); ++pi)
@@ -80,7 +76,6 @@ void Path::toWKT( std::ostream& output) const
         output <<",";
         p->toWKT(output);
     }
-    
 }
 
 } // namespace

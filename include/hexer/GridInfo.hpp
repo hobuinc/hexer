@@ -13,8 +13,7 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_GRID_INFO_HPP
-#define INCLUDED_PSHAPE_GRID_INFO_HPP
+#pragma once
 
 #include <vector>
 #include <ostream>
@@ -56,9 +55,7 @@ public:
         p.m_x = hex.x() * m_grid->width();
         p.m_y = hex.y() * m_grid->height();
         if (hex.xodd())
-        {
             p.m_y += (m_grid->height() / 2);
-        }
         info.m_center = p + m_grid->centerOffset(0);
         info.m_density = hex.count();
         return info;
@@ -75,9 +72,7 @@ private:
         while (m_iter != m_grid->m_hexes.end())
         {
             if (m_iter->second.count())
-            {
                 break;
-            }
             m_iter++;
         }
     }
@@ -96,6 +91,7 @@ public:
 
     double m_hexsize;
     int m_density;
+    HexGrid *m_grid;
 
     std::vector<Path *> const& rootPaths() const
         { return m_grid->rootPaths(); }
@@ -122,11 +118,7 @@ public:
     
     void toWKT(std::ostream& strm) const 
         { m_grid->toWKT(strm); }
-    
-    HexGrid *m_grid;
 };
 
-} // namespace
-
-#endif
+} // namespace hexer
 

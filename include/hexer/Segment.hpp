@@ -13,8 +13,7 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_SEGMENT_HPP
-#define INCLUDED_PSHAPE_SEGMENT_HPP
+#pragma once
 
 #include <iostream>
 #include <stdlib.h>
@@ -68,9 +67,7 @@ private:
     Hexagon *m_hex;
     /// Which side of the hexagon.
     int m_side;
-
 };
 
 } // namespace
 
-#endif // file guard

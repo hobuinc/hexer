@@ -30,34 +30,22 @@ namespace hexer
 bool Hexagon::less(Hexagon *h) const
 {
     if (y() < h->y())
-    {
         return true;
-    }
     if (y() > h->y())
-    {
         return false;
-    }
     if (xeven() && h->xodd())
-    {
         return true;
-    }
     if (xodd() && h->xeven())
-    {
         return false;
-    }
     return x() < h->x();
 }
 
 bool Hexagon::yless(Hexagon *h) const
 {
     if (y() < h->y())
-    {
         return true;
-    }
     if (y() > h->y())
-    {
         return false;
-    }
     return (xeven() && h->xodd());
 }
 
@@ -84,4 +72,4 @@ Coord Hexagon::neighborCoord(int dir) const
     return coord;
 }
 
-} // namespace
+} // namespace hexer

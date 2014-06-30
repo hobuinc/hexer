@@ -13,9 +13,6 @@
 
 *****************************************************************************/
 
-
-#include <iostream>
-
 #include <hexer/Draw.hpp>
 
 #include <hexer/Hexagon.hpp>
@@ -35,11 +32,8 @@ typedef double Color[];
 namespace hexer
 {
 
-
-Draw::Draw( HexGrid *grid_p, 
-            std::string const& filename) 
-    : m_grid_p(grid_p)
-    , m_filename(filename)
+Draw::Draw( HexGrid *grid_p, std::string const& filename) :
+    m_grid_p(grid_p), m_filename(filename)
 {
 
 #ifdef HEXER_HAVE_CAIRO    
@@ -49,7 +43,6 @@ Draw::Draw( HexGrid *grid_p,
     // Move things to the center.
     cairo_translate(m_cairo_p, 400, 50 );
 #endif
-    
 }
 
 Draw::~Draw()
@@ -72,9 +65,7 @@ void Draw::drawHexagon(Hexagon *hex_p, bool fill)
     pos.m_y = hex_p->y() * m_grid_p->height();
 
     if (hex_p->xodd())
-    {
         pos.m_y += (m_grid_p->height() / 2);
-    }
     cairo_move_to(m_cairo_p, pos.m_x, pos.m_y);
     for (int i = 1; i <= 5; ++i)
     {
@@ -82,11 +73,10 @@ void Draw::drawHexagon(Hexagon *hex_p, bool fill)
         cairo_line_to(m_cairo_p, p.m_x, p.m_y);
     }
     cairo_close_path(m_cairo_p);
-    if ( hex_p->x() == 0 && hex_p->y() == 0 )
-    {
+    if ((hex_p->x() == 0) && (hex_p->y() == 0))
         cairo_fill(m_cairo_p);
-    }
-    if ( hex_p->dense() )
+
+    if (hex_p->dense())
     {
         cairo_set_source_rgb(m_cairo_p, .3, .3, 0);
         cairo_fill(m_cairo_p);
@@ -126,5 +116,4 @@ void Draw::drawPoint(hexer::Point p)
 #endif
 }
 
-
-} //namespace
+} //namespace hexer

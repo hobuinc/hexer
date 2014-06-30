@@ -13,18 +13,16 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_UTILS_HPP
-#define INCLUDED_PSHAPE_UTILS_HPP
-
+#pragma once
 
 namespace hexer
 {
 
-
 // compares two values to within a given tolerance
 // the value |tolerance| is compared to |actual - expected|
 template<class T>
-static bool compare_approx(const T& actual, const T& expected, const T& tolerance)
+static bool compare_approx(const T& actual, const T& expected,
+    const T& tolerance)
 {
     const double diff = std::abs((double)actual - (double)expected);
     const double delta = std::abs((double)tolerance);
@@ -43,6 +41,5 @@ static bool compare_distance(const T& actual, const T& expected)
     return compare_approx<T>(actual, expected, epsilon);
 }
 
-#endif
+} // namespace hexer
 
-} // namespace

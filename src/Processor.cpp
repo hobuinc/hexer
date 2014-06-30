@@ -30,7 +30,6 @@
 
 namespace hexer
 {
-
     double distance(const Point& p1, const Point& p2)
     {
         double xdist = p2.m_x - p1.m_x;
@@ -38,8 +37,8 @@ namespace hexer
         return sqrt(xdist * xdist + ydist * ydist);
     }
 
-    // Compute hex size based on distance between consecutive points and density.
-    // The probably needs some work based on more data.
+    // Compute hex size based on distance between consecutive points and
+    // density.  The probably needs some work based on more data.
     double computeHexSize(const std::vector<Point>& samples, int density)
     {
         double dist = 0;
@@ -80,13 +79,9 @@ void process(const std::vector<GridInfo *>& infos, PointReader reader)
         info->m_grid = grid;
 
         for (std::vector<Point>::size_type i = 0; i < samples.size(); ++i)
-        {
             grid->addPoint(samples[i]);
-        }
         while (reader(x, y, context))
-        {
             grid->addPoint(Point(x, y));
-        }
         grid->findShapes();
         grid->findParentPaths();
     }
@@ -107,9 +102,7 @@ void processHexes(const std::vector<GridInfo *>& infos, HexReader reader)
         info->m_grid = grid;
         
         while (reader(x, y, ctx))
-        {
             grid->addDenseHexagon(x, y);
-        }
         grid->findShapes();
         grid->findParentPaths();
     }

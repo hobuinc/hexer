@@ -13,8 +13,7 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_HEXER_EXCEPTION_HPP
-#define INCLUDED_HEXER_EXCEPTION_HPP
+#pragma once
 
 #include <stdexcept>
 
@@ -29,6 +28,5 @@ public:
     {}
 };
 
-}
+} // namespace hexer
 
-#endif

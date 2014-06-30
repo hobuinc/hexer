@@ -13,8 +13,7 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_PATH_HPP
-#define INCLUDED_PSHAPE_PATH_HPP
+#pragma once
 
 #include <vector>
 #include <ostream>
@@ -87,6 +86,5 @@ private:
     std::vector<Segment> m_segs;
 };
 
-} //namespace
+} //namespace hexer
 
-#endif

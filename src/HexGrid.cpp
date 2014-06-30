@@ -13,10 +13,9 @@
 
 *****************************************************************************/
 
-#include <iostream>
-
 #include <hexer/HexGrid.hpp>
 #include <hexer/Mathpair.hpp>
+#include <hexer/Processor.hpp>
 #include <hexer/Segment.hpp>
 #include <hexer/exception.hpp>
 
@@ -25,6 +24,22 @@ using namespace std;
 namespace hexer
 {
 
+HexGrid::HexGrid(int dense_limit) : m_height(-1.0), m_width(-1.0),
+    m_dense_limit(dense_limit), m_miny(1)
+{}
+
+void HexGrid::initialize(double height)
+{
+    m_height = height;
+    m_miny = 1;
+    m_width = (3 / (2 * SQRT_3)) * m_height;
+    m_offsets[0] = Point(0, 0);
+    m_offsets[1] = Point(-m_width / 3, m_height / 2);
+    m_offsets[2] = Point(0, m_height);
+    m_offsets[3] = Point(2 * m_width / 3, m_height);
+    m_center_offset = Point(m_width / 3, m_height / 2);
+}
+
 bool HexGrid::dense(Hexagon *h)
 {
     return h->count() >= m_dense_limit;
@@ -32,24 +47,50 @@ bool HexGrid::dense(Hexagon *h)
 
 void HexGrid::addPoint(Point p)
 {
+    const size_t MAX_SAMPLE_SIZE = 10000;
+
+    if (m_width < 0)
+    {
+        m_sample.push_back(p);
+        if (m_sample.size() >= MAX_SAMPLE_SIZE)
+            processSample();
+        return;
+    }
+
     Hexagon *h = findHexagon(p);
+    h->increment();
     if (!h->dense())
     {
-        h->increment();
         if (dense(h))
         {
             h->setDense();
             m_miny = std::min(m_miny, h->y() - 1);
             if (h->possibleRoot())
-            {
                 m_pos_roots.insert(h);
-            }
             markNeighborBelow(h);
         }
-    } else
-	{
-		h->increment();
-	}
+    }
+}
+
+void HexGrid::processSample()
+{
+    if (m_width > 0)
+    {
+        throw hexer_error("Can't process point sample of HexGrid with a "
+            "determined hexagon size.");
+        return;
+    }
+    if (m_sample.empty())
+    {
+        throw hexer_error("Can't process empty point sample.");
+        return;
+    }
+
+    double height = computeHexSize(m_sample, m_dense_limit);
+    initialize(height);
+    for (auto pi = m_sample.begin(); pi != m_sample.end(); ++pi)
+        addPoint(*pi);
+    m_sample.clear();
 }
 
 // A debugging function that can be used to make a particular hexagon
@@ -63,9 +104,7 @@ void HexGrid::addDenseHexagon(int x, int y)
         h->setDense();
         m_miny = std::min(m_miny, h->y() - 1);
         if (h->possibleRoot())
-        {
             m_pos_roots.insert(h);
-        }
         markNeighborBelow(h);
     }
 }
@@ -76,9 +115,7 @@ void HexGrid::markNeighborBelow(Hexagon *h)
     Hexagon *neighbor = getHexagon(c);
     neighbor->setDenseNeighbor(0);
     if (neighbor->dense() && !neighbor->possibleRoot())
-    {
         m_pos_roots.erase(neighbor);
-    }
 }
 
 //  first point (origin) and start of column 0
@@ -139,13 +176,9 @@ Hexagon *HexGrid::findHexagon(Point p)
     // This works for 2/3 of the width of the hexagons.
     x = (int)floor(col);
     if (x % 2 == 0)
-    {
         y = static_cast<int>(floor(p.m_y / m_height));
-    }
     else
-    {
         y = static_cast<int>(floor((p.m_y - (m_height / 2)) / m_height));
-    }
 
     // Compute the column remainder to determine if we are in a strip where
     // the hexagons overlap (the mini-column).
@@ -192,7 +225,6 @@ Hexagon *HexGrid::findHexagon(Point p)
             }
         }
     }
-
     return getHexagon(x, y);
 }
 
@@ -225,7 +257,8 @@ void HexGrid::findShapes()
 {
     if (m_pos_roots.empty())
     {
-        throw hexer_error( "No areas of sufficient density - no shapes. Decrease density or area size.");
+        throw hexer_error("No areas of sufficient density - no shapes. "
+            "Decrease density or area size.");
     }
 
     while (m_pos_roots.size())
@@ -290,10 +323,8 @@ void HexGrid::findShape(Hexagon *hex)
         cleanPossibleRoot(cur, p);
         p->push_back(cur);
         Segment next = cur.leftClockwise(this);
-        if ( !next.hex()->dense() )
-        {
+        if (!next.hex()->dense())
             next = cur.rightClockwise(this); 
-        }
         cur = next;
     } while (cur != first);
     m_paths.push_back(p);
@@ -302,9 +333,7 @@ void HexGrid::findShape(Hexagon *hex)
 void HexGrid::cleanPossibleRoot(Segment s, Path *p)
 {
     if (s.possibleRoot(this))
-    {
         m_pos_roots.erase(s.hex());
-    }
     if (s.horizontal())
     {
         s.normalize(this);
@@ -313,41 +342,27 @@ void HexGrid::cleanPossibleRoot(Segment s, Path *p)
     }
 }
 
-void HexGrid::dumpInfo()
-{
-    int count = 0;
-    for (HexMap::iterator it = m_hexes.begin(); it != m_hexes.end(); ++it)
-    {
-        Hexagon& hex = it->second;
-        count += hex.count();
-    }
-}
-
 void HexGrid::toWKT(std::ostream& output) const
 {
+    auto outputPath = [this,&output](size_t pathNum)
+    {
+        Path *p = rootPaths()[pathNum];
+
+        output << "(";
+        p->toWKT(output);
+        output << ")";
+    };
 
     output << "MULTIPOLYGON (";
     
-    bool bFirst(true);
-	typedef std::vector<hexer::Path*>::size_type st;
-    for (st pi = 0; pi < rootPaths().size(); ++pi)
+    if (rootPaths().size())
+        outputPath(0);
+    for (size_t pi = 1; pi < rootPaths().size(); ++pi)
     {
-        Path *p = rootPaths()[pi];
-
-        if (!bFirst)
-        {
-            output << ",";
-        } else {
-            bFirst = false;
-        }
-            
-        output << "(";
-        p->toWKT(output);
-        
-        output << ")";
-        
+        output << ",";
+        outputPath(pi);
     }
     output << ")";
-    
 }
-} //namespace
+
+} //namespace hexer

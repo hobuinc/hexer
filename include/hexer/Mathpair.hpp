@@ -13,8 +13,7 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_MATHPAIR_HPP
-#define INCLUDED_PSHAPE_MATHPAIR_HPP
+#pragma once
 
 #include "export.hpp"
 
@@ -63,6 +62,5 @@ public:
 typedef Mathpair<double> Point;
 typedef Mathpair<int> Coord;
 
-} // namespace
+} // namespace hexer
 
-#endif // file guard

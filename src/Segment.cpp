@@ -125,9 +125,7 @@ bool operator == (const Segment& s1, const Segment &s2)
     static int oddx[] = { 0, -1, -1, 0, 1, 1, };
     static int oddy[] = { -1, 0, 1, 1, 1, 0 };
     if (s1.m_hex == s2.m_hex && s1.m_side == s2.m_side)
-    {
         return true;
-    }
     if (s2.m_side == sharedside[s1.m_side])
     {
         int xinc;
@@ -162,5 +160,5 @@ std::ostream& operator << (std::ostream& os, const Segment &s)
     return os;
 };
 
+} // namespace hexer
 
-} // namespace

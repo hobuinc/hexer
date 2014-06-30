@@ -35,18 +35,9 @@ class HexGrid
     friend class HexIter;
     friend class GridInfo;
 public:
-    HexGrid(double height, int dense_limit) :
-        m_height(height), m_dense_limit(dense_limit), m_miny(1)
-    {
-        m_width = (3 / (2 * SQRT_3)) * m_height;
-        m_offsets[0] = Point(0, 0);
-        m_offsets[1] = Point(-m_width / 3, m_height / 2);
-        m_offsets[2] = Point(0, m_height);
-        m_offsets[3] = Point(2 * m_width / 3, m_height);
-        m_offsets[4] = Point(m_width, m_height / 2);
-        m_offsets[5] = Point(2 * m_width / 3, 0);
-        m_center_offset = Point(m_width / 3, m_height / 2);
-    }
+    HexGrid(int dense_limit);
+    HexGrid(double height, int dense_limit) : m_dense_limit(dense_limit)
+        { initialize(height); }
 
     ~HexGrid()
     {
@@ -55,7 +46,10 @@ public:
     }
 
     bool dense(Hexagon *h);
+    void addPoint(double x, double y)
+        { addPoint(Point(x, y)); }
     void addPoint(Point p);
+    void processSample();
     void findShapes();
     void findParentPaths();
     void extractShapes();
@@ -84,6 +78,7 @@ public:
     void toWKT(std::ostream&) const;
     
 private:
+    void initialize(double height);
     Hexagon *findHexagon(Point p);
     void findShape(Hexagon *hex);
     void findHole(Hexagon *hex);
@@ -116,6 +111,8 @@ private:
     int m_dense_limit;
     /// Minimum y - 1.
     int m_miny;
+    /// Vector of points to use to determine hex height.
+    std::vector<Point> m_sample;
 };
 
 } // namespace

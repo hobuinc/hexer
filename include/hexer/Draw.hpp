@@ -13,11 +13,12 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_DRAW_HPP
-#define INCLUDED_PSHAPE_DRAW_HPP
+#pragma once
 
 #include <hexer/hexer.hpp>
 #include <hexer/hexer_defines.h>
+
+#include <string>
 
 #ifdef HEXER_HAVE_CAIRO
 #include <cairo/cairo.h>
@@ -68,4 +69,3 @@ private:
 
 } // namespace
 
-#endif // file guard
