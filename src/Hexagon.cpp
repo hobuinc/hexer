@@ -61,7 +61,7 @@ bool Hexagon::yless(Hexagon *h) const
     return (xeven() && h->xodd());
 }
 
-// Find the x and Y in hex coordinates of the hexagon next to this hexagon
+// Find the X and Y in hex coordinates of the hexagon next to this hexagon
 // in the direction specified.
 Coord Hexagon::neighborCoord(int dir) const
 {

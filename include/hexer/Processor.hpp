@@ -13,13 +13,12 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PROCESSOR_HPP
-#define INCLUDED_PROCESSOR_HPP
+#pragma once
 
 #include <string>
 #include <vector>
 
-#include <boost/function.hpp>
+#include <functional>
 
 #include <hexer/GridInfo.hpp>
 #include <hexer/Path.hpp>
@@ -27,15 +26,16 @@
 
 namespace hexer
 {
-    typedef boost::function<bool(double&, double&, void*&)> PointReader;
-    typedef boost::function<bool(int&, int&, void*&)> HexReader;
+    typedef std::function<bool(double&, double&, void*&)> PointReader;
+    typedef std::function<bool(int&, int&, void*&)> HexReader;
 
     HEXER_DLL void process(const std::vector<GridInfo *>& infos, PointReader);
-    HEXER_DLL void processHexes(const std::vector<GridInfo *>& infos, HexReader);
+    HEXER_DLL void processHexes(const std::vector<GridInfo *>& infos,
+        HexReader);
     
-    HEXER_DLL double computeHexSize(const std::vector<Point>& samples, int density);
+    HEXER_DLL double computeHexSize(const std::vector<Point>& samples,
+        int density);
 
     HEXER_DLL std::string GetFullVersion( void );
 } // namespace hexer
 
-#endif // INCLUDED_PROCESSOR_HPP

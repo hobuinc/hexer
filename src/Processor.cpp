@@ -15,6 +15,7 @@
 
 #include <hexer/Processor.hpp>
 
+#include <assert.h>
 #include <math.h>
 #include <sstream>
 #include <string>

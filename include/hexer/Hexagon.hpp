@@ -13,10 +13,9 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_HEXAGON_HPP
-#define INCLUDED_PSHAPE_HEXAGON_HPP
+#pragma once
 
-#include <boost/cstdint.hpp>
+#include <stdint.h>
 
 #include "export.hpp"
 #include "Mathpair.hpp"
@@ -31,7 +30,7 @@ public:
         m_dense_neighbors(0)
         {}
 
-    boost::uint64_t key()
+    uint64_t key()
     {
         return key(m_x, m_y);
     }
@@ -39,11 +38,11 @@ public:
     void increment()
        { m_count++; }
 
-    static boost::uint64_t key(boost::int32_t x, boost::int32_t y)
+    static uint64_t key(int32_t x, int32_t y)
     {
-        boost::uint32_t ux = (boost::uint32_t)x;
-        boost::uint32_t uy = (boost::uint32_t)y;
-        return (ux | ((boost::uint64_t)uy << 32));
+        uint32_t ux = (uint32_t)x;
+        uint32_t uy = (uint32_t)y;
+        return (ux | ((uint64_t)uy << 32));
     }
 
     int x() const
@@ -88,8 +87,8 @@ public:
     Coord neighborCoord(int dir) const;
 
 private:
-    boost::int32_t m_x;
-    boost::int32_t m_y;
+    int32_t m_x;
+    int32_t m_y;
     int m_count;
     bool m_dense;
     int m_dense_neighbors;
@@ -97,4 +96,3 @@ private:
 
 } // namespace
 
-#endif // file guard

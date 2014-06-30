@@ -97,7 +97,7 @@ void HexGrid::markNeighborBelow(Hexagon *h)
 //   /    \      /                       |    /|  The top rectangle is the
 //  / 0,1  \____/                        |   / |  negative slope case and
 //  \      /    \                        |  /  |  the lower rectangle is the
-//   \____/      \                       | /   |  negative slope case.
+//   \____/      \                       | /   |  positive slope case.
 //                                       |/____|
 //        ** <--  The area above these
 //                asterisks are the "mini-column"

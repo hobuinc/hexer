@@ -13,11 +13,10 @@
 
 *****************************************************************************/
 
-#ifndef INCLUDED_PSHAPE_HEX_GRID_HPP
-#define INCLUDED_PSHAPE_HEX_GRID_HPP
+#pragma once
 
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "Draw.hpp"
 #include "Hexagon.hpp"
@@ -103,13 +102,13 @@ private:
     /// Offset of the center of the hexagons.
     Point m_center_offset;
     /// Map of hexagons based on keys.
-    typedef boost::unordered_map<uint64_t, Hexagon> HexMap;
+    typedef std::unordered_map<uint64_t, Hexagon> HexMap;
     HexMap m_hexes;
     /// Set of dense hexagons with non-dense neighbors above.
-    typedef boost::unordered_set<Hexagon *> HexSet;
+    typedef std::unordered_set<Hexagon *> HexSet;
     HexSet m_pos_roots;
     /// Map of roots and their associated paths.
-    typedef boost::unordered_map<Hexagon *, Path *> HexPathMap;
+    typedef std::unordered_map<Hexagon *, Path *> HexPathMap;
     HexPathMap m_hex_paths;
     /// List of paths
     std::vector<Path *> m_paths;
@@ -121,4 +120,3 @@ private:
 
 } // namespace
 
-#endif // file guard

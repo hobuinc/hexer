@@ -182,7 +182,7 @@ void boundary(	std::string const& input,
 	if (!hexer::compare_distance(edge, 0.0))
 		gi->m_hexsize = edge;
 	
-	if (!density == 0)
+	if (density != 0)
 		gi->m_density = density;
 
     infos.push_back(gi);
@@ -234,7 +234,7 @@ void density(	std::string const& input,
 	if (!hexer::compare_distance(edge, 0.0))
 		gi->m_hexsize = edge;
 	
-	if (!density == 0)
+	if (density != 0)
 		gi->m_density = density;
 
     infos.push_back(gi);
