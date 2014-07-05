@@ -16,3 +16,5 @@ cmake_install.cmake
 bin/
 include/hexer/hexer_defines.h
 install_manifest.txt
+curse
+
