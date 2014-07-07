@@ -13,6 +13,8 @@
 
 *****************************************************************************/
 
+#include <cmath>
+
 #include <hexer/HexGrid.hpp>
 #include <hexer/Mathpair.hpp>
 #include <hexer/Processor.hpp>
