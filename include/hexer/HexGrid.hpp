@@ -74,6 +74,8 @@ public:
         { return m_dense_limit; }
     std::vector<Path *> const& rootPaths() const
         { return m_paths; }
+    void setSampleSize(unsigned sampleSize)
+        { m_maxSample = sampleSize; }
     
     void toWKT(std::ostream&) const;
     
@@ -113,6 +115,8 @@ private:
     int m_miny;
     /// Vector of points to use to determine hex height.
     std::vector<Point> m_sample;
+    /// Maximum sample size.
+    unsigned m_maxSample;
 };
 
 } // namespace

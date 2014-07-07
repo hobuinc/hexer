@@ -30,6 +30,7 @@ HexGrid::HexGrid(int dense_limit) : m_height(-1.0), m_width(-1.0),
 
 void HexGrid::initialize(double height)
 {
+    m_maxSample = 10000;
     m_height = height;
     m_miny = 1;
     m_width = (3 / (2 * SQRT_3)) * m_height;
@@ -47,12 +48,10 @@ bool HexGrid::dense(Hexagon *h)
 
 void HexGrid::addPoint(Point p)
 {
-    const size_t MAX_SAMPLE_SIZE = 10000;
-
     if (m_width < 0)
     {
         m_sample.push_back(p);
-        if (m_sample.size() >= MAX_SAMPLE_SIZE)
+        if (m_sample.size() >= m_maxSample)
             processSample();
         return;
     }
@@ -74,17 +73,9 @@ void HexGrid::addPoint(Point p)
 
 void HexGrid::processSample()
 {
-    if (m_width > 0)
-    {
-        throw hexer_error("Can't process point sample of HexGrid with a "
-            "determined hexagon size.");
+    std::cerr << "Processing sample!\n";
+    if (m_width > 0 || m_sample.empty())
         return;
-    }
-    if (m_sample.empty())
-    {
-        throw hexer_error("Can't process empty point sample.");
-        return;
-    }
 
     double height = computeHexSize(m_sample, m_dense_limit);
     initialize(height);
