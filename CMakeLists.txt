@@ -122,7 +122,7 @@ endif()
 
 set(WITH_DRAWING FALSE CACHE BOOL "Choose to build Cairo-based SVG drawing")
 if(WITH_DRAWING)
-    find_package(cairo)
+    find_package(Cairo)
     set(HEXER_HAVE_CAIRO 1)
 endif(WITH_DRAWING)
 
