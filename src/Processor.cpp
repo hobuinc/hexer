@@ -13,19 +13,18 @@
 
 *****************************************************************************/
 
+#include <assert.h>
+#include <sstream>
+
 #include <hexer/Processor.hpp>
 
-#include <assert.h>
-#include <math.h>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <hexer/gitsha.h>
+#include <hexer/HexGrid.hpp>
 
 #ifdef HEXER_HAVE_GDAL
 #include "gdal.h"
 #endif
 
-#include <hexer/GridInfo.hpp>
 #include <hexer/Mathpair.hpp>
 
 namespace hexer
@@ -52,60 +51,29 @@ namespace hexer
     }
 
 
-void process(const std::vector<GridInfo *>& infos, PointReader reader)
+void process(HexGrid *grid, PointReader reader)
 {
-    std::vector<Point> samples;
-
-    int cnt = 0;
     double x, y;
     void* context;
 
-    // Max number of points to read to determine grid spacing.
-    const int SAMPLE_COUNT = 5000;
-    
-    while (reader(x, y, context) && (cnt < SAMPLE_COUNT))
-    {
-        samples.push_back(Point(x,y));
-        cnt++;
-    }
-
-    for (size_t gi = 0; gi < infos.size(); ++gi)
-    {
-        GridInfo *info = infos[gi];
-        double hexsize = computeHexSize(samples, info->m_density);
-        hexsize = (info->m_hexsize < 0) ?
-            (-hexsize * info->m_hexsize) : info->m_hexsize;
-        HexGrid *grid = new HexGrid(hexsize, info->m_density);
-        info->m_grid = grid;
-
-        for (std::vector<Point>::size_type i = 0; i < samples.size(); ++i)
-            grid->addPoint(samples[i]);
-        while (reader(x, y, context))
-            grid->addPoint(Point(x, y));
-        grid->findShapes();
-        grid->findParentPaths();
-    }
+    while (reader(x, y, context))
+        grid->addPoint(x, y);
+    grid->findShapes();
+    grid->findParentPaths();
 }
 
-void processHexes(const std::vector<GridInfo *>& infos, HexReader reader)
+void processHexes(HexGrid *grid, HexReader reader)
 {
-    int cnt = 0;
     int x, y;
     void* ctx;
 
-    for (size_t gi = 0; gi < infos.size(); ++gi)
-    {
-        GridInfo *info = infos[gi];
-        assert(info->m_hexsize > 0);
-        assert(info->m_density > 0);
-        HexGrid *grid = new HexGrid(info->m_hexsize, info->m_density);
-        info->m_grid = grid;
+    assert(grid->width() > 0);
+    assert(grid->denseLimit() < 0);
         
-        while (reader(x, y, ctx))
-            grid->addDenseHexagon(x, y);
-        grid->findShapes();
-        grid->findParentPaths();
-    }
+    while (reader(x, y, ctx))
+        grid->addDenseHexagon(x, y);
+    grid->findShapes();
+    grid->findParentPaths();
 }
 
 std::string GetFullVersion( void )

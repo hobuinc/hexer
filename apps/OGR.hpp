@@ -19,7 +19,6 @@
 #include <hexer/hexer.hpp>
 
 #include <hexer/Processor.hpp>
-#include <hexer/GridInfo.hpp>
 
 #include <hexer/hexer_defines.h>
 #include <hexer/Mathpair.hpp>
@@ -28,13 +27,13 @@
 
 #ifdef HEXER_HAVE_GDAL
 
-
 #include "ogr_api.h"
 #include "gdal.h"
 
-
 namespace hexer
 {
+
+class HexInfo;
 
 namespace reader
 {
@@ -148,8 +147,8 @@ public:
     OGR(std::string const& filename);
 	~OGR();
 
-    void writeBoundary(std::vector<GridInfo*> const& infos);
-	void writeDensity(std::vector<GridInfo*> const& infos);
+    void writeBoundary(HexGrid *grid);
+	void writeDensity(HexGrid *grid);
 	
 private:
     std::string m_filename;

@@ -2,8 +2,9 @@ set(HEXER_HEADERS_DIR ../include/hexer)
 
 set(HEXER_HPP
   "${HEXER_HEADERS_DIR}/Draw.hpp"
-  "${HEXER_HEADERS_DIR}/GridInfo.hpp"
   "${HEXER_HEADERS_DIR}/HexGrid.hpp"
+  "${HEXER_HEADERS_DIR}/HexInfo.hpp"
+  "${HEXER_HEADERS_DIR}/HexIter.hpp"
   "${HEXER_HEADERS_DIR}/Hexagon.hpp"
   "${HEXER_HEADERS_DIR}/Mathpair.hpp"
   "${HEXER_HEADERS_DIR}/Path.hpp"

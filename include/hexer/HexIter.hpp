@@ -1,4 +1,4 @@
-/*****************************************************************************
+/***************************************************************************
 
     (c) 2013 Hobu, Inc. hobu.inc@gmail.com
 
@@ -15,21 +15,12 @@
 
 #pragma once
 
-#include <vector>
-#include <ostream>
-
 #include "export.hpp"
 #include "HexGrid.hpp"
+#include "HexInfo.hpp"
 
 namespace hexer
 {
-
-class HEXER_DLL HexInfo
-{
-public:
-    Point m_center;
-    int m_density;
-};
 
 class HEXER_DLL HexIter
 {
@@ -51,12 +42,10 @@ public:
     {
         HexInfo info;
         Hexagon& hex = m_iter->second;
-        Point p;
-        p.m_x = hex.x() * m_grid->width();
-        p.m_y = hex.y() * m_grid->height();
-        if (hex.xodd())
-            p.m_y += (m_grid->height() / 2);
-        info.m_center = p + m_grid->centerOffset(0);
+        info.m_pos.m_x = hex.x();
+        info.m_pos.m_y = hex.y();
+        info.m_center.m_x = m_grid->width() * hex.x();
+        info.m_center.m_y = m_grid->height() * hex.y();
         info.m_density = hex.count();
         return info;
     }
@@ -79,45 +68,6 @@ private:
 
     HexGrid::HexMap::iterator m_iter;
     HexGrid *m_grid;
-};
-
-class HEXER_DLL GridInfo
-{
-public:
-    GridInfo() : m_hexsize(-1), m_density(10)
-        {}
-    ~GridInfo()
-        { delete m_grid; }
-
-    double m_hexsize;
-    int m_density;
-    HexGrid *m_grid;
-
-    std::vector<Path *> const& rootPaths() const
-        { return m_grid->rootPaths(); }
-    
-    inline void addPoint(Point const& p)
-        {
-            m_grid->addPoint(p);
-        };
-
-    Point offset(int idx) const
-        { return m_grid->centerOffset(idx); }
-
-    double width() const
-        { return m_grid->width(); }
-
-    double height() const
-        { return m_grid->height(); }
-
-    HexIter begin()
-        { return HexIter(m_grid->m_hexes.begin(), m_grid); }
-
-    HexIter end()
-        { return HexIter(m_grid->m_hexes.end(), m_grid); }
-    
-    void toWKT(std::ostream& strm) const 
-        { m_grid->toWKT(strm); }
 };
 
 } // namespace hexer

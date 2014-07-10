@@ -21,7 +21,7 @@
 #include <sstream>
 
 #include <hexer/HexGrid.hpp>
-#include <hexer/GridInfo.hpp>
+#include <hexer/HexIter.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -30,7 +30,6 @@ using namespace std;
 
 namespace hexer
 {
-
 namespace reader
 {
 
@@ -59,7 +58,6 @@ OGR::~OGR()
 		OGR_DS_Destroy(m_ds);
 
 #endif
-
 }
 
 } // reader
@@ -132,48 +130,41 @@ void OGR::createLayer()
 
 }
 
-void OGR::writeBoundary(std::vector<GridInfo*> const& infos)
+void OGR::writeBoundary(HexGrid *grid)
 {
-    typedef std::vector<GridInfo*>::const_iterator it;
-    int counter(0);
-    for (it i = infos.begin(); i != infos.end(); ++i)
+    OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
+
+    const std::vector<hexer::Path *>& paths = grid->rootPaths();
+    for (auto pi = paths.begin(); pi != paths.end(); ++pi)
     {
-        OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
+        OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
+        collectPath(*pi, polygon);
 
-    	typedef std::vector<hexer::Path*>::size_type st;
-        for (st pi = 0; pi < (*i)->rootPaths().size(); ++pi)
-        {
-            OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
-            Path *p = (*i)->rootPaths()[pi];
-            collectPath(p, polygon);
-
-            if( OGR_G_AddGeometryDirectly(multi, polygon ) != OGRERR_NONE )
-            {
-                std::ostringstream oss;
-                oss << "Unable to add polygon to multipolygon with error '" 
-                    << CPLGetLastErrorMsg() << "'";
-                throw hexer_error(oss.str());
-            }
-        }
-        
-        OGRFeatureH hFeature;
-    
-        hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
-        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"), counter);
-
-        OGR_F_SetGeometry(hFeature, multi);
-        OGR_G_DestroyGeometry(multi);
-
-        if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
+        if( OGR_G_AddGeometryDirectly(multi, polygon ) != OGRERR_NONE )
         {
             std::ostringstream oss;
-            oss << "Unable to create feature for multipolygon with error '" 
+            oss << "Unable to add polygon to multipolygon with error '" 
                 << CPLGetLastErrorMsg() << "'";
             throw hexer_error(oss.str());
         }
-        OGR_F_Destroy( hFeature );                
-        counter++;
     }
+
+    OGRFeatureH hFeature;
+
+    hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
+    OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"), 0);
+
+    OGR_F_SetGeometry(hFeature, multi);
+    OGR_G_DestroyGeometry(multi);
+
+    if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
+    {
+        std::ostringstream oss;
+        oss << "Unable to create feature for multipolygon with error '" 
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_F_Destroy( hFeature );                
 }
 
 void OGR::collectPath(Path* path, OGRGeometryH polygon)
@@ -191,7 +182,8 @@ void OGR::collectPath(Path* path, OGRGeometryH polygon)
     if( OGR_G_AddGeometryDirectly(polygon, ring) != OGRERR_NONE )
     {
         std::ostringstream oss;
-        oss << "Unable to add geometry with error '" << CPLGetLastErrorMsg() << "'";
+        oss << "Unable to add geometry with error '" <<
+            CPLGetLastErrorMsg() << "'";
         throw hexer_error(oss.str());
     }
 
@@ -233,37 +225,34 @@ OGRGeometryH OGR::collectHexagon(HexInfo const& info, HexGrid const* grid)
 }
 
 
-void OGR::writeDensity(std::vector<GridInfo*> const& infos)
+void OGR::writeDensity(HexGrid *grid)
 {
-    typedef std::vector<GridInfo*>::const_iterator it;
-    
-    for (it gi = infos.begin(); gi != infos.end(); ++gi)
+    int counter(0);
+    for (HexIter iter = grid->hexBegin(); iter != grid->hexEnd(); ++iter)
     {
-		int counter(0);
-	    for (HexIter iter = (*gi)->begin(); iter != (*gi)->end(); ++iter)
-	    {
 
-	        HexInfo hi = *iter;
-			OGRGeometryH polygon = collectHexagon(hi, (*gi)->m_grid);
-	        OGRFeatureH hFeature;
-    
-	        hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
-	        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"), counter);
-	        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"), hi.m_density);
+        HexInfo hi = *iter;
+        OGRGeometryH polygon = collectHexagon(hi, grid);
+        OGRFeatureH hFeature;
 
-	        OGR_F_SetGeometry(hFeature, polygon);
-	        OGR_G_DestroyGeometry(polygon);
+        hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
+        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
+            counter);
+        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
+            hi.m_density);
 
-	        if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
-	        {
-	            std::ostringstream oss;
-	            oss << "Unable to create feature for multipolygon with error '" 
-	                << CPLGetLastErrorMsg() << "'";
-	            throw hexer_error(oss.str());
-	        }
-	        OGR_F_Destroy( hFeature );                
-	        counter++;
-	    }
+        OGR_F_SetGeometry(hFeature, polygon);
+        OGR_G_DestroyGeometry(polygon);
+
+        if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
+        {
+            std::ostringstream oss;
+            oss << "Unable to create feature for multipolygon with error '" 
+                << CPLGetLastErrorMsg() << "'";
+            throw hexer_error(oss.str());
+        }
+        OGR_F_Destroy( hFeature );                
+        counter++;
     }
 }
 
@@ -271,12 +260,10 @@ void OGR::writeDensity(std::vector<GridInfo*> const& infos)
 OGR::~OGR()
 {
     OGR_DS_Destroy(m_ds);
-
 }
 
-} // writer
-
-
-} //namespace
+} // namespace writer
+} // namespace hexer
 
 #endif // HEXER_HAVE_GDAL
+

@@ -16,6 +16,7 @@
 #include <cmath>
 
 #include <hexer/HexGrid.hpp>
+#include <hexer/HexIter.hpp>
 #include <hexer/Mathpair.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Segment.hpp>
@@ -40,6 +41,8 @@ void HexGrid::initialize(double height)
     m_offsets[1] = Point(-m_width / 3, m_height / 2);
     m_offsets[2] = Point(0, m_height);
     m_offsets[3] = Point(2 * m_width / 3, m_height);
+    m_offsets[4] = Point(m_width, m_height / 2);
+    m_offsets[5] = Point(2 * m_width / 3, 0);
     m_center_offset = Point(m_width / 3, m_height / 2);
 }
 
@@ -75,7 +78,6 @@ void HexGrid::addPoint(Point p)
 
 void HexGrid::processSample()
 {
-    std::cerr << "Processing sample!\n";
     if (m_width > 0 || m_sample.empty())
         return;
 
@@ -100,6 +102,16 @@ void HexGrid::addDenseHexagon(int x, int y)
             m_pos_roots.insert(h);
         markNeighborBelow(h);
     }
+}
+
+HexIter HexGrid::hexBegin()
+{
+    return HexIter(m_hexes.begin(), this);
+}
+
+HexIter HexGrid::hexEnd()
+{
+    return HexIter(m_hexes.end(), this);
 }
 
 void HexGrid::markNeighborBelow(Hexagon *h)

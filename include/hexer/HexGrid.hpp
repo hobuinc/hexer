@@ -28,12 +28,13 @@
 namespace hexer
 {
 
+class HexIter;
+
 static const double SQRT_3 = 1.732050808; 
 
 class HexGrid
 {
     friend class HexIter;
-    friend class GridInfo;
 public:
     HexGrid(int dense_limit);
     HexGrid(double height, int dense_limit) : m_dense_limit(dense_limit)
@@ -59,7 +60,8 @@ public:
     Hexagon *getHexagon(const Coord& c)
         { return getHexagon(c.m_x, c.m_y); }
     void addDenseHexagon(int x, int y);
-
+    HexIter hexBegin();
+    HexIter hexEnd();
     double width() const
         { return m_width; }
     double height() const

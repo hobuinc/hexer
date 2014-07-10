@@ -15,25 +15,27 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
-#include <functional>
-
-#include <hexer/Path.hpp>
-#include <hexer/export.hpp>
-
 namespace hexer
 {
-    typedef std::function<bool(double&, double&, void*&)> PointReader;
-    typedef std::function<bool(int&, int&, void*&)> HexReader;
 
-    HEXER_DLL void process(HexGrid *grid, PointReader);
-    HEXER_DLL void processHexes(HexGrid *grid, HexReader);
+class HEXER_DLL HexInfo
+{
+public:
+    Point m_center;
+    Coord m_pos;
+    int m_density;
 
-    HEXER_DLL double computeHexSize(const std::vector<Point>& samples,
-        int density);
+    int density() const
+        { return m_density; }
+    int xgrid() const
+        { return m_pos.m_x; }
+    int ygrid() const
+        { return m_pos.m_y; }
+    double x() const
+        { return m_center.m_x; }
+    double y() const
+        { return m_center.m_y; }
+};
 
-    HEXER_DLL std::string GetFullVersion( void );
 } // namespace hexer
 

@@ -23,9 +23,8 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
-
-
-#include <hexer/hexer.hpp>
+#include <hexer/HexGrid.hpp>
+#include <hexer/HexIter.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
 #include "las.hpp"
@@ -107,49 +106,37 @@ void hextest(std::string filename)
 {
     using namespace hexer;
 
-    std::vector<GridInfo *> infos;
-    GridInfo *gi = new GridInfo;
-
-    gi->m_hexsize = 10;
-    gi->m_density = 10;
-    infos.push_back(gi);
+    HexGrid grid(10, 10);
 
     // LAS l(filename);
     // l.open();
     // process(infos, l.reader);
     
-    processHexes(infos, readHex);
+    processHexes(&grid, readHex);
 
     // Dump hexes.
-    for (HexIter iter = gi->begin(); iter != gi->end(); ++iter)
+    for (HexIter iter = grid.hexBegin(); iter != grid.hexEnd(); ++iter)
     {
         HexInfo hi = *iter;
         std::cerr << "Density/X/Y = " << hi.m_density << "/" <<
             hi.m_center.m_x << "/" << hi.m_center.m_y << "!\n";
     }
-
-    delete gi;
 }
 
 void pathtest(std::string filename)
 {
     using namespace hexer;
 
-    std::vector<GridInfo *> infos;
-    GridInfo *gi = new GridInfo;
+    HexGrid grid(10);
 
-    infos.push_back(gi);
     LAS l(filename);
     l.open();
-    process(infos, l.reader);
+    process(&grid, l.reader);
 
-    for (std::vector<Path*>::size_type pi = 0; pi < gi->rootPaths().size(); ++pi)
-    {
-        Path *p = gi->rootPaths()[pi];
-        dumpPath(p);
-    }
+    std::vector<Path *> paths = grid.rootPaths();
 
-    delete gi;
+    for (auto pi = paths.begin(); pi != paths.end(); ++pi)
+        dumpPath(*pi);
 }
 
 enum FormatType
@@ -175,29 +162,27 @@ void boundary(	std::string const& input,
 				int density)
 {
     using namespace hexer;
-
-    std::vector<GridInfo *> infos;
-    GridInfo *gi = new GridInfo;
 	
+    std::unique_ptr<HexGrid> grid;
+	
+    if (density == 0)
+        density = 10;
 	if (!hexer::compare_distance(edge, 0.0))
-		gi->m_hexsize = edge;
-	
-	if (density != 0)
-		gi->m_density = density;
+        grid.reset(new HexGrid(density));
+    else
+        grid.reset(new HexGrid(edge, density));
 
-    infos.push_back(gi);
-    
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
         LAS l(input);
         l.open();
-        process(infos, l.reader);
+        process(grid.get(), l.reader);
     } else {
 #ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
         o.open();
-        process(infos, o.reader);
+        process(grid.get(), o.reader);
 #endif
     }
 	   
@@ -207,17 +192,16 @@ void boundary(	std::string const& input,
 	    multi.setf(std::ios::fixed);
 	    multi.precision(8);
     
-	    gi->toWKT(multi);
+	    grid->toWKT(multi);
         std::cout << multi.str() << std::endl;
 	}
     else
     {
 #ifdef HEXER_HAVE_GDAL
         writer::OGR o(output);
-        o.writeBoundary(infos);
+        o.writeBoundary(grid.get());
 #endif
     }
-    delete gi;
 }
 
 
@@ -228,37 +212,33 @@ void density(	std::string const& input,
 {
     using namespace hexer;
 
-    std::vector<GridInfo *> infos;
-    GridInfo *gi = new GridInfo;
+    std::unique_ptr<HexGrid> grid;
 	
+    if (density == 0)
+        density = 10;
 	if (!hexer::compare_distance(edge, 0.0))
-		gi->m_hexsize = edge;
-	
-	if (density != 0)
-		gi->m_density = density;
+        grid.reset(new HexGrid(density));
+    else
+        grid.reset(new HexGrid(edge, density));
 
-    infos.push_back(gi);
-    
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
         LAS l(input);
         l.open();
-        process(infos, l.reader);
+        process(grid.get(), l.reader);
     } else {
 #ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
         o.open();
-        process(infos, o.reader);
+        process(grid.get(), o.reader);
 #endif
     }
 
 #ifdef HEXER_HAVE_GDAL
     writer::OGR o(output);
-    o.writeDensity(infos);
+    o.writeDensity(grid.get());
 #endif
-
-	delete gi;
 }
 
 
