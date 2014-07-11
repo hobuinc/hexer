@@ -82,7 +82,7 @@ public:
         return (m_dense && ((m_dense_neighbors & TOP) == 0) );
     }
 
-    bool less(Hexagon *h) const;
+    bool less(const Hexagon *h) const;
     bool yless(Hexagon *h) const;
     Coord neighborCoord(int dir) const;
 
@@ -92,6 +92,13 @@ private:
     int m_count;
     bool m_dense;
     int m_dense_neighbors;
+};
+
+class HexCompare
+{
+public:
+    bool operator()(const Hexagon *h1, const Hexagon *h2)
+        { return h1->less(h2); }
 };
 
 } // namespace

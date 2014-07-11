@@ -27,7 +27,7 @@ namespace hexer
 //      3
 //
 
-bool Hexagon::less(Hexagon *h) const
+bool Hexagon::less(const Hexagon *h) const
 {
     if (y() < h->y())
         return true;

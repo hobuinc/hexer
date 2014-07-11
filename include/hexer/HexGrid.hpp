@@ -16,7 +16,7 @@
 #pragma once
 
 #include <unordered_map>
-#include <unordered_set>
+#include <set>
 
 #include "Draw.hpp"
 #include "Hexagon.hpp"
@@ -104,7 +104,7 @@ private:
     typedef std::unordered_map<uint64_t, Hexagon> HexMap;
     HexMap m_hexes;
     /// Set of dense hexagons with non-dense neighbors above.
-    typedef std::unordered_set<Hexagon *> HexSet;
+    typedef std::set<Hexagon *, HexCompare> HexSet;
     HexSet m_pos_roots;
     /// Map of roots and their associated paths.
     typedef std::unordered_map<Hexagon *, Path *> HexPathMap;

@@ -28,7 +28,7 @@ namespace hexer
 {
 
 HexGrid::HexGrid(int dense_limit) : m_height(-1.0), m_width(-1.0),
-    m_dense_limit(dense_limit), m_miny(1)
+    m_pos_roots(HexCompare()), m_dense_limit(dense_limit), m_miny(1)
 {}
 
 void HexGrid::initialize(double height)
