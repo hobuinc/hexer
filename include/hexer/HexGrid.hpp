@@ -32,7 +32,7 @@ class HexIter;
 
 static const double SQRT_3 = 1.732050808; 
 
-class HexGrid
+class HEXER_DLL HexGrid
 {
     friend class HexIter;
 public:
