@@ -85,7 +85,7 @@ public:
 	{
 		if (m_current_feature)
 			OGR_F_Destroy(m_current_feature);
-		m_current_feature = OGR_L_GetFeature(m_layer, m_index);
+		m_current_feature = OGR_L_GetFeature(m_layer, (long)m_index);
 		if (!m_current_feature)
 			return false;
 		
