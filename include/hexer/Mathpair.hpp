@@ -24,7 +24,7 @@ template <typename T>
 struct HEXER_DLL Mathpair
 {
 public:
-    Mathpair() : m_x(0.0), m_y(0.0)
+    Mathpair() : m_x(T(0)), m_y(T(0))
     {}
 
     Mathpair(T x, T y) : m_x(x), m_y(y)
