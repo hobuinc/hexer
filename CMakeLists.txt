@@ -135,7 +135,9 @@ if (GDAL_FOUND)
     set(HEXER_HAVE_GDAL 1)
 endif()
 
+if (NOT WIN32)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
 
 ###############################################################################
 # Installation settings
