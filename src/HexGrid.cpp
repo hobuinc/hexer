@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include <cmath>
+#include <algorithm>
 
 #include <hexer/HexGrid.hpp>
 #include <hexer/HexIter.hpp>
