@@ -97,7 +97,7 @@ IF(WIN32)
         SET(OSGEO4W_ROOT_DIR $ENV{OSGEO4W_ROOT})
         #MESSAGE(STATUS " FindGDAL: trying OSGeo4W using environment variable OSGEO4W_ROOT=$ENV{OSGEO4W_ROOT}")
     ELSE()
-        SET(OSGEO4W_ROOT_DIR c:/OSGeo4W)
+        SET(OSGEO4W_ROOT_DIR c:/OSGeo4W64)
         #MESSAGE(STATUS " FindGDAL: trying OSGeo4W using default location OSGEO4W_ROOT=${OSGEO4W_ROOT_DIR}")
     ENDIF()
 
