@@ -40,20 +40,11 @@ endif()
 include_directories(../include ../include/hexer . ${GDAL_INCLUDE_DIR} ${CAIRO_INCLUDE_DIR})
 
 
-if(BUILD_STATIC)
-    add_library(${HEXER_LIB_NAME} STATIC ${HEXER_SOURCES})
-else()
     add_library(${HEXER_LIB_NAME} SHARED ${HEXER_SOURCES})
-endif()
 
 
-if (WIN32)
-	target_link_libraries( ${HEXER_LIB_NAME} LINK_PRIVATE general ${Boost_LIBRARIES})
-else()
-	target_link_libraries( ${HEXER_LIB_NAME} ${Boost_LIBRARIES})
-endif()
 
-target_link_libraries(  ${HEXER_LIB_NAME} 
+target_link_libraries(  ${HEXER_LIB_NAME} ${Boost_LIBRARIES} 
                         ${CAIRO_LIBRARIES} 
                         ${GDAL_LIBRARY})
 

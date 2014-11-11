@@ -10,15 +10,13 @@ set(HEXER_UTILITIES
   ${CURSE})
 
 if(WIN32)
-if(NOT BUILD_STATIC)
     add_definitions("-DHEXER_DLL_IMPORT=1")
-endif()
 endif()
 
 
 if(CURSE)
     add_executable(${CURSE} curse.cpp lasfile.hpp las.hpp las.cpp OGR.hpp OGR.cpp)
-    target_link_libraries(${CURSE} ${HEXER_LIB_NAME}  ${GDAL_LIBRARY})
+    target_link_libraries(${CURSE} ${HEXER_LIB_NAME}  )
 endif()
 
 install(TARGETS ${HEXER_UTILITIES}

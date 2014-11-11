@@ -69,11 +69,14 @@ set(BUILD_STATIC FALSE CACHE BOOL "Build Hexer statically" )
 if(WIN32)
   if (MSVC)
     if (MSVC80 OR MSVC90 OR MSVC10 OR MSVC11 OR MSVC12 OR MSVC13)
-      add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+#      add_definitions(-D_CRT_SECURE_NO_DEPRECATE -DBOOST_ALL_NO_LIB -DBOOST_LIB_DIAGNOSTIC)
       add_definitions(-D_CRT_SECURE_NO_WARNINGS)
       add_definitions(-D_CRT_NONSTDC_NO_WARNING)
       add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+	  add_definitions(-DBOOST_LIB_TOOLSET="vc110")
+	  add_definitions(-DBOOST_ALL_DYN_LINK)
 	  set(HEXER_COMPILER_MSVC 1)
+	    SET(Boost_LIB_DIAGNOSTIC_DEFINITIONS "-DBOOST_LIB_DIAGNOSTIC")
     endif()
   endif()
 else()
@@ -83,48 +86,22 @@ endif()
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-if (NOT HEXER_EMBED_BOOST)
-	find_package(Boost 1.52 COMPONENTS program_options thread iostreams filesystem system unit_test_framework random)
-endif()
+
+find_package(Boost 1.52 COMPONENTS program_options thread iostreams filesystem system unit_test_framework random)
+
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
-
+   add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
     # make these available for the user to set.
     mark_as_advanced(CLEAR Boost_INCLUDE_DIR) 
     mark_as_advanced(CLEAR Boost_LIBRARY_DIRS) 
     link_directories(${Boost_LIBRARY_DIRS})
     if (MSVC)
-        set(Boost_USE_STATIC_LIBS   ON)
+    #    set(Boost_USE_STATIC_LIBS   ON)
         set(Boost_USE_MULTITHREADED ON)
-        set(Boost_USE_STATIC_RUNTIME ON)
+      #  set(Boost_USE_STATIC_RUNTIME ON)
 		endif()	
-else()
-	set(BOOST_ROOT "${PROJECT_SOURCE_DIR}/boost")
-
-	# find_package would normally set the following variables
-	set(Boost_FOUND TRUE)
-	set(Boost_INCLUDE_DIRS ${BOOST_ROOT})
-
-	set(HEXERBOOST_LIB_NAME "hexerboost" CACHE STRING "use embedded boost")
-	mark_as_advanced(FORCE HEXERBOOST_LIB_NAME)
-
-	if (WIN32)
-	  set(Boost_LIBRARIES "${HEXERBOOST_LIB_NAME}.lib")
-	  link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-	else()
-	  # Some Cmake versions are borken here. See
-	  # http://www.cmake.org/Bug/view.php?id=12258#c26851
-	  # set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem")
-	  # include_directories(BEFORE SYSTEM ${Boost_INCLUDE_DIRS}/)
-	  set(Boost_LIBRARIES "${HEXERBOOST_LIB_NAME}")
-	endif()
-
-	# this prevents auto-linking pragmas from depending on wrong lib names
-	add_definitions(-DBOOST_ALL_NO_LIB)
-
-	include_directories("${Boost_INCLUDE_DIRS}/")
-	add_subdirectory(boost)
     message(STATUS "External boost not found, using embedded boost tree")
 endif()
 
