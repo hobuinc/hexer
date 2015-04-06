@@ -102,7 +102,6 @@ if(Boost_FOUND)
         set(Boost_USE_MULTITHREADED ON)
       #  set(Boost_USE_STATIC_RUNTIME ON)
 		endif()	
-    message(STATUS "External boost not found, using embedded boost tree")
 endif()
 
 
