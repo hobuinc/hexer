@@ -102,6 +102,10 @@ if(Boost_FOUND)
         set(Boost_USE_MULTITHREADED ON)
       #  set(Boost_USE_STATIC_RUNTIME ON)
 		endif()	
+else()
+    set(HEXERBOOST_LIB_NAME hexerboost)
+    add_subdirectory(boost)
+    include_directories(${PROJECT_SOURCE_DIR}/boost)
 endif()
 
 
