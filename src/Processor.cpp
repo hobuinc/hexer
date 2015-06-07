@@ -15,6 +15,7 @@
 
 #include <assert.h>
 #include <sstream>
+#include <cmath>
 
 #include <hexer/Processor.hpp>
 
@@ -33,7 +34,7 @@ namespace hexer
     {
         double xdist = p2.m_x - p1.m_x;
         double ydist = p2.m_y - p1.m_y;
-        return sqrt(xdist * xdist + ydist * ydist);
+        return std::sqrt(xdist * xdist + ydist * ydist);
     }
 
     // Compute hex size based on distance between consecutive points and
@@ -69,7 +70,7 @@ void processHexes(HexGrid *grid, HexReader reader)
 
     assert(grid->width() > 0);
     assert(grid->denseLimit() < 0);
-        
+
     while (reader(x, y, ctx))
         grid->addDenseHexagon(x, y);
     grid->findShapes();
@@ -80,7 +81,7 @@ std::string GetFullVersion( void )
 {
     std::ostringstream os;
 
-    os << "hexer " 
+    os << "hexer "
        << HEXER_VERSION_MAJOR << "."
        << HEXER_VERSION_MINOR << "."
        << HEXER_VERSION_PATCH;
