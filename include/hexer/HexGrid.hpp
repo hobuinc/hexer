@@ -78,8 +78,8 @@ public:
         { return m_paths; }
     void setSampleSize(unsigned sampleSize)
         { m_maxSample = sampleSize; }
-    
     void toWKT(std::ostream&) const;
+    size_t densePointCount() const;
     
 private:
     void initialize(double height);

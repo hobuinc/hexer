@@ -371,4 +371,16 @@ void HexGrid::toWKT(std::ostream& output) const
     output << ")";
 }
 
+size_t HexGrid::densePointCount() const
+{
+    size_t count = 0;
+    for (auto it = m_hexes.begin(); it != m_hexes.end(); ++it)
+    {
+        const Hexagon& h = it->second;
+        if (h.dense())
+            count += h.count();
+    }
+    return count;
+}
+
 } //namespace hexer
