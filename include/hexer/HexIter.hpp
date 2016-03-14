@@ -46,6 +46,8 @@ public:
         info.m_pos.m_y = hex.y();
         info.m_center.m_x = m_grid->width() * hex.x();
         info.m_center.m_y = m_grid->height() * hex.y();
+        if (hex.xodd())
+            info.m_center.m_y += (m_grid->height() / 2);
         info.m_density = hex.count();
         return info;
     }
