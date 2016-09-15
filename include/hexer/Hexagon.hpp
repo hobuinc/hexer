@@ -97,7 +97,7 @@ private:
 class HexCompare
 {
 public:
-    bool operator()(const Hexagon *h1, const Hexagon *h2)
+    bool operator()(const Hexagon *h1, const Hexagon *h2) const
         { return h1->less(h2); }
 };
 
