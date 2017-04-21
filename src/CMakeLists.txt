@@ -11,7 +11,7 @@ set(HEXER_HPP
   "${HEXER_HEADERS_DIR}/Processor.hpp"
   "${HEXER_HEADERS_DIR}/Segment.hpp"
   "${HEXER_HEADERS_DIR}/gitsha.h"
-  
+
  )
 
 set(HEXER_CPP
@@ -44,14 +44,14 @@ include_directories(../include ../include/hexer . ${GDAL_INCLUDE_DIR} ${CAIRO_IN
 
 
 
-target_link_libraries(  ${HEXER_LIB_NAME} ${Boost_LIBRARIES} 
-                        ${CAIRO_LIBRARIES} 
+target_link_libraries(  ${HEXER_LIB_NAME}
+                        ${CAIRO_LIBRARIES}
                         ${GDAL_LIBRARY})
 
 
 set_target_properties(${HEXER_LIB_NAME}
   PROPERTIES SOVERSION "${HEXER_LIB_SOVERSION}" )
-      
+
 ###############################################################################
 # Targets installation
 
@@ -62,7 +62,7 @@ if (APPLE)
     INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib" BUILD_WITH_INSTALL_RPATH ON)
 endif()
 
-install(TARGETS ${HEXER_LIB_NAME} 
+install(TARGETS ${HEXER_LIB_NAME}
   RUNTIME DESTINATION ${HEXER_BIN_DIR}
   LIBRARY DESTINATION ${HEXER_LIB_DIR}
   ARCHIVE DESTINATION ${HEXER_LIB_DIR})
