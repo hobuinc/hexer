@@ -152,7 +152,7 @@ FormatType getDriver(std::string filename)
     auto idx = filename.find_last_of('.');
     if (idx == std::string::npos)
         return Format_LAS;
-    else if (hexer::Utils::iequals(filename.substr(idx), "LAS"))
+    else if (hexer::Utils::iequals(filename.substr(idx), ".LAS"))
         return Format_LAS;
     else
         return Format_OGR;
@@ -177,11 +177,13 @@ void boundary(  std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
+        std::cout << "Type was LAS!" << std::endl;
         LAS l(input);
         l.open();
         process(grid.get(), l.reader);
     } else {
 #ifdef HEXER_HAVE_GDAL
+        std::cout << "Type was OGR!" << std::endl;
         reader::OGR o(input);
         o.open();
         process(grid.get(), o.reader);
@@ -226,11 +228,13 @@ void density(   std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
+        std::cout << "Type was LAS!" << std::endl;
         LAS l(input);
         l.open();
         process(grid.get(), l.reader);
     } else {
 #ifdef HEXER_HAVE_GDAL
+        std::cout << "Type was OGR!" << std::endl;
         reader::OGR o(input);
         o.open();
         process(grid.get(), o.reader);
@@ -279,9 +283,9 @@ int main(int argc, char* argv[])
     double m_edge(0.0);
     int m_count(0);
 
-    args.add("command", "Command to run on points ('boundary' or 'density')", m_command, "boundary").setPositional();
-    args.add("input", "Input point set to curse", m_input).setPositional();
-    args.add("output", "Specify and OGR-compatible output filename to write boundary. stdout used if none specified.", m_output, "STDOUT");
+    args.add("command,c", "Command to run on points ('boundary' or 'density')", m_command, "boundary").setPositional();
+    args.add("input,i", "Input point set to curse", m_input).setPositional();
+    args.add("output,o", "Specify and OGR-compatible output filename to write boundary. stdout used if none specified.", m_output, "").setPositional();
     args.add("edge", "Edge distance of hexagon", m_edge, 0.0);
     args.add("count", "Number of points that must be in polygon for it to be positive space", m_count, 0);
 
@@ -293,7 +297,7 @@ int main(int argc, char* argv[])
     {
         args.parseSimple(argList);
     }
-    catch (hexer::arg_val_error const& e)
+    catch (hexer::arg_error const& e)
     {
         std::cout << "validation error: " << e.what() << std::endl;
         OutputHelp(std::cout, args);
