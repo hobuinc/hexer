@@ -64,12 +64,36 @@ OGR::~OGR()
 namespace writer
 {
 
+
+std::string getBasename(const std::string& path)
+{
+#ifdef _WIN32
+    char sep('\\');
+#else
+    char sep('/');
+#endif
+
+    auto idx = path.find_last_of('.');
+    std::string name("");
+    if (idx == std::string::npos)
+        name = path;
+    else
+        name = path.substr(0,idx);
+    std::cout << "name is " << name << std::endl;
+    std::cout << "path is " << path << std::endl;
+    return {std::find_if(name.rbegin(), name.rend(),
+                         [sep](char c) { return c == sep; }).base(),
+            name.end()};
+}
+
 OGR::OGR(std::string const& filename)
     : m_filename(filename)
 	, m_ds(0)
 	, m_layer(0)
 {
-    createLayer("cursed");
+
+    std::cout << "basename was ' " << getBasename(filename) << "'" << std::endl;
+    createLayer(getBasename(filename));
 }
 
 void OGR::createLayer(std::string const& basename)

@@ -14,11 +14,11 @@
 *****************************************************************************/
 
 #include "las.hpp"
-#include <boost/bind.hpp>
+#include <functional>
 
-LAS::LAS(std::string filename) 
+LAS::LAS(std::string filename)
     : m_filename(filename)
-    , m_index(0) 
+    , m_index(0)
 {
-    reader = boost::bind(&LAS::read, _1, _2, this);
+    reader = std::bind(&LAS::read, std::placeholders::_1, std::placeholders::_2, this);
 };
