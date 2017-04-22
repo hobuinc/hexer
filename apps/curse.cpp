@@ -188,7 +188,7 @@ void boundary(  std::string const& input,
 #endif
     }
 
-    if (output.empty() || boost::iequals(output, "STDOUT"))
+    if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
     {
         std::ostringstream multi;
         multi.setf(std::ios::fixed);
