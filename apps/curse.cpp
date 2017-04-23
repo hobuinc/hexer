@@ -177,13 +177,11 @@ void boundary(  std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        std::cout << "Type was LAS!" << std::endl;
         LAS l(input);
         l.open();
         process(grid.get(), l.reader);
     } else {
 #ifdef HEXER_HAVE_GDAL
-        std::cout << "Type was OGR!" << std::endl;
         reader::OGR o(input);
         o.open();
         process(grid.get(), o.reader);
@@ -228,13 +226,11 @@ void density(   std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        std::cout << "Type was LAS!" << std::endl;
         LAS l(input);
         l.open();
         process(grid.get(), l.reader);
     } else {
 #ifdef HEXER_HAVE_GDAL
-        std::cout << "Type was OGR!" << std::endl;
         reader::OGR o(input);
         o.open();
         process(grid.get(), o.reader);

@@ -18,6 +18,7 @@
 #ifdef HEXER_HAVE_GDAL
 
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 
 #include <hexer/HexGrid.hpp>
@@ -79,8 +80,6 @@ std::string getBasename(const std::string& path)
         name = path;
     else
         name = path.substr(0,idx);
-    std::cout << "name is " << name << std::endl;
-    std::cout << "path is " << path << std::endl;
     return {std::find_if(name.rbegin(), name.rend(),
                          [sep](char c) { return c == sep; }).base(),
             name.end()};
@@ -91,8 +90,6 @@ OGR::OGR(std::string const& filename)
 	, m_ds(0)
 	, m_layer(0)
 {
-
-    std::cout << "basename was ' " << getBasename(filename) << "'" << std::endl;
     createLayer(getBasename(filename));
 }
 
