@@ -3,13 +3,13 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 include(${hexer_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
-set(HEXER_VERSION 1.3.0 CACHE STRING "Hexer version")
+set(HEXER_VERSION 1.4.0 CACHE STRING "Hexer version")
 
 DISSECT_VERSION()
 GET_OS_INFO()
 SET_INSTALL_DIRS()
 
-SET(HEXER_LIB_SOVERSION "1.0.2")
+SET(HEXER_LIB_SOVERSION "1.1.0")
 
 # Name of C++ library
 set(HEXER_LIB_NAME hexer)
@@ -68,7 +68,6 @@ set(BUILD_STATIC FALSE CACHE BOOL "Build Hexer statically" )
 if(WIN32)
   if (MSVC)
     if (MSVC80 OR MSVC90 OR MSVC10 OR MSVC11 OR MSVC12 OR MSVC13 OR MSVC14 OR MSVC15)
-#      add_definitions(-D_CRT_SECURE_NO_DEPRECATE -DBOOST_ALL_NO_LIB -DBOOST_LIB_DIAGNOSTIC)
       add_definitions(-D_CRT_SECURE_NO_WARNINGS)
       add_definitions(-D_CRT_NONSTDC_NO_WARNING)
       add_definitions(-D_SCL_SECURE_NO_WARNINGS)
