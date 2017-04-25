@@ -15,6 +15,9 @@
 
 #pragma once
 
+#include <cmath>
+#include <limits>
+
 namespace hexer
 {
 
