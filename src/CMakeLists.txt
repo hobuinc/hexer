@@ -21,7 +21,7 @@ set(HEXER_CPP
     Path.cpp
     Processor.cpp
     Segment.cpp
-    gitsha.cpp
+    "${PROJECT_BINARY_DIR}/src/gitsha.cpp"
 )
 
 set(HEXER_SOURCES
