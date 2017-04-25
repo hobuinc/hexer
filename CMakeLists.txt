@@ -128,7 +128,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/gitsha.cpp.in"
-  "${PROJECT_SOURCE_DIR}/src/gitsha.cpp")
+  "${PROJECT_BINARY_DIR}/src/gitsha.cpp")
 
 add_subdirectory(src)
 add_subdirectory(apps)
