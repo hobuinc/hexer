@@ -122,6 +122,8 @@ endif(WIN32)
 
 set(hexer_defines_h_in "${CMAKE_CURRENT_SOURCE_DIR}/hexer_defines.h.in")
 set(hexer_defines_h "${CMAKE_CURRENT_BINARY_DIR}/include/hexer/hexer_defines.h")
+include(CheckIncludeFiles)
+check_include_files(execinfo.h HEXER_HAVE_EXECINFO_H)
 configure_file(${hexer_defines_h_in} ${hexer_defines_h})
 HEXER_ADD_INCLUDES("" "" ${hexer_defines_h})
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)

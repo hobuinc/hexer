@@ -25,6 +25,11 @@
 #cmakedefine HEXER_HAVE_GDAL
 
 /*
+ * availability of execinfo and backtrace
+ */
+#cmakedefine HEXER_HAVE_EXECINFO_H
+
+/*
  * Debug or Release build?
  */
 #define HEXER_BUILD_TYPE "@CMAKE_BUILD_TYPE@"

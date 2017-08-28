@@ -44,7 +44,9 @@
 #include <cxxabi.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>  // WIFEXITED, WEXITSTATUS
+#ifdef HEXER_HAVE_EXECINFO_H
 #include <execinfo.h> // backtrace
+#endif
 #include <dlfcn.h> // dladdr
 #endif
 
@@ -600,11 +602,11 @@ double Utils::normalizeLongitude(double longitude)
     return longitude;
 }
 
-
 std::vector<std::string> Utils::backtrace()
 {
     std::vector<std::string> lines;
 #ifndef WIN32
+#ifdef HEXER_HAVE_EXECINFO_H
     const int MAX_STACK_SIZE(100);
     void* buffer[MAX_STACK_SIZE];
     std::vector<std::string> prefixes;
@@ -657,9 +659,9 @@ std::vector<std::string> Utils::backtrace()
         }
     }
 #endif
+#endif
     return lines;
 }
-
 
 // Useful for debug on occasion.
 std::string Utils::hexDump(const char *buf, size_t count)
