@@ -3,13 +3,13 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 include(${hexer_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
-set(HEXER_VERSION 1.3.0 CACHE STRING "Hexer version")
+set(HEXER_VERSION 1.4.0 CACHE STRING "Hexer version")
 
 DISSECT_VERSION()
 GET_OS_INFO()
 SET_INSTALL_DIRS()
 
-SET(HEXER_LIB_SOVERSION "1.0.2")
+SET(HEXER_LIB_SOVERSION "1.1.0")
 
 # Name of C++ library
 set(HEXER_LIB_NAME hexer)
@@ -37,11 +37,11 @@ endif()
 ###############################################################################
 # General build settings
 
-# Default to release mode 
+# Default to release mode
 if(NOT MSVC_IDE)
   if(NOT CMAKE_BUILD_TYPE)
 
-  set(CMAKE_BUILD_TYPE Release CACHE STRING 
+  set(CMAKE_BUILD_TYPE Release CACHE STRING
     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel" FORCE)
   endif()
     message(STATUS "Setting Hexer build type - ${CMAKE_BUILD_TYPE}")
@@ -57,9 +57,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
 
 # Output directory in which to build ARCHIVE target files.
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY}) 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
 
-option(HEXER_EMBED_BOOST "Use embedded rather than system boost" FALSE)
 
 set(BUILD_STATIC FALSE CACHE BOOL "Build Hexer statically" )
 
@@ -68,15 +67,11 @@ set(BUILD_STATIC FALSE CACHE BOOL "Build Hexer statically" )
 
 if(WIN32)
   if (MSVC)
-    if (MSVC80 OR MSVC90 OR MSVC10 OR MSVC11 OR MSVC12 OR MSVC13)
-#      add_definitions(-D_CRT_SECURE_NO_DEPRECATE -DBOOST_ALL_NO_LIB -DBOOST_LIB_DIAGNOSTIC)
+    if (MSVC80 OR MSVC90 OR MSVC10 OR MSVC11 OR MSVC12 OR MSVC13 OR MSVC14 OR MSVC15)
       add_definitions(-D_CRT_SECURE_NO_WARNINGS)
       add_definitions(-D_CRT_NONSTDC_NO_WARNING)
       add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-	  add_definitions(-DBOOST_LIB_TOOLSET="vc110")
-	  add_definitions(-DBOOST_ALL_DYN_LINK)
 	  set(HEXER_COMPILER_MSVC 1)
-	    SET(Boost_LIB_DIAGNOSTIC_DEFINITIONS "-DBOOST_LIB_DIAGNOSTIC")
     endif()
   endif()
 else()
@@ -85,29 +80,6 @@ endif()
 # from http://stackoverflow.com/questions/1435953/how-can-i-pass-git-sha1-to-compiler-as-definition-using-cmake
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
-
-
-find_package(Boost 1.52 COMPONENTS program_options thread iostreams filesystem system unit_test_framework random)
-
-
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-   add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
-    # make these available for the user to set.
-    mark_as_advanced(CLEAR Boost_INCLUDE_DIR) 
-    mark_as_advanced(CLEAR Boost_LIBRARY_DIRS) 
-    link_directories(${Boost_LIBRARY_DIRS})
-    if (MSVC)
-    #    set(Boost_USE_STATIC_LIBS   ON)
-        set(Boost_USE_MULTITHREADED ON)
-      #  set(Boost_USE_STATIC_RUNTIME ON)
-		endif()	
-else()
-    set(HEXERBOOST_LIB_NAME hexerboost)
-    add_subdirectory(boost)
-    include_directories(${PROJECT_SOURCE_DIR}/boost)
-endif()
-
 
 set(WITH_DRAWING FALSE CACHE BOOL "Choose to build Cairo-based SVG drawing")
 if(WITH_DRAWING)
@@ -150,13 +122,15 @@ endif(WIN32)
 
 set(hexer_defines_h_in "${CMAKE_CURRENT_SOURCE_DIR}/hexer_defines.h.in")
 set(hexer_defines_h "${CMAKE_CURRENT_BINARY_DIR}/include/hexer/hexer_defines.h")
+include(CheckIncludeFiles)
+check_include_files(execinfo.h HEXER_HAVE_EXECINFO_H)
 configure_file(${hexer_defines_h_in} ${hexer_defines_h})
 HEXER_ADD_INCLUDES("" "" ${hexer_defines_h})
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/gitsha.cpp.in"
-  "${PROJECT_SOURCE_DIR}/src/gitsha.cpp")
+  "${PROJECT_BINARY_DIR}/src/gitsha.cpp")
 
 add_subdirectory(src)
 add_subdirectory(apps)

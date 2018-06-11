@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, Hobu Inc. (howard@hobu.co)
+ * Copyright (c) 2010, Howard Butler
  *
  * All rights reserved.
  *
@@ -13,8 +13,8 @@
  *       notice, this list of conditions and the following disclaimer in
  *       the documentation and/or other materials provided
  *       with the distribution.
- *     * Neither the name of the Howard Butler or Hobu, Inc.
- *       the names of its contributors may be
+ *     * Neither the name of the Martin Isenburg or Iowa Department
+ *       of Natural Resources nor the names of its contributors may be
  *       used to endorse or promote products derived from this software
  *       without specific prior written permission.
  *
@@ -32,32 +32,20 @@
  * OF SUCH DAMAGE.
  ****************************************************************************/
 
+// This eliminates the need to include pdal base includes in code for the Util
+// library.
 
-#ifndef INCLUDED_HEXER_EXPORT_HPP
-#define INCLUDED_HEXER_EXPORT_HPP
+#pragma once
 
-#include <hexer/hexer_defines.h>
-
-#ifndef HEXER_DLL
-#if defined(HEXER_COMPILER_MSVC) && !defined(HEXER_DISABLE_DLL)
-#if defined(HEXER_DLL_EXPORT)
-#   define HEXER_DLL   __declspec(dllexport)
-#elif defined(HEXER_DLL_IMPORT)
-#   define HEXER_DLL   __declspec(dllimport)
-#else
-#   define HEXER_DLL
-#endif
+#ifndef PDAL_DLL
+#if defined(_WIN32)
+#   define PDAL_DLL   __declspec(dllexport)
 #else
 #  if defined(USE_GCC_VISIBILITY_FLAG)
-#    define HEXER_DLL     __attribute__ ((visibility("default")))
+#    define PDAL_DLL     __attribute__ ((visibility("default")))
 #  else
-#    define HEXER_DLL
+#    define PDAL_DLL
 #  endif
 #endif
 #endif
 
-#ifdef HEXER_COMPILER_MSVC
-#pragma warning(disable:4251)// [templated class] needs to have dll-interface...
-#endif
-
-#endif

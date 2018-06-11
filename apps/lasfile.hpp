@@ -18,17 +18,19 @@
 #ifndef INCLUDED_HEXER_LASFILE_HPP
 #define INCLUDED_HEXER_LASFILE_HPP
 
-#include <boost/noncopyable.hpp>
-#include <boost/interprocess/file_mapping.hpp>
-#include <boost/interprocess/mapped_region.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/algorithm/string.hpp>
+
+
+
+#include "mmaplib.hpp"
+#include "Utils.hpp"
+
 
 #include <algorithm>
+#include <memory>
 #include <stdexcept>
 
 
-class las_file : public boost::noncopyable {
+class las_file {
 public:
 	las_file() : is_open_(false) {
     }
@@ -38,18 +40,16 @@ public:
 	}
 
 	void open(const std::string& filename, int offset = 0, int count = -1) {
-		using namespace boost::interprocess;
         
         start_offset_ = offset;
         count_ = count;
 
-		pmapping_.reset(new file_mapping(filename.c_str(), read_only));
-		pregion_.reset(new mapped_region(*pmapping_, read_only));
+		pmapping_.reset(new mmaplib::MemoryMappedFile(filename.c_str()));
 
-		void *addr = pregion_->get_address();
+		void *addr = (void*)pmapping_->data();
 
 		std::string magic((char *)addr, (char *)addr + 4);
-		if (!boost::iequals(magic, "LASF")) {
+		if (!hexer::Utils::iequals(magic, "LASF")) {
 			throw std::runtime_error("Not a las file");
 		}
 
@@ -79,7 +79,7 @@ public:
         // std::cerr << "points offset: " << points_offset_ << std::endl;
 
 
-		uint64_t diff = pregion_->get_size() - points_offset_;
+		uint64_t diff = pmapping_->size() - points_offset_;
 
 		if (diff % stride() != 0)
 			throw std::runtime_error("Point record data size is inconsistent");
@@ -93,17 +93,15 @@ public:
 	}
 
 	size_t size() {
-		return pregion_->get_size();
+		return pmapping_->size();
 	}
 
 	void *points_offset() {
-		return (char *)pregion_->get_address() + points_offset_ + start_offset_;
+		return (char *)pmapping_->data() + points_offset_ + start_offset_;
 	}
 
 	void close() {
-		pregion_.reset();
-		pmapping_.reset();
-        is_open_ = false;
+		is_open_ = false;
 	}
 
 	size_t stride() {
@@ -125,7 +123,7 @@ public:
         if (count_ == -1)
             return points_count_;
         
-        return std::min(points_count_, (unsigned int)count_);
+        return (std::min)(points_count_, (unsigned int)count_);
 	}
 
 	double* minimums() { return mins_; }
@@ -174,8 +172,8 @@ private:
         if (start_offset_ == 0 && count_ == -1)
             return; // no update required if no subrange is requested
         
-        int largest = std::numeric_limits<int>::max();
-        int smallest = std::numeric_limits<int>::min();
+        int largest = (std::numeric_limits<int>::max)();
+        int smallest = (std::numeric_limits<int>::min)();
         
         int n[3] = { largest, largest, largest };
         int x[3] = { smallest, smallest, smallest };
@@ -184,8 +182,8 @@ private:
         for (size_t i = 0 ; i < points_count() ; i ++) {
             int *p = (int *)ip;		
             for (int j = 0 ; j < 3 ; j ++) {
-                n[j] = std::min(n[j], p[j]);
-                x[j] = std::max(x[j], p[j]);
+                n[j] = (std::min)(n[j], p[j]);
+                x[j] = (std::max)(x[j], p[j]);
             }
             
             ip += stride();
@@ -199,21 +197,20 @@ private:
 
 	template<typename T>
 	T readAs(size_t offset) {
-		return *((T*)((char*)pregion_->get_address() + offset));
+		return *((T*)((char*)pmapping_->data() + offset));
 	}
 
 	template<typename T>
 	void readN(size_t offset, T* dest, size_t n) {
-		char *buf = (char *)pregion_->get_address() + offset;
+		char *buf = (char *)pmapping_->data() + offset;
 		for(size_t i = 0 ; i < n ; i ++) {
 			dest[i] = *((T*)(buf + sizeof(T) * i));
 		}
 	}
 
 private:
-	boost::shared_ptr<boost::interprocess::file_mapping> pmapping_;
-	boost::shared_ptr<boost::interprocess::mapped_region> pregion_;
-
+	std::shared_ptr<mmaplib::MemoryMappedFile> pmapping_;
+	
     unsigned int start_offset_;
 	int count_;
 	unsigned int points_offset_;

@@ -41,10 +41,10 @@ namespace reader
 class OGR
 {
 public:
-    
+
     inline size_t const& getIndex() const
-    { 
-        return m_index; 
+    {
+        return m_index;
     }
 
     inline void setIndex(size_t v)
@@ -64,11 +64,11 @@ public:
         return true;
     }
 
-    inline bool close() 
-    { 
+    inline bool close()
+    {
 		OGR_DS_Destroy(m_ds);
 		m_ds = 0;
-        return true; 
+        return true;
     }
 
     inline double getX()
@@ -80,7 +80,7 @@ public:
     {
 		return OGR_G_GetY(m_current_geometry, 0);
     }
-	
+
 	bool getNextFeature()
 	{
 		if (m_current_feature)
@@ -88,7 +88,7 @@ public:
 		m_current_feature = OGR_L_GetFeature(m_layer, (long)m_index);
 		if (!m_current_feature)
 			return false;
-		
+
 		m_current_geometry = OGR_F_GetGeometryRef(m_current_feature);
 		return true;
 	}
@@ -96,24 +96,24 @@ public:
     inline static bool read(double&x, double& y, void* ctx)
     {
 		OGR* l = static_cast<OGR*>(ctx);
-		
+
         if (l->getIndex() == l->count())
         {
             return false;
         }
-		
+
 		bool next = l->getNextFeature();
 		if (next)
 		{
 	        x = l->getX();
 	        y = l->getY();
-        
+
 	        l->setIndex(l->getIndex()+1);
 		} else
 			return false;
 
         return true;
-    
+
     }
 
     hexer::PointReader reader;
@@ -135,21 +135,21 @@ public:
 
 } // reader
 
-namespace writer 
+namespace writer
 {
 
 
 class OGR
 {
 
-    
+
 public:
     OGR(std::string const& filename);
 	~OGR();
 
     void writeBoundary(HexGrid *grid);
 	void writeDensity(HexGrid *grid);
-	
+
 private:
     std::string m_filename;
 
@@ -157,7 +157,7 @@ private:
     OGRDataSourceH m_ds;
 	OGRLayerH m_layer;
 
-    void createLayer();
+    void createLayer(std::string const& basename);
     void collectPath(Path* path, OGRGeometryH polygon);
 	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
 

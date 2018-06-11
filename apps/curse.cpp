@@ -19,20 +19,20 @@
 #include <string>
 #include <vector>
 
-#include <boost/algorithm/string/compare.hpp>
-#include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
-
 #include <hexer/HexGrid.hpp>
 #include <hexer/HexIter.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
 #include "las.hpp"
+#include "ProgramArgs.hpp"
 
 #ifdef HEXER_HAVE_GDAL
 #include "OGR.hpp"
 #endif
-namespace po = boost::program_options;
+
+std::string headline(hexer::Utils::screenWidth(), '-');
+
+
 
 bool readHex(int& x, int& y, void* ctx)
 {
@@ -64,7 +64,7 @@ bool readHex(int& x, int& y, void* ctx)
     };
 
     static int num_coords = sizeof(coords) / (sizeof(coords[0]));
-    
+
     if (pos + 1 < num_coords) {
         x = coords[pos++];
         y = coords[pos++];
@@ -111,7 +111,7 @@ void hextest(std::string filename)
     // LAS l(filename);
     // l.open();
     // process(infos, l.reader);
-    
+
     processHexes(&grid, readHex);
 
     // Dump hexes.
@@ -149,25 +149,27 @@ enum FormatType
 
 FormatType getDriver(std::string filename)
 {
-    std::string ext = boost::filesystem::extension(filename);
-    if (boost::iequals(ext, ".LAS"))
+    auto idx = filename.find_last_of('.');
+    if (idx == std::string::npos)
+        return Format_LAS;
+    else if (hexer::Utils::iequals(filename.substr(idx), ".LAS"))
         return Format_LAS;
     else
         return Format_OGR;
 }
 
-void boundary(	std::string const& input, 
-				std::string const& output,
-				double edge,
-				int density)
+void boundary(  std::string const& input,
+                std::string const& output,
+                double edge,
+                int density)
 {
     using namespace hexer;
-	
+
     std::unique_ptr<HexGrid> grid;
-	
+
     if (density == 0)
         density = 10;
-	if (!hexer::compare_distance(edge, 0.0))
+    if (!hexer::compare_distance(edge, 0.0))
         grid.reset(new HexGrid(density));
     else
         grid.reset(new HexGrid(edge, density));
@@ -185,16 +187,16 @@ void boundary(	std::string const& input,
         process(grid.get(), o.reader);
 #endif
     }
-	   
-    if (output.empty() || boost::iequals(output, "STDOUT"))
-	{
-	    std::ostringstream multi;
-	    multi.setf(std::ios::fixed);
-	    multi.precision(8);
-    
-	    grid->toWKT(multi);
+
+    if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
+    {
+        std::ostringstream multi;
+        multi.setf(std::ios::fixed);
+        multi.precision(8);
+
+        grid->toWKT(multi);
         std::cout << multi.str() << std::endl;
-	}
+    }
     else
     {
 #ifdef HEXER_HAVE_GDAL
@@ -205,18 +207,18 @@ void boundary(	std::string const& input,
 }
 
 
-void density(	std::string const& input, 
-				std::string const& output,
-				double edge,
-				int density)
+void density(   std::string const& input,
+                std::string const& output,
+                double edge,
+                int density)
 {
     using namespace hexer;
 
     std::unique_ptr<HexGrid> grid;
-	
+
     if (density == 0)
         density = 10;
-	if (!hexer::compare_distance(edge, 0.0))
+    if (!hexer::compare_distance(edge, 0.0))
         grid.reset(new HexGrid(density));
     else
         grid.reset(new HexGrid(edge, density));
@@ -242,56 +244,21 @@ void density(	std::string const& input,
 }
 
 
-void OutputHelp( std::ostream & oss, po::options_description const& options)
+void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
 {
-    oss << "--------------------------------------------------------------------" << std::endl;
+    oss << headline << std::endl;
     oss << "    curse (" << hexer::GetFullVersion() << ")" << std::endl;
-    oss << "--------------------------------------------------------------------" << std::endl;
+    oss << headline << std::endl;
 
-    oss << options << std::endl;
+    args.dump2(oss, 2, 6, headline.size());
 
     oss <<"For more information, see the full documentation for hexer at:" << std::endl;
-    
+
     oss << " http://github.com/hobu/hexer" << std::endl;
-    oss << "----------------------------------------------------------" << std::endl;
+    oss << headline << std::endl;
 
 }
 
-
-po::options_description getOptions()
-{
-
-    po::options_description basic = po::options_description("Basic");
-    
-    basic.add_options()
-        ("help,h", po::value<bool>()->zero_tokens()->implicit_value(true), "This help message")
-        // ("debug,d", po::value<bool>()->zero_tokens()->implicit_value(true), "Enable debug mode")
-        // ("verbose,v", po::value<boost::uint32_t>()->default_value(0), "Set verbose message level")
-        ("version", po::value<bool>()->zero_tokens()->implicit_value(true), "Show version info")
-    ;
-
-    po::options_description command = po::options_description("Command");
-    
-    command.add_options()
-        ("input", po::value<std::string>(), "Input point set to curse")
-        ("command", po::value<std::string>(), "Command to run on points ('boundary' or 'density')")
-        ("output", po::value<std::string>(), "Specify an OGR-compatible output filename to write boundary. stdout used if none specified.")
-     ;
-
-    po::options_description boundary = po::options_description("Boundary");
-    boundary.add_options()
-        ("edge", po::value<double>()->default_value(0.0), "Edge distance of hexagon")
-        ("count", po::value<boost::uint32_t>()->default_value(0), "Number of points that must be in polygon for it to be positive space")
-   ;
-    
-	
-
-    po::options_description options;
-    
-    options.add(command).add(basic).add(boundary);
-    return options;
-    
-}
 
 int main(int argc, char* argv[])
 {
@@ -299,99 +266,97 @@ int main(int argc, char* argv[])
 #ifdef HEXER_HAVE_GDAL
     OGRRegisterAll();
 #endif
-        
+
     bool bVerbose(false);
-    po::variables_map vm;    
-    po::options_description options = getOptions();
-    po::positional_options_description p;
-    p.add("command", 1);
-    p.add("input", 1);
-     
+
+    hexer::ProgramArgs args;
+
+    std::string m_command;
+    bool m_showHelp(false);
+    bool m_showVersion(false);
+    std::string m_input("");
+    std::string m_output("");
+    double m_edge(0.0);
+    int m_count(0);
+
+    args.add("command,c", "Command to run on points ('boundary' or 'density')", m_command, "boundary").setPositional();
+    args.add("input,i", "Input point set to curse", m_input).setPositional();
+    args.add("output,o", "Specify and OGR-compatible output filename to write boundary. stdout used if none specified.", m_output, "").setPositional();
+    args.add("edge", "Edge distance of hexagon", m_edge, 0.0);
+    args.add("count", "Number of points that must be in polygon for it to be positive space", m_count, 0);
+
+    std::vector< std::string > argList;
+    for (int i = 1; i < argc; ++i)
+        argList.push_back(argv[i]);
+
     try
     {
-        po::store(po::command_line_parser(argc, argv).
-            options(options).positional(p).run(), vm);
-
-        po::notify(vm);
-    }     
-    catch (boost::program_options::error& e)
+        args.parseSimple(argList);
+    }
+    catch (hexer::arg_error const& e)
     {
         std::cout << "validation error: " << e.what() << std::endl;
-        OutputHelp(std::cout, options);
-        return 1;
+        OutputHelp(std::cout, args);
+        return -1;
     }
-    
-    if (vm.count("help")) 
+
+
+    if (m_showHelp)
     {
-        OutputHelp(std::cout, options);
+        OutputHelp(std::cout, args);
         return 1;
     }
 
-    if (vm.count("version")) 
+    if (m_showVersion)
     {
         std::cout << hexer::GetFullVersion() << std::endl;
         return 0;
     }
 
-    if (!vm.count("command") ) 
-    {
-        std::cerr << "Command not specified!\n";
-        OutputHelp(std::cout, options);
-        return 1;
-    }
-    if (!vm.count("input") ) 
+    if (m_input.empty())
     {
         std::cerr << "Input not specified!\n";
-        OutputHelp(std::cout, options);
+        OutputHelp(std::cout, args);
         return 1;
-    } 
+    }
 
-    std::string command = vm["command"].as<std::string>();
-    std::string input = vm["input"].as<std::string>();
-    
-	try
-	{
-		std::string output("");
-		if (vm.count("output"))
-			output = vm["output"].as<std::string>();
-		
-		double edge = vm["edge"].as<double>();
-		boost::uint32_t count = vm["count"].as<boost::uint32_t>();
-		
-		if (boost::iequals(command, "BOUNDARY"))
-		{
-			boundary(input, output, edge, count);
-			return 0;
-		}
 
-		if (boost::iequals(command, "DENSITY"))
-		{
-			density(input, output, edge, count);
-			return 0;
-		}
+    try
+    {
+        if (hexer::Utils::iequals(m_command, "BOUNDARY"))
+        {
+            boundary(m_input, m_output, m_edge, m_count);
+            return 0;
+        }
 
-		if (boost::iequals(command, "PATH"))
-		{
-			pathtest(input);
-			return 0;
-		}
+        if (hexer::Utils::iequals(m_command, "DENSITY"))
+        {
+            density(m_input, m_output, m_edge, m_count);
+            return 0;
+        }
 
-		if (boost::iequals(command, "HEX"))
-		{
-			hextest(input);
-			return 0;
-		}    
+        if (hexer::Utils::iequals(m_command, "PATH"))
+        {
+            pathtest(m_input);
+            return 0;
+        }
 
-		return 1;
-	} catch (hexer::hexer_error const& e)
-	{
-		std::cout << "Curse failed with error: '" << e.what() << "'" << std::endl;
-		return 1;
-	}
+        if (hexer::Utils::iequals(m_command, "HEX"))
+        {
+            hextest(m_input);
+            return 0;
+        }
+
+        return 1;
+    } catch (hexer::hexer_error const& e)
+    {
+        std::cout << "Curse failed with error: '" << e.what() << "'" << std::endl;
+        return 1;
+    }
 
 #ifdef HEXER_HAVE_GDAL
-	OGRCleanupAll();
-#endif    
-    
+    OGRCleanupAll();
+#endif
+
 }
 

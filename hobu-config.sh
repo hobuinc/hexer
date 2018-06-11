@@ -11,5 +11,5 @@ fi
 
 cmake   -G "$CONFIG"  \
         -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
-        -DCMAKE_INSTALL_PREFIX=/Users/hobu \
-        -DWITH_DRAWING=ON 
+        -DCMAKE_INSTALL_PREFIX=$USR_LOCAL \
+        -DWITH_DRAWING=ON
