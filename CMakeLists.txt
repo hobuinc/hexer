@@ -31,33 +31,25 @@ mark_as_advanced(CLEAR CMAKE_VERBOSE_MAKEFILE )
 set(CMAKE_MODULE_PATH "${hexer_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 if (CMAKE_MAJOR_VERSION GREATER 2)
 cmake_policy(SET CMP0022 OLD) # interface link libraries
-cmake_policy(SET CMP0042 OLD) # osx rpath
+cmake_policy(SET CMP0042 NEW) # osx rpath
 endif()
 
 ###############################################################################
 # General build settings
 
 # Default to release mode
-if(NOT MSVC_IDE)
-  if(NOT CMAKE_BUILD_TYPE)
-
-  set(CMAKE_BUILD_TYPE Release CACHE STRING
-    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel" FORCE)
-  endif()
-    message(STATUS "Setting Hexer build type - ${CMAKE_BUILD_TYPE}")
-endif()
 
 # TODO: Still testing the output paths --mloskot
-set(HEXER_BUILD_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+#set(HEXER_BUILD_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 # Output directory in which to build RUNTIME target files.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
 
 # Output directory in which to build LIBRARY target files
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
 
 # Output directory in which to build ARCHIVE target files.
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
 
 
 set(BUILD_STATIC FALSE CACHE BOOL "Build Hexer statically" )

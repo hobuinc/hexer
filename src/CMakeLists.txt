@@ -55,13 +55,6 @@ set_target_properties(${HEXER_LIB_NAME}
 ###############################################################################
 # Targets installation
 
-if (APPLE)
-  set_target_properties(
-    ${HEXER_LIB_NAME}
-    PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib" BUILD_WITH_INSTALL_RPATH ON)
-endif()
-
 install(TARGETS ${HEXER_LIB_NAME}
   RUNTIME DESTINATION ${HEXER_BIN_DIR}
   LIBRARY DESTINATION ${HEXER_LIB_DIR}
