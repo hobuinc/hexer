@@ -674,11 +674,11 @@ std::string Utils::hexDump(const char *buf, size_t count)
    bytes = (count > 16) ? 16 : count;
 
    while (bytes) {
-      sprintf(foo, "0x%06x ", address);
+      snprintf(foo, 16, "0x%06x ", address);
       address += 16;
       for (i = 0; i < 16; i++) {
          if (i < bytes) {
-            sprintf(foo, "%02X ", cp[i]);
+            snprintf(foo, 16, "%02X ", cp[i]);
             out += foo;
          }
          else
@@ -686,7 +686,7 @@ std::string Utils::hexDump(const char *buf, size_t count)
       }
       out += "|";
       for (i = 0; i < bytes; i++) {
-         sprintf(foo, "%c", isprint(cp[i]) ? cp[i] : '.');
+         snprintf(foo, 16, "%c", isprint(cp[i]) ? cp[i] : '.');
          out += foo;
       }
       out += "|\n";
