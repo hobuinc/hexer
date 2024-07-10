@@ -1,3 +1,14 @@
+###############################################################################
+# CMake settings
+cmake_minimum_required(VERSION 3.5.0)
+
+set(CMAKE_COLOR_MAKEFILE ON)
+
+# Allow advanced users to generate Makefiles printing detailed commands
+mark_as_advanced(CLEAR CMAKE_VERBOSE_MAKEFILE )
+
+###############################################################################
+# Project setup
 project(hexer)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
@@ -17,15 +28,6 @@ set(HEXER_LIB_NAME hexer)
 message(STATUS "Configuring Hexer library - ${HEXER_LIB_NAME}")
 
 set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
-
-###############################################################################
-# CMake settings
-cmake_minimum_required(VERSION 2.6.0)
-
-set(CMAKE_COLOR_MAKEFILE ON)
-
-# Allow advanced users to generate Makefiles printing detailed commands
-mark_as_advanced(CLEAR CMAKE_VERBOSE_MAKEFILE )
 
 # Path to additional CMake modules
 set(CMAKE_MODULE_PATH "${hexer_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
