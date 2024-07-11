@@ -38,7 +38,6 @@
 
 #include <hexer/Processor.hpp>
 
-#include <hexer/gitsha.h>
 #include <hexer/HexGrid.hpp>
 
 #ifdef HEXER_HAVE_GDAL
@@ -106,7 +105,7 @@ std::string GetFullVersion( void )
        << HEXER_VERSION_PATCH;
 
     std::ostringstream revs;
-    revs << g_GIT_SHA1;
+    revs << hexerSha;
 
     os << " at revision " << revs.str().substr(0, 6);
 

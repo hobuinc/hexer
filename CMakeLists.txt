@@ -9,12 +9,18 @@ mark_as_advanced(CLEAR CMAKE_VERBOSE_MAKEFILE )
 
 ###############################################################################
 # Project setup
-project(hexer)
+project(hexer VERSION 1.90 LANGUAGES CXX)
+
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 include(${hexer_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
 set(HEXER_VERSION 1.4.0 CACHE STRING "Hexer version")
+
+set(CMAKE_MODULE_PATH "${hexer_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
 DISSECT_VERSION()
 GET_OS_INFO()
@@ -30,31 +36,9 @@ message(STATUS "Configuring Hexer library - ${HEXER_LIB_NAME}")
 set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 # Path to additional CMake modules
-set(CMAKE_MODULE_PATH "${hexer_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 if (CMAKE_MAJOR_VERSION GREATER 2)
-cmake_policy(SET CMP0022 OLD) # interface link libraries
-cmake_policy(SET CMP0042 NEW) # osx rpath
+    cmake_policy(SET CMP0042 NEW) # osx rpath
 endif()
-
-###############################################################################
-# General build settings
-
-# Default to release mode
-
-# TODO: Still testing the output paths --mloskot
-#set(HEXER_BUILD_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
-
-# Output directory in which to build RUNTIME target files.
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
-
-# Output directory in which to build LIBRARY target files
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
-
-# Output directory in which to build ARCHIVE target files.
-#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HEXER_BUILD_OUTPUT_DIRECTORY})
-
-
-set(BUILD_STATIC FALSE CACHE BOOL "Build Hexer statically" )
 
 ###############################################################################
 # Platform and compiler specific settings
@@ -87,7 +71,7 @@ if (GDAL_FOUND)
 endif()
 
 if (NOT WIN32)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
 ###############################################################################
@@ -122,9 +106,30 @@ configure_file(${hexer_defines_h_in} ${hexer_defines_h})
 HEXER_ADD_INCLUDES("" "" ${hexer_defines_h})
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
-configure_file(
-  "${PROJECT_SOURCE_DIR}/gitsha.cpp.in"
-  "${PROJECT_BINARY_DIR}/src/gitsha.cpp")
+file(GLOB LAZPERF_SRCS
+    lazperf/*.cpp
+    lazperf/detail/*.cpp
+)
 
-add_subdirectory(src)
-add_subdirectory(apps)
+file(GLOB LIB_SRCS
+    hexer/*.cpp
+)
+
+file(GLOB APP_SRCS
+    apps/*.cpp
+)
+
+add_executable(curse ${APP_SRCS} ${LIB_SRCS} ${LAZPERF_SRCS})
+
+target_include_directories(curse
+    PRIVATE
+        .
+        ${GDAL_INCLUDE_DIR}
+)
+
+target_link_libraries(curse
+    PRIVATE
+        ${CAIRO_LIBRARIES}
+        ${GDAL_LIBRARY}
+)
+
