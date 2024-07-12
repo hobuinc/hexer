@@ -179,15 +179,24 @@ void boundary(  std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        char buf[256];
+        char buf[30];
         std::ifstream file(input, std::ios::binary);
         lazperf::reader::generic_file l(file);
+        const lazperf::header14 h = l.header();
         size_t count = l.pointCount();
+        HexGrid *grid_ptr = grid.get();
         std::cout << count << std::endl;
-        for(size_t i = 0 ; i < count ; i ++) {
+        for(size_t i = 0; i < count; i ++) {
 		    l.readPoint(buf);
-            lazperf::las::point10 p;
-
+            int32_t *pos = (int32_t *)buf;
+            int32_t x_int = *pos;
+            pos++;
+            int32_t y_int = *pos;
+            double x = x_int * h.scale.x + h.offset.x;
+            double y = y_int * h.scale.y + h.offset.y;
+            grid->addPoint(x, y);
+        grid->findShapes();
+        grid->findParentPaths();
         }
     } else {
 #ifdef HEXER_HAVE_GDAL
