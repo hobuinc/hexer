@@ -81,6 +81,21 @@ void process(HexGrid *grid, PointReader reader)
     grid->findParentPaths();
 }
 
+/*void processLaz(HexGrid *grid, lazperf::reader::generic_file f)
+{
+    double x, y;
+    char file;
+
+    size_t count = f.pointCount();
+    char buf[256];
+
+    for(size_t i = 0 ; i < count ; i ++) {
+        f.readPoint(buf);
+        std::cout << buf[i] << std::endl;
+    }
+
+}*/
+
 void processHexes(HexGrid *grid, HexReader reader)
 {
     int x, y;

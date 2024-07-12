@@ -25,6 +25,8 @@
 #include <hexer/Utils.hpp>
 #include "las.hpp"
 #include "ProgramArgs.hpp"
+#include "../lazperf/readers.hpp"
+#include "../lazperf/las.hpp"
 
 #ifdef HEXER_HAVE_GDAL
 #include "OGR.hpp"
@@ -152,7 +154,7 @@ FormatType getDriver(std::string filename)
     auto idx = filename.find_last_of('.');
     if (idx == std::string::npos)
         return Format_LAS;
-    else if (hexer::Utils::iequals(filename.substr(idx), ".LAS"))
+    else if (hexer::Utils::iequals(filename.substr(idx), ".LAS") || hexer::Utils::iequals(filename.substr(idx), ".LAZ"))
         return Format_LAS;
     else
         return Format_OGR;
@@ -177,9 +179,16 @@ void boundary(  std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        LAS l(input);
-        l.open();
-        process(grid.get(), l.reader);
+        char buf[256];
+        std::ifstream file(input, std::ios::binary);
+        lazperf::reader::generic_file l(file);
+        size_t count = l.pointCount();
+        std::cout << count << std::endl;
+        for(size_t i = 0 ; i < count ; i ++) {
+		    l.readPoint(buf);
+            lazperf::las::point10 p;
+
+        }
     } else {
 #ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
