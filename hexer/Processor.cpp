@@ -90,20 +90,22 @@ void processLaz(HexGrid *grid, std::ifstream& file)
 
     size_t count = l.pointCount();
 
-    const lazperf::header14 h = l.header();
+    lazperf::header14 h = l.header();
     uint16_t len = h.point_record_length;
-    char buf[len];
+    std::vector<char> buf(len, 0);
+    char* buf_data = buf.data();
 
     for(size_t i = 0; i < count; i ++) {
-        l.readPoint(buf);
+        l.readPoint(buf_data);
 
-        int32_t *pos = (int32_t *)buf;
+        int32_t *pos = (int32_t *)buf_data;
         int32_t x_int = *pos;
         pos++;
         int32_t y_int = *pos;
 
         double x = x_int * h.scale.x + h.offset.x;
         double y = y_int * h.scale.y + h.offset.y;
+
         grid->addPoint(x, y);
     }
     grid->findShapes();
