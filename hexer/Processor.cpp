@@ -86,12 +86,13 @@ void process(HexGrid *grid, PointReader reader)
 
 void processLaz(HexGrid *grid, std::ifstream& file)
 {
-    char buf[30];
-
     lazperf::reader::generic_file l(file);
 
-    const lazperf::header14 h = l.header();
     size_t count = l.pointCount();
+
+    const lazperf::header14 h = l.header();
+    uint16_t len = h.point_record_length;
+    char buf[len];
 
     for(size_t i = 0; i < count; i ++) {
         l.readPoint(buf);
