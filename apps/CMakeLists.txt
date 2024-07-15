@@ -21,7 +21,7 @@ file(GLOB LAZPERF_SRCS
 )
 
 if(CURSE)
-    add_executable(${CURSE} ${LAZPERF_SRCS} curse.cpp lasfile.hpp las.hpp las.cpp OGR.hpp OGR.cpp mmaplib.hpp pdal_util_export.hpp ProgramArgs.hpp Utils.cpp Utils.hpp )
+    add_executable(${CURSE} ${LAZPERF_SRCS} curse.cpp OGR.hpp OGR.cpp pdal_util_export.hpp ProgramArgs.hpp Utils.cpp Utils.hpp )
     target_link_libraries(${CURSE} ${HEXER_LIB_NAME} ${HEXERBOOST_LIB_NAME})
     if(NOT WIN32)
         target_link_libraries(${CURSE} ${CMAKE_DL_LIBS})

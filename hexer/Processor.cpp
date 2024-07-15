@@ -40,6 +40,9 @@
 
 #include <hexer/HexGrid.hpp>
 
+#include "../lazperf/readers.hpp"
+#include "../lazperf/las.hpp"
+
 #ifdef HEXER_HAVE_GDAL
 #include "gdal.h"
 #endif
@@ -81,20 +84,30 @@ void process(HexGrid *grid, PointReader reader)
     grid->findParentPaths();
 }
 
-/*void processLaz(HexGrid *grid, lazperf::reader::generic_file f)
+void processLaz(HexGrid *grid, std::ifstream& file)
 {
-    double x, y;
-    char file;
+    char buf[30];
 
-    size_t count = f.pointCount();
-    char buf[256];
+    lazperf::reader::generic_file l(file);
 
-    for(size_t i = 0 ; i < count ; i ++) {
-        f.readPoint(buf);
-        std::cout << buf[i] << std::endl;
+    const lazperf::header14 h = l.header();
+    size_t count = l.pointCount();
+
+    for(size_t i = 0; i < count; i ++) {
+        l.readPoint(buf);
+
+        int32_t *pos = (int32_t *)buf;
+        int32_t x_int = *pos;
+        pos++;
+        int32_t y_int = *pos;
+
+        double x = x_int * h.scale.x + h.offset.x;
+        double y = y_int * h.scale.y + h.offset.y;
+        grid->addPoint(x, y);
     }
-
-}*/
+    grid->findShapes();
+    grid->findParentPaths();
+}
 
 void processHexes(HexGrid *grid, HexReader reader)
 {

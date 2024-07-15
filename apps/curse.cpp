@@ -23,7 +23,6 @@
 #include <hexer/HexIter.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
-#include "las.hpp"
 #include "ProgramArgs.hpp"
 #include "../lazperf/readers.hpp"
 #include "../lazperf/las.hpp"
@@ -131,9 +130,8 @@ void pathtest(std::string filename)
 
     HexGrid grid(10);
 
-    LAS l(filename);
-    l.open();
-    process(&grid, l.reader);
+    std::ifstream file(filename, std::ios::binary);
+    processLaz(&grid, file);
 
     std::vector<Path *> paths = grid.rootPaths();
 
@@ -156,8 +154,12 @@ FormatType getDriver(std::string filename)
         return Format_LAS;
     else if (hexer::Utils::iequals(filename.substr(idx), ".LAS") || hexer::Utils::iequals(filename.substr(idx), ".LAZ"))
         return Format_LAS;
-    else
+    else {
+#ifdef HEXER_HAVE_GDAL
+
         return Format_OGR;
+#endif
+    }
 }
 
 void boundary(  std::string const& input,
@@ -179,25 +181,8 @@ void boundary(  std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        char buf[30];
         std::ifstream file(input, std::ios::binary);
-        lazperf::reader::generic_file l(file);
-        const lazperf::header14 h = l.header();
-        size_t count = l.pointCount();
-        HexGrid *grid_ptr = grid.get();
-        std::cout << count << std::endl;
-        for(size_t i = 0; i < count; i ++) {
-		    l.readPoint(buf);
-            int32_t *pos = (int32_t *)buf;
-            int32_t x_int = *pos;
-            pos++;
-            int32_t y_int = *pos;
-            double x = x_int * h.scale.x + h.offset.x;
-            double y = y_int * h.scale.y + h.offset.y;
-            grid->addPoint(x, y);
-        grid->findShapes();
-        grid->findParentPaths();
-        }
+        processLaz(grid.get(), file);
     } else {
 #ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
@@ -244,9 +229,8 @@ void density(   std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        LAS l(input);
-        l.open();
-        process(grid.get(), l.reader);
+        std::ifstream file(input, std::ios::binary);
+        processLaz(grid.get(), file);
     } else {
 #ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
