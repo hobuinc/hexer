@@ -23,8 +23,9 @@
 #include <hexer/HexIter.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
-#include "las.hpp"
 #include "ProgramArgs.hpp"
+#include "../lazperf/readers.hpp"
+#include "../lazperf/las.hpp"
 
 #ifdef HEXER_HAVE_GDAL
 #include "OGR.hpp"
@@ -129,9 +130,8 @@ void pathtest(std::string filename)
 
     HexGrid grid(10);
 
-    LAS l(filename);
-    l.open();
-    process(&grid, l.reader);
+    std::ifstream file(filename, std::ios::binary);
+    processLaz(&grid, file);
 
     std::vector<Path *> paths = grid.rootPaths();
 
@@ -152,10 +152,14 @@ FormatType getDriver(std::string filename)
     auto idx = filename.find_last_of('.');
     if (idx == std::string::npos)
         return Format_LAS;
-    else if (hexer::Utils::iequals(filename.substr(idx), ".LAS"))
+    else if (hexer::Utils::iequals(filename.substr(idx), ".LAS") || hexer::Utils::iequals(filename.substr(idx), ".LAZ"))
         return Format_LAS;
-    else
+    else {
+#ifdef HEXER_HAVE_GDAL
+
         return Format_OGR;
+#endif
+    }
 }
 
 void boundary(  std::string const& input,
@@ -177,9 +181,8 @@ void boundary(  std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        LAS l(input);
-        l.open();
-        process(grid.get(), l.reader);
+        std::ifstream file(input, std::ios::binary);
+        processLaz(grid.get(), file);
     } else {
 #ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
@@ -226,9 +229,8 @@ void density(   std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS)
     {
-        LAS l(input);
-        l.open();
-        process(grid.get(), l.reader);
+        std::ifstream file(input, std::ios::binary);
+        processLaz(grid.get(), file);
     } else {
 #ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);

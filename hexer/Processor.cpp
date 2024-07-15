@@ -38,8 +38,10 @@
 
 #include <hexer/Processor.hpp>
 
-#include <hexer/gitsha.h>
 #include <hexer/HexGrid.hpp>
+
+#include "../lazperf/readers.hpp"
+#include "../lazperf/las.hpp"
 
 #ifdef HEXER_HAVE_GDAL
 #include "gdal.h"
@@ -82,6 +84,34 @@ void process(HexGrid *grid, PointReader reader)
     grid->findParentPaths();
 }
 
+void processLaz(HexGrid *grid, std::ifstream& file)
+{
+    lazperf::reader::generic_file l(file);
+
+    size_t count = l.pointCount();
+
+    lazperf::header14 h = l.header();
+    uint16_t len = h.point_record_length;
+    std::vector<char> buf(len, 0);
+    char* buf_data = buf.data();
+
+    for(size_t i = 0; i < count; i ++) {
+        l.readPoint(buf_data);
+
+        int32_t *pos = (int32_t *)buf_data;
+        int32_t x_int = *pos;
+        pos++;
+        int32_t y_int = *pos;
+
+        double x = x_int * h.scale.x + h.offset.x;
+        double y = y_int * h.scale.y + h.offset.y;
+
+        grid->addPoint(x, y);
+    }
+    grid->findShapes();
+    grid->findParentPaths();
+}
+
 void processHexes(HexGrid *grid, HexReader reader)
 {
     int x, y;
@@ -106,7 +136,7 @@ std::string GetFullVersion( void )
        << HEXER_VERSION_PATCH;
 
     std::ostringstream revs;
-    revs << g_GIT_SHA1;
+    revs << hexerSha;
 
     os << " at revision " << revs.str().substr(0, 6);
 
