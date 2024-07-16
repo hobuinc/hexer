@@ -40,8 +40,8 @@
 
 #include <hexer/HexGrid.hpp>
 
-#include "../lazperf/readers.hpp"
-#include "../lazperf/las.hpp"
+#include <lazperf/readers.hpp>
+#include <lazperf/las.hpp>
 
 #ifdef HEXER_HAVE_GDAL
 #include "gdal.h"
