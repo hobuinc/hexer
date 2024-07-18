@@ -39,6 +39,7 @@
 #include <hexer/Processor.hpp>
 
 #include <hexer/HexGrid.hpp>
+#include <hexer/HexIter.hpp>
 
 #include "../lazperf/readers.hpp"
 #include "../lazperf/las.hpp"
@@ -108,6 +109,23 @@ void processLaz(HexGrid *grid, std::ifstream& file)
 
         grid->addPoint(x, y);
     }
+    int maxX = -1000000;
+    int minX = 1000000;
+    int maxY = -1000000;
+    int minY = 1000000;
+    int cnt = 0;
+    for (auto it = grid->hexBegin(); it != grid->hexEnd(); ++it)
+    {
+        HexInfo info = *it;
+        maxX = std::max(info.m_pos.m_x, maxX);
+        minX = std::min(info.m_pos.m_x, minX);
+        maxY = std::max(info.m_pos.m_y, maxY);
+        minY = std::min(info.m_pos.m_y, minY);
+        cnt++;
+    }
+    std::cerr << "Grid size = " << cnt << "!\n";
+    std::cerr << "min x/y = " << minX << "/" << minY << "!\n";
+    std::cerr << "max x/y = " << maxX << "/" << maxY << "!\n";
     grid->findShapes();
     grid->findParentPaths();
 }

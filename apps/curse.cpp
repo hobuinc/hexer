@@ -274,10 +274,8 @@ int main(int argc, char* argv[])
     hexer::ProgramArgs args;
 
     std::string m_command;
-    bool m_showHelp(false);
-    bool m_showVersion(false);
-    std::string m_input("");
-    std::string m_output("");
+    std::string m_input;
+    std::string m_output;
     double m_edge(0.0);
     int m_count(0);
 
@@ -293,26 +291,13 @@ int main(int argc, char* argv[])
 
     try
     {
-        args.parseSimple(argList);
+        args.parse(argList);
     }
     catch (hexer::arg_error const& e)
     {
         std::cout << "validation error: " << e.what() << std::endl;
         OutputHelp(std::cout, args);
         return -1;
-    }
-
-
-    if (m_showHelp)
-    {
-        OutputHelp(std::cout, args);
-        return 1;
-    }
-
-    if (m_showVersion)
-    {
-        std::cout << hexer::GetFullVersion() << std::endl;
-        return 0;
     }
 
     if (m_input.empty())
