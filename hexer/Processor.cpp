@@ -95,6 +95,8 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
 
+    grid->setSampleSize(10000);
+
     for(size_t i = 0; i < count; i ++) {
         l.readPoint(buf_data);
 

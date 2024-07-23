@@ -77,7 +77,7 @@ void HexGrid::addPoint(Point p)
     if (m_width < 0)
     {
         m_sample.push_back(p);
-        if (m_sample.size() >= 10000)
+        if (m_sample.size() >= m_maxSample)
             processSample();
         return;
     }
