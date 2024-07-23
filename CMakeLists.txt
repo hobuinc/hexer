@@ -9,10 +9,10 @@ mark_as_advanced(CLEAR CMAKE_VERBOSE_MAKEFILE )
 
 ###############################################################################
 # Project setup
-project(hexer VERSION 1.90 LANGUAGES CXX)
+project(HEXER VERSION 1.90 LANGUAGES CXX)
 
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
-include(${hexer_SOURCE_DIR}/cmake/hexer_utils.cmake)
+include(${HEXER_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
 set(HEXER_VERSION 1.4.0 CACHE STRING "Hexer version")
 
