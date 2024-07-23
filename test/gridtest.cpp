@@ -5,7 +5,6 @@
 
 #include <hexer/HexGrid.hpp>
 #include <hexer/HexIter.hpp>
-#include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
 #include "test_main.hpp"
 #include <lazperf/readers.hpp>

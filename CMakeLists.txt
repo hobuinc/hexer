@@ -77,8 +77,8 @@ endif()
 ###############################################################################
 # Installation settings
 
-set(HEXER_OUTPUT_LIB_DIR ${hexer_BINARY_DIR}/${LIB_INSTALL_DIR})
-set(HEXER_OUTPUT_BIN_DIR ${hexer_BINARY_DIR}/${BIN_INSTALL_DIR})
+set(HEXER_OUTPUT_LIB_DIR ${HEXER_BINARY_DIR}/${LIB_INSTALL_DIR})
+set(HEXER_OUTPUT_BIN_DIR ${HEXER_BINARY_DIR}/${BIN_INSTALL_DIR})
 make_directory(${HEXER_OUTPUT_LIB_DIR})
 make_directory(${HEXER_OUTPUT_BIN_DIR})
 if(WIN32)
@@ -133,7 +133,5 @@ target_link_libraries(curse
         ${GDAL_LIBRARY}
 )
 
-if(WITH_TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()
+enable_testing()
+add_subdirectory(test)
