@@ -173,7 +173,7 @@ void boundary(  std::string const& input,
 
     if (density == 0)
         density = 10;
-    if (!hexer::compare_distance(edge, 0.0))
+    if (edge == 0.0)
         grid.reset(new HexGrid(density));
     else
         grid.reset(new HexGrid(edge, density));
@@ -221,7 +221,7 @@ void density(   std::string const& input,
 
     if (density == 0)
         density = 10;
-    if (!hexer::compare_distance(edge, 0.0))
+    if (edge == 0.0) 
         grid.reset(new HexGrid(density));
     else
         grid.reset(new HexGrid(edge, density));
@@ -273,19 +273,19 @@ int main(int argc, char* argv[])
 
     hexer::ProgramArgs args;
 
-    std::string m_command;
-    bool m_showHelp(false);
-    bool m_showVersion(false);
-    std::string m_input("");
-    std::string m_output("");
-    double m_edge(0.0);
-    int m_count(0);
+    std::string command;
+    bool showHelp(false);
+    bool showVersion(false);
+    std::string input("");
+    std::string output("");
+    double edge(0.0);
+    int count(0);
 
-    args.add("command,c", "Command to run on points ('boundary' or 'density')", m_command, "boundary").setPositional();
-    args.add("input,i", "Input point set to curse", m_input).setPositional();
-    args.add("output,o", "Specify and OGR-compatible output filename to write boundary. stdout used if none specified.", m_output, "").setPositional();
-    args.add("edge", "Edge distance of hexagon", m_edge, 0.0);
-    args.add("count", "Number of points that must be in polygon for it to be positive space", m_count, 0);
+    args.add("command,c", "Command to run on points ('boundary' or 'density')", command, "boundary").setPositional();
+    args.add("input,i", "Input point set to curse", input).setPositional();
+    args.add("output,o", "Specify and OGR-compatible output filename to write boundary. stdout used if none specified.", output, "").setPositional();
+    args.add("edge", "Edge distance of hexagon", edge, 0.0);
+    args.add("count", "Number of points that must be in polygon for it to be positive space", count, 0);
 
     std::vector< std::string > argList;
     for (int i = 1; i < argc; ++i)
@@ -303,19 +303,19 @@ int main(int argc, char* argv[])
     }
 
 
-    if (m_showHelp)
+    if (showHelp)
     {
         OutputHelp(std::cout, args);
         return 1;
     }
 
-    if (m_showVersion)
+    if (showVersion)
     {
         std::cout << hexer::GetFullVersion() << std::endl;
         return 0;
     }
 
-    if (m_input.empty())
+    if (input.empty())
     {
         std::cerr << "Input not specified!\n";
         OutputHelp(std::cout, args);
@@ -325,27 +325,27 @@ int main(int argc, char* argv[])
 
     try
     {
-        if (hexer::Utils::iequals(m_command, "BOUNDARY"))
+        if (hexer::Utils::iequals(command, "BOUNDARY"))
         {
-            boundary(m_input, m_output, m_edge, m_count);
+            boundary(input, output, edge, count);
             return 0;
         }
 
-        if (hexer::Utils::iequals(m_command, "DENSITY"))
+        if (hexer::Utils::iequals(command, "DENSITY"))
         {
-            density(m_input, m_output, m_edge, m_count);
+            density(input, output, edge, count);
             return 0;
         }
 
-        if (hexer::Utils::iequals(m_command, "PATH"))
+        if (hexer::Utils::iequals(command, "PATH"))
         {
-            pathtest(m_input);
+            pathtest(input);
             return 0;
         }
 
-        if (hexer::Utils::iequals(m_command, "HEX"))
+        if (hexer::Utils::iequals(command, "HEX"))
         {
-            hextest(m_input);
+            hextest(input);
             return 0;
         }
 
