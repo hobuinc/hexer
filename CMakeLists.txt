@@ -16,7 +16,7 @@ include(${hexer_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
 set(HEXER_VERSION 1.4.0 CACHE STRING "Hexer version")
 
-set(CMAKE_MODULE_PATH "${HEXER_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${hexer_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
@@ -133,7 +133,5 @@ target_link_libraries(curse
         ${GDAL_LIBRARY}
 )
 
-if(WITH_TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()
+enable_testing()
+add_subdirectory(test)
