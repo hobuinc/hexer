@@ -71,7 +71,11 @@ void inputTest(std::string const& input, double edge = 0.0, int density = 0) {
 }
 
 
-TEST(gridtest, grid_output) {
+TEST(gridtest, grid_output_las) {
     inputTest(testFile("autzen_trim.las"));
+}
+
+TEST(gridtest, grid_output_laz) {
+    inputTest(testFile("autzen_trim.laz")); 
 }
 } //namespace hexer
