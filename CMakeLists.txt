@@ -9,7 +9,7 @@ mark_as_advanced(CLEAR CMAKE_VERBOSE_MAKEFILE )
 
 ###############################################################################
 # Project setup
-project(HEXER VERSION 1.90 LANGUAGES CXX)
+project(HEXER VERSION 1.90 LANGUAGES CXX C)
 
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 include(${HEXER_SOURCE_DIR}/cmake/hexer_utils.cmake)
@@ -29,6 +29,7 @@ SET(HEXER_LIB_SOVERSION "1.1.0")
 
 # Name of C++ library
 set(HEXER_LIB_NAME hexer)
+set(H3_LIB_NAME h3)
 
 message(STATUS "Configuring Hexer library - ${HEXER_LIB_NAME}")
 
@@ -119,7 +120,18 @@ file(GLOB APP_SRCS
     apps/*.cpp
 )
 
+file(GLOB H3SRCS
+    h3/lib/*.c
+)
+
+add_library(${H3_LIB_NAME} OBJECT ${H3SRCS}) 
+
 add_executable(curse ${APP_SRCS} ${LIB_SRCS} ${LAZPERF_SRCS})
+
+target_include_directories(${H3_LIB_NAME}
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/h3/include"
+)
 
 target_include_directories(curse
     PRIVATE
@@ -131,6 +143,7 @@ target_link_libraries(curse
     PRIVATE
         ${CAIRO_LIBRARIES}
         ${GDAL_LIBRARY}
+        ${H3_LIB_NAME}
 )
 
 enable_testing()

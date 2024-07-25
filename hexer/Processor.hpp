@@ -49,6 +49,7 @@ namespace hexer
     HEXER_DLL void process(HexGrid *grid, PointReader);
     HEXER_DLL void processHexes(HexGrid *grid, HexReader);
     HEXER_DLL void processLaz(HexGrid *grid, std::ifstream& file);
+    HEXER_DLL void processH3(std::ifstream& file, int resolution);
 
     HEXER_DLL double computeHexSize(const std::vector<Point>& samples,
         int density);

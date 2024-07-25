@@ -10,6 +10,7 @@
 #include "test_main.hpp"
 #include <lazperf/readers.hpp>
 #include <lazperf/las.hpp>
+#include <h3/include/h3api.h>
 
 namespace hexer {
 
@@ -55,5 +56,14 @@ TEST(gridtest, grid_output_las) {
 
 TEST(gridtest, grid_output_laz) {
     inputTest(testFile("autzen_trim.laz")); 
+}
+
+TEST(gridtest, test_h3_exist) {
+    LatLng location;
+    location.lat = degsToRads(40.689167);
+    location.lng = degsToRads(-74.044444);
+    int resolution = 10;
+    H3Index index;
+    EXPECT_EQ(latLngToCell(&location, resolution, &index), E_SUCCESS); 
 }
 } //namespace hexer

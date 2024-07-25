@@ -27,6 +27,7 @@
 #include <lazperf/readers.hpp>
 #include <lazperf/las.hpp>
 
+
 #ifdef HEXER_HAVE_GDAL
 #include "OGR.hpp"
 #endif
@@ -245,6 +246,21 @@ void density(   std::string const& input,
 #endif
 }
 
+void densityH3( std::string const& input,
+                std::string const& output,
+                int res,
+                int density) 
+{
+    using namespace hexer;
+
+    if (res == -1) {
+        std::cerr << "H3 resolution not specified; use '--resolution' argument" << std::endl;
+    }
+    else {
+        std::ifstream file(input, std::ios::binary);
+        processH3(file, res);
+    }
+}
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
 {
@@ -280,12 +296,16 @@ int main(int argc, char* argv[])
     std::string output("");
     double edge(0.0);
     int count(0);
+    int res(-1);
+    std::string grid;
 
     args.add("command,c", "Command to run on points ('boundary' or 'density')", command, "boundary").setPositional();
     args.add("input,i", "Input point set to curse", input).setPositional();
     args.add("output,o", "Specify and OGR-compatible output filename to write boundary. stdout used if none specified.", output, "").setPositional();
     args.add("edge", "Edge distance of hexagon", edge, 0.0);
     args.add("count", "Number of points that must be in polygon for it to be positive space", count, 0);
+    args.add("resolution,r", "H3 grid resolution: 0 (coarsest) - 15 (finest)", res, -1);
+    args.add("grid", "Grid type ('hexgrid' or 'h3'): proprietary HexGrid hexagons, or H3 indexed grid", grid, "hexgrid");
 
     std::vector< std::string > argList;
     for (int i = 1; i < argc; ++i)
@@ -325,29 +345,46 @@ int main(int argc, char* argv[])
 
     try
     {
-        if (hexer::Utils::iequals(command, "BOUNDARY"))
+        if (hexer::Utils::iequals(grid, "H3")) 
         {
-            boundary(input, output, edge, count);
-            return 0;
+            if (hexer::Utils::iequals(command, "DENSITY"))
+            {
+                densityH3(input, output, res, count);
+                return 0;
+            }
+            else
+            {
+                std::cerr << "H3 support for " << command << " not active" << std::endl;
+                return 0;  
+            }
+        }
+        else
+        {
+            if (hexer::Utils::iequals(command, "BOUNDARY"))
+            {
+                boundary(input, output, edge, count);
+                return 0;
+            }
+
+            if (hexer::Utils::iequals(command, "DENSITY"))
+            {
+                density(input, output, edge, count);
+                return 0;
+            }
+
+            if (hexer::Utils::iequals(command, "PATH"))
+            {
+                pathtest(input);
+                return 0;
+            }
+
+            if (hexer::Utils::iequals(command, "HEX"))
+            {
+                hextest(input);
+                return 0;
+            }
         }
 
-        if (hexer::Utils::iequals(command, "DENSITY"))
-        {
-            density(input, output, edge, count);
-            return 0;
-        }
-
-        if (hexer::Utils::iequals(command, "PATH"))
-        {
-            pathtest(input);
-            return 0;
-        }
-
-        if (hexer::Utils::iequals(command, "HEX"))
-        {
-            hextest(input);
-            return 0;
-        }
 
         return 1;
     } catch (hexer::hexer_error const& e)
