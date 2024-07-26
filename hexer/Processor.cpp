@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <sstream>
 #include <cmath>
+#include <map>
 
 #include <hexer/Processor.hpp>
 
@@ -44,6 +45,8 @@
 #include <lazperf/las.hpp>
 
 #include <h3/include/h3api.h>
+#include <hexer/H3grid.hpp>
+
 #ifdef HEXER_HAVE_GDAL
 #include "gdal.h"
 #endif
@@ -52,6 +55,22 @@
 
 namespace hexer
 {
+    /*class H3Input
+    {
+    public:
+        H3Input(H3Index h, LatLng l)
+            : m_idx{h}, m_loc{l}
+        {}
+    private:
+        H3Index m_idx;
+        LatLng m_loc;
+    };
+
+    class H3Grid
+    {
+
+    };*/
+
     double distance(const Point& p1, const Point& p2)
     {
         double xdist = p2.m_x - p1.m_x;
@@ -115,7 +134,39 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     grid->findParentPaths();
 }
 
-void processH3(std::ifstream& file, int resolution) {
+void processH3(H3Grid *grid, std::ifstream& file) 
+{
+    lazperf::reader::generic_file l(file);
+
+    size_t count = l.pointCount();
+
+    lazperf::header14 h = l.header();
+    uint16_t len = h.point_record_length;
+    std::vector<char> buf(len, 0);
+    char* buf_data = buf.data();
+
+    // add support for CRS read and reprojection -- from VLR ?
+
+    for(size_t i = 0; i < count; i ++) {
+        l.readPoint(buf_data);
+
+        int32_t *pos = (int32_t *)buf_data;
+        int32_t x_int = *pos;
+        pos++;
+        int32_t y_int = *pos;
+
+        LatLng loc;
+
+        double x_rad = degsToRads(x_int * h.scale.x + h.offset.x);
+        double y_rad = degsToRads(y_int * h.scale.y + h.offset.y);
+        loc.lat = y_rad;
+        loc.lng = x_rad;
+        
+        grid->addLatLng(&loc);
+    }
+    for(const auto& i : grid->getmap()){
+        std::cout << i.first << ", " << i.second << "\n";
+    }
 
 }
 

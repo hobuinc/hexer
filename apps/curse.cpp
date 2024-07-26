@@ -26,6 +26,7 @@
 #include "ProgramArgs.hpp"
 #include <lazperf/readers.hpp>
 #include <lazperf/las.hpp>
+#include <hexer/H3grid.hpp>
 
 
 #ifdef HEXER_HAVE_GDAL
@@ -253,12 +254,22 @@ void densityH3( std::string const& input,
 {
     using namespace hexer;
 
-    if (res == -1) {
+    std::unique_ptr<H3Grid> grid;
+
+    if (density == 0)
+        density = 10;
+    if (res == -1) 
         std::cerr << "H3 resolution not specified; use '--resolution' argument" << std::endl;
+    else
+        grid.reset(new H3Grid(density, res));
+
+    FormatType t = getDriver(input);
+    if (t == Format_LAS) {
+        std::ifstream file(input, std::ios::binary);
+        processH3(grid.get(), file); 
     }
     else {
-        std::ifstream file(input, std::ios::binary);
-        processH3(file, res);
+        std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;
     }
 }
 

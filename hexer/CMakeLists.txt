@@ -11,12 +11,14 @@ set(HEXER_HPP
   "${HEXER_HEADERS_DIR}/Processor.hpp"
   "${HEXER_HEADERS_DIR}/Segment.hpp"
   "${HEXER_HEADERS_DIR}/gitsha.h"
+  "${HEXER_HEADERS_DIR}/H3grid.hpp"
 
  )
 
 set(HEXER_CPP
     Draw.cpp
     HexGrid.cpp
+    H3grid.cpp
     Hexagon.cpp
     Path.cpp
     Processor.cpp
