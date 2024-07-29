@@ -55,21 +55,6 @@
 
 namespace hexer
 {
-    /*class H3Input
-    {
-    public:
-        H3Input(H3Index h, LatLng l)
-            : m_idx{h}, m_loc{l}
-        {}
-    private:
-        H3Index m_idx;
-        LatLng m_loc;
-    };
-
-    class H3Grid
-    {
-
-    };*/
 
     double distance(const Point& p1, const Point& p2)
     {
@@ -115,7 +100,10 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
 
-    grid->setSampleSize(10000);
+    if(count < 10000)
+        grid->setSampleSize(count);
+    else 
+        grid->setSampleSize(10000);
 
     for(size_t i = 0; i < count; i ++) {
         l.readPoint(buf_data);
@@ -144,6 +132,11 @@ void processH3(H3Grid *grid, std::ifstream& file)
     uint16_t len = h.point_record_length;
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
+    
+    if(count < 10000)
+        grid->setSampleSize(count);
+    else 
+        grid->setSampleSize(10000);
 
     // add support for CRS read and reprojection -- from VLR ?
 
@@ -164,9 +157,10 @@ void processH3(H3Grid *grid, std::ifstream& file)
         
         grid->addLatLng(&loc);
     }
-    for(const auto& i : grid->getmap()){
+    grid->processGrid();
+    /* for(const auto& i : grid->getMap()){
         std::cout << i.first << ", " << i.second << "\n";
-    }
+    } */
 
 }
 

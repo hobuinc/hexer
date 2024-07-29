@@ -258,8 +258,10 @@ void densityH3( std::string const& input,
 
     if (density == 0)
         density = 10;
-    if (res == -1) 
-        std::cerr << "H3 resolution not specified; use '--resolution' argument" << std::endl;
+    if (res > 15 || res < -1) {
+        std::cerr << "Input an H3 grid cell size between 1 and 15." 
+         << "Info on H3 cell specifications can be found at https://h3geo.org/docs/core-library/restable" << std::endl;
+    }
     else
         grid.reset(new H3Grid(density, res));
 
