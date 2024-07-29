@@ -57,12 +57,13 @@ namespace hexer
 
         // bins for H3 auto resolution: 
         // - H3 level ~roughly~ equivalent to hexer hexagon size at same edge value
-        // - does not automatically make very large (>1km^2) or very small (<44m^2) hexagons
+        // - does not automatically make very large (>1km^2) or very small (<6m^2) hexagons
         double min_8(0.015);
         double min_9(0.0036);
         double min_10(0.0012);
         double min_11(0.0005);
         double min_12(0.00019);
+        double min_13(0.00008);
 
         if (min_8 < height)
             m_res = 8;
@@ -74,8 +75,10 @@ namespace hexer
             m_res = 11;
         else if (min_12 < height && height < min_11)
             m_res = 12;
-        else if (height < min_12)
+        else if (min_13 < height && height < min_12)
             m_res = 13;
+        else if (height < min_13)
+            m_res = 14;
         else
             throw hexer_error("unable to calculate H3 grid size!");
         
