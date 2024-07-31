@@ -23,7 +23,9 @@
 
 #include <hexer/HexGrid.hpp>
 #include <hexer/HexIter.hpp>
+#include <hexer/H3grid.hpp>
 
+#include <h3/include/h3api.h>
 #include <functional>
 
 using namespace std;
@@ -264,6 +266,60 @@ void OGR::writeDensity(HexGrid *grid)
     }
 }
 
+OGRGeometryH OGR::collectH3(CellBoundary b)
+{
+    OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
+
+    for (int i = 0; i <= b.numVerts - 1; ++i) {
+        LatLng ll = b.verts[i];
+        //std::cout << ll.lng << " " << ll.lat << std::endl;
+        OGR_G_AddPoint_2D(ring, radsToDegs(ll.lng), radsToDegs(ll.lat));
+    }
+    OGR_G_AddPoint_2D(ring, radsToDegs(b.verts[0].lng), radsToDegs(b.verts[0].lat));
+
+    OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
+    if( OGR_G_AddGeometryDirectly(polygon, ring ) != OGRERR_NONE )
+    {
+        std::ostringstream oss;
+        oss << "Unable to add ring to polygon in collectHexagon '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+
+	return polygon; 
+}
+
+void OGR::writeH3Density(H3Grid *grid)
+{
+    std::map<H3Index, int> hex_map = grid->getMap();
+    for (auto iter = hex_map.begin(); iter != hex_map.end(); ++iter) {
+        CellBoundary bounds;
+        H3Error err = cellToBoundary(iter->first, &bounds);
+        if (err == E_SUCCESS) {
+            OGRGeometryH polygon = collectH3(bounds);
+            OGRFeatureH hFeature;
+            hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
+            OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
+                iter->first);
+            OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
+                iter->second);
+
+            OGR_F_SetGeometry(hFeature, polygon);
+            OGR_G_DestroyGeometry(polygon);
+
+            if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
+            {
+                std::ostringstream oss;
+                oss << "Unable to create feature for multipolygon with error '"
+                    << CPLGetLastErrorMsg() << "'";
+                throw hexer_error(oss.str());
+            }
+            OGR_F_Destroy( hFeature );  
+        }
+        else
+            throw hexer_error("Unable to collect H3 boundary!"); 
+    } 
+}
 
 OGR::~OGR()
 {

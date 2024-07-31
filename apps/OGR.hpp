@@ -149,6 +149,7 @@ public:
 
     void writeBoundary(HexGrid *grid);
 	void writeDensity(HexGrid *grid);
+    void writeH3Density(H3Grid *grid);
 
 private:
     std::string m_filename;
@@ -160,6 +161,7 @@ private:
     void createLayer(std::string const& basename);
     void collectPath(Path* path, OGRGeometryH polygon);
 	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
+    OGRGeometryH collectH3(CellBoundary b);
 
 };
 

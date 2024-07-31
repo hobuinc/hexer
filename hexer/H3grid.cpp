@@ -57,6 +57,8 @@ namespace hexer
 
         // bins for H3 auto resolution: 
         // - H3 level ~roughly~ equivalent to hexer hexagon size at same edge value
+        //     - (since our coords are in degrees, the appropriate values will vary based on 
+        //       location. Some way of scaling this by latitude would be more accurate)
         // - does not automatically make very large (>1km^2) or very small (<6m^2) hexagons
         double min_8(0.015);
         double min_9(0.0036);

@@ -273,6 +273,11 @@ void densityH3( std::string const& input,
     else {
         std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;
     }
+
+#ifdef HEXER_HAVE_GDAL
+    writer::OGR o(output);
+    o.writeH3Density(grid.get());
+#endif
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
