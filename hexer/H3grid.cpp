@@ -16,8 +16,7 @@ namespace hexer
     void H3Grid::addLatLng(LatLng *ll)
     {
         if(m_res == -1) {
-            Point p(radsToDegs(ll->lng), radsToDegs(ll->lat));
-            m_sample.push_back(p);
+            m_sample.push_back(*ll);
             if (m_sample.size() >= m_maxSample)
                 processH3Sample();
             return;
@@ -53,19 +52,18 @@ namespace hexer
         if (m_res > 0 || m_sample.empty())
             return;
         double height = computeHexSize(m_sample, m_dense_limit);
-        std::cout << "height: " << height << std::endl;
 
         // bins for H3 auto resolution: 
         // - H3 level ~roughly~ equivalent to hexer hexagon size at same edge value
         //     - (since our coords are in degrees, the appropriate values will vary based on 
         //       location. Some way of scaling this by latitude would be more accurate)
         // - does not automatically make very large (>1km^2) or very small (<6m^2) hexagons
-        double min_8(0.015);
-        double min_9(0.0036);
-        double min_10(0.0012);
-        double min_11(0.0005);
-        double min_12(0.00019);
-        double min_13(0.00008);
+        double min_8(2.62E-4);
+        double min_9(6.28E-5);
+        double min_10(2.09E-5);
+        double min_11(8.73E-6);
+        double min_12(3.32E-6);
+        double min_13(1.4E-6);
 
         if (min_8 < height)
             m_res = 8;
@@ -85,14 +83,10 @@ namespace hexer
             throw hexer_error("unable to calculate H3 grid size!");
         
         for (auto pi = m_sample.begin(); pi != m_sample.end(); ++pi) {
-            LatLng ll;
-            double x_rad = degsToRads(pi->m_x);
-            double y_rad = degsToRads(pi->m_y);
-            ll.lat = y_rad;
-            ll.lng = x_rad;
+            LatLng ll = *pi;
             addLatLng(&ll);
         }
         m_sample.clear();
-        std::cout << "res: " << m_res <<std::endl;
+        std::cout << "res: " << m_res <<std::endl; 
     }
 } // namespace hexer

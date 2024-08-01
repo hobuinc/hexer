@@ -97,7 +97,6 @@ OGR::OGR(std::string const& filename)
 
 void OGR::createLayer(std::string const& basename)
 {
-
     OGRSFDriverH driver = OGRGetDriverByName("ESRI Shapefile");
     if (driver == NULL)
     {
@@ -250,20 +249,24 @@ void OGR::writeDensity(HexGrid *grid)
             counter);
         OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
             hi.m_density);
-
-        OGR_F_SetGeometry(hFeature, polygon);
-        OGR_G_DestroyGeometry(polygon);
-
-        if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
-        {
-            std::ostringstream oss;
-            oss << "Unable to create feature for multipolygon with error '"
-                << CPLGetLastErrorMsg() << "'";
-            throw hexer_error(oss.str());
-        }
-        OGR_F_Destroy( hFeature );
+        processGeometry(m_layer, hFeature, polygon);
         counter++;
     }
+}
+
+void OGR::processGeometry(OGRLayerH m_layer, OGRFeatureH feature, OGRGeometryH polygon)
+{
+    OGR_F_SetGeometry(feature, polygon);
+    OGR_G_DestroyGeometry(polygon);
+
+    if( OGR_L_CreateFeature( m_layer, feature ) != OGRERR_NONE )
+    {
+        std::ostringstream oss;
+        oss << "Unable to create feature for multipolygon with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_F_Destroy( feature ); 
 }
 
 OGRGeometryH OGR::collectH3(CellBoundary b)
@@ -299,22 +302,12 @@ void OGR::writeH3Density(H3Grid *grid)
             OGRGeometryH polygon = collectH3(bounds);
             OGRFeatureH hFeature;
             hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
+            // H3 id: make new string field in createLayer
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
                 iter->first);
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
-                iter->second);
-
-            OGR_F_SetGeometry(hFeature, polygon);
-            OGR_G_DestroyGeometry(polygon);
-
-            if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
-            {
-                std::ostringstream oss;
-                oss << "Unable to create feature for multipolygon with error '"
-                    << CPLGetLastErrorMsg() << "'";
-                throw hexer_error(oss.str());
-            }
-            OGR_F_Destroy( hFeature );  
+                iter->second); 
+            processGeometry(m_layer, hFeature, polygon);
         }
         else
             throw hexer_error("Unable to collect H3 boundary!"); 

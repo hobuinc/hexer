@@ -160,6 +160,7 @@ private:
 
     void createLayer(std::string const& basename);
     void collectPath(Path* path, OGRGeometryH polygon);
+    void processGeometry(OGRLayerH m_layer, OGRFeatureH feature, OGRGeometryH polygon); 
 	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
     OGRGeometryH collectH3(CellBoundary b);
 

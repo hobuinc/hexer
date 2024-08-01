@@ -54,7 +54,8 @@ namespace hexer
 
     HEXER_DLL double computeHexSize(const std::vector<Point>& samples,
         int density);
-
+    HEXER_DLL double computeHexSize(const std::vector<LatLng>& samples,
+        int density);
     HEXER_DLL std::string GetFullVersion( void );
 } // namespace hexer
 

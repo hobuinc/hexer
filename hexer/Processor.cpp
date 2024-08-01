@@ -63,6 +63,13 @@ namespace hexer
         return std::sqrt(xdist * xdist + ydist * ydist);
     }
 
+    double distance(const LatLng& p1, const LatLng& p2)
+    {
+        double xdist = p2.lng - p1.lng;
+        double ydist = p2.lat - p1.lat;
+        return std::sqrt(xdist * xdist + ydist * ydist);
+    }
+
     // Compute hex size based on distance between consecutive points and
     // density.  The probably needs some work based on more data.
     double computeHexSize(const std::vector<Point>& samples, int density)
@@ -76,6 +83,18 @@ namespace hexer
         }
         return ((density * dist) / samples.size());
     }
+
+    double computeHexSize(const std::vector<LatLng>& samples, int density)
+    {
+        double dist = 0;
+        for (std::vector<LatLng>::size_type i = 0; i < samples.size() - 1; ++i)
+        {
+           LatLng p1 = samples[i];
+           LatLng p2 = samples[i + 1];
+           dist += distance(p1, p2);
+        }
+        return ((density * dist) / samples.size());
+    } 
 
 
 void process(HexGrid *grid, PointReader reader)
