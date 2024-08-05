@@ -29,9 +29,7 @@
 #include <hexer/H3grid.hpp>
 
 
-#ifdef HEXER_HAVE_GDAL
 #include "OGR.hpp"
-#endif
 
 std::string headline(hexer::Utils::screenWidth(), '-');
 
@@ -156,12 +154,8 @@ FormatType getDriver(std::string filename)
         return Format_LAS;
     else if (hexer::Utils::iequals(filename.substr(idx), ".LAS") || hexer::Utils::iequals(filename.substr(idx), ".LAZ"))
         return Format_LAS;
-    else {
-#ifdef HEXER_HAVE_GDAL
-
+    else 
         return Format_OGR;
-#endif
-    }
 }
 
 void boundary(  std::string const& input,
@@ -186,11 +180,9 @@ void boundary(  std::string const& input,
         std::ifstream file(input, std::ios::binary);
         processLaz(grid.get(), file);
     } else {
-#ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
         o.open();
         process(grid.get(), o.reader);
-#endif
     }
 
     if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
@@ -204,10 +196,8 @@ void boundary(  std::string const& input,
     }
     else
     {
-#ifdef HEXER_HAVE_GDAL
         writer::OGR o(output);
         o.writeBoundary(grid.get());
-#endif
     }
 }
 
@@ -234,17 +224,12 @@ void density(   std::string const& input,
         std::ifstream file(input, std::ios::binary);
         processLaz(grid.get(), file);
     } else {
-#ifdef HEXER_HAVE_GDAL
         reader::OGR o(input);
         o.open();
         process(grid.get(), o.reader);
-#endif
     }
-
-#ifdef HEXER_HAVE_GDAL
     writer::OGR o(output);
     o.writeDensity(grid.get());
-#endif
 }
 
 void densityH3( std::string const& input,
@@ -274,10 +259,8 @@ void densityH3( std::string const& input,
         std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;
     }
 
-#ifdef HEXER_HAVE_GDAL
-    writer::OGR o(output);
+    writer::h3::OGR o(output);
     o.writeH3Density(grid.get());
-#endif
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
@@ -299,9 +282,7 @@ void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
 int main(int argc, char* argv[])
 {
 
-#ifdef HEXER_HAVE_GDAL
     OGRRegisterAll();
-#endif
 
     bool bVerbose(false);
 
@@ -411,9 +392,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-#ifdef HEXER_HAVE_GDAL
     OGRCleanupAll();
-#endif
 
 }
 

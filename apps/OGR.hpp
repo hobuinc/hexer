@@ -12,9 +12,7 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 *****************************************************************************/
-
-#ifndef INCLUDED_PSHAPE_OGR_HPP
-#define INCLUDED_PSHAPE_OGR_HPP
+#pragma once
 
 #include <hexer/hexer.hpp>
 
@@ -23,9 +21,6 @@
 #include <hexer/hexer_defines.h>
 #include <hexer/Mathpair.hpp>
 #include <hexer/export.hpp>
-
-
-#ifdef HEXER_HAVE_GDAL
 
 #include "ogr_api.h"
 #include "gdal.h"
@@ -149,7 +144,6 @@ public:
 
     void writeBoundary(HexGrid *grid);
 	void writeDensity(HexGrid *grid);
-    void writeH3Density(H3Grid *grid);
 
 private:
     std::string m_filename;
@@ -160,16 +154,35 @@ private:
 
     void createLayer(std::string const& basename);
     void collectPath(Path* path, OGRGeometryH polygon);
-    void processGeometry(OGRLayerH m_layer, OGRFeatureH feature, OGRGeometryH polygon); 
+    void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon); 
 	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
-    OGRGeometryH collectH3(CellBoundary b);
 
 };
+namespace h3
+{
+class OGR
+{
 
-} // writer
 
-} // namespace
+public:
+    OGR(std::string const& filename);
+	~OGR();
 
-#endif // HEXER_HAVE_GDAL
+    void writeH3Density(H3Grid *grid);
+
+private:
+    std::string m_filename;
+
+    OGRDataSourceH m_ds;
+	OGRLayerH m_layer;
+    void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
+    void createLayer(std::string const& basename);
+    OGRGeometryH collectH3(CellBoundary b);
+
+}; 
+} // namespace h3
+} // namespace writer
+
+} // namespace hexer
 
 #endif // file guard

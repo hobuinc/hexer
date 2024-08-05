@@ -15,8 +15,6 @@
 
 #include "OGR.hpp"
 
-#ifdef HEXER_HAVE_GDAL
-
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -43,23 +41,17 @@ OGR::OGR(std::string filename)
 	, m_current_feature(0)
 	, m_current_geometry(0)
 {
-#ifdef HEXER_HAVE_GDAL
-	reader = std::bind(&OGR::read, std::placeholders::_1, std::placeholders::_2, this);
-#endif
+reader = std::bind(&OGR::read, std::placeholders::_1, std::placeholders::_2, this);
 
 }
 
 OGR::~OGR()
 {
-#ifdef HEXER_HAVE_GDAL
+if (m_current_feature)
+    OGR_F_Destroy(m_current_feature);
 
-	if (m_current_feature)
-		OGR_F_Destroy(m_current_feature);
-
-	if (m_ds)
-		OGR_DS_Destroy(m_ds);
-
-#endif
+if (m_ds)
+    OGR_DS_Destroy(m_ds);
 }
 
 } // reader
@@ -254,12 +246,107 @@ void OGR::writeDensity(HexGrid *grid)
     }
 }
 
-void OGR::processGeometry(OGRLayerH m_layer, OGRFeatureH feature, OGRGeometryH polygon)
+void OGR::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon)
 {
     OGR_F_SetGeometry(feature, polygon);
     OGR_G_DestroyGeometry(polygon);
 
-    if( OGR_L_CreateFeature( m_layer, feature ) != OGRERR_NONE )
+    if( OGR_L_CreateFeature( layer, feature ) != OGRERR_NONE )
+    {
+        std::ostringstream oss;
+        oss << "Unable to create feature for multipolygon with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_F_Destroy( feature ); 
+}
+
+OGR::~OGR()
+{
+    OGR_DS_Destroy(m_ds);
+}
+
+namespace h3
+{
+
+OGR::OGR(std::string const& filename)
+    : m_filename(filename)
+	, m_ds(0)
+	, m_layer(0)
+{
+    createLayer(getBasename(filename));
+}
+
+void OGR::createLayer(std::string const& basename)
+{
+    OGRSFDriverH driver = OGRGetDriverByName("ESRI Shapefile");
+    if (driver == NULL)
+    {
+        throw hexer_error("OGR Driver was null!");
+    }
+
+    m_ds = OGR_Dr_CreateDataSource(driver, m_filename.c_str(), NULL);
+    if (m_ds == NULL)
+    {
+        throw hexer_error("Data source creation was null!");
+    }
+
+    m_layer = OGR_DS_CreateLayer(m_ds, basename.c_str(), NULL, wkbMultiPolygon, NULL);
+    if (m_layer == NULL)
+    {
+        throw hexer_error("Layer creation was null!");
+    }
+
+    OGRFieldDefnH hFieldDefn;
+    hFieldDefn = OGR_Fld_Create("ID", OFTInteger);
+    if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
+    {
+        std::ostringstream oss;
+        oss << "Could not create ID field on layer with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_Fld_Destroy(hFieldDefn);
+
+    hFieldDefn = OGR_Fld_Create("COUNT", OFTInteger);
+    if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
+    {
+        std::ostringstream oss;
+        oss << "Could not create COUNT field on layer with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_Fld_Destroy(hFieldDefn);
+
+    hFieldDefn = OGR_Fld_Create("H3_ID", OFTInteger64);
+    if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
+    {
+        std::ostringstream oss;
+        oss << "Could not create H3_ID field on layer with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_Fld_Destroy(hFieldDefn);
+    
+    hFieldDefn = OGR_Fld_Create("IJ", OFTString);
+    if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
+    {
+        std::ostringstream oss;
+        oss << "Could not create IJ field on layer with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_Fld_Destroy(hFieldDefn);
+
+
+}
+
+void OGR::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon)
+{
+    OGR_F_SetGeometry(feature, polygon);
+    OGR_G_DestroyGeometry(polygon);
+
+    if( OGR_L_CreateFeature( layer, feature ) != OGRERR_NONE )
     {
         std::ostringstream oss;
         oss << "Unable to create feature for multipolygon with error '"
@@ -295,6 +382,8 @@ OGRGeometryH OGR::collectH3(CellBoundary b)
 void OGR::writeH3Density(H3Grid *grid)
 {
     std::map<H3Index, int> hex_map = grid->getMap();
+    std::vector<std::string> ij_arr = grid->getIJArr();
+    int counter(0);
     for (auto iter = hex_map.begin(); iter != hex_map.end(); ++iter) {
         CellBoundary bounds;
         H3Error err = cellToBoundary(iter->first, &bounds);
@@ -304,14 +393,19 @@ void OGR::writeH3Density(H3Grid *grid)
             hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
             // H3 id: make new string field in createLayer
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
-                iter->first);
+                counter);
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
-                iter->second); 
+                iter->second);
+            OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
+                iter->first);
+            OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "IJ"),
+                ij_arr[counter].c_str());  
             processGeometry(m_layer, hFeature, polygon);
+            counter++;
         }
         else
             throw hexer_error("Unable to collect H3 boundary!"); 
-    } 
+    }
 }
 
 OGR::~OGR()
@@ -319,8 +413,6 @@ OGR::~OGR()
     OGR_DS_Destroy(m_ds);
 }
 
+} // namespace h3
 } // namespace writer
 } // namespace hexer
-
-#endif // HEXER_HAVE_GDAL
-

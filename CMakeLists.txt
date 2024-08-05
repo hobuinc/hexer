@@ -9,7 +9,7 @@ mark_as_advanced(CLEAR CMAKE_VERBOSE_MAKEFILE )
 
 ###############################################################################
 # Project setup
-project(HEXER VERSION 1.90 LANGUAGES CXX C)
+project(HEXER VERSION 1.9.0 LANGUAGES CXX C)
 
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 include(${HEXER_SOURCE_DIR}/cmake/hexer_utils.cmake)
@@ -65,10 +65,7 @@ if(WITH_DRAWING)
     set(HEXER_HAVE_CAIRO 1)
 endif(WITH_DRAWING)
 
-find_package(GDAL 1.9.0)
-if (GDAL_FOUND)
-    set(HEXER_HAVE_GDAL 1)
-endif()
+find_package(GDAL 1.9.0 REQUIRED)
 
 if (NOT WIN32)
     set(CMAKE_CXX_STANDARD 17)

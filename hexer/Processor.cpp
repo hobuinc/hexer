@@ -47,9 +47,7 @@
 #include <h3/include/h3api.h>
 #include <hexer/H3grid.hpp>
 
-#ifdef HEXER_HAVE_GDAL
 #include "gdal.h"
-#endif
 
 #include <hexer/Mathpair.hpp>
 
@@ -177,10 +175,7 @@ void processH3(H3Grid *grid, std::ifstream& file)
         grid->addLatLng(&loc);
     }
     grid->processGrid();
-    /* for(const auto& i : grid->getMap()){
-        std::cout << i.first << ", " << i.second << "\n";
-    } */
-
+    grid->findIJ();
 }
 
 void processHexes(HexGrid *grid, HexReader reader)
@@ -211,9 +206,7 @@ std::string GetFullVersion( void )
 
     os << " at revision " << revs.str().substr(0, 6);
 
-#ifdef HEXER_HAVE_GDAL
     os << " with GDAL " << GDALVersionInfo("RELEASE_NAME");
-#endif
 
     return os.str();
 }
