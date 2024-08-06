@@ -29,19 +29,38 @@ public:
         { m_maxSample = sampleSize; }
     void processGrid();
     void findIJ();
+
+    H3Index ij2h3(CoordIJ& ij)
+        {   H3Index h3;
+            if (localIjToCell(m_origin, &ij, 0, &h3) != E_SUCCESS) {
+                std::ostringstream oss;
+                oss << "Can't convert IJ (" << std::to_string(ij.i) << 
+                    ", " << std::to_string(ij.j) <<") to H3Index.";
+                throw hexer_error(oss.str()); 
+            }
+            return h3;  }
+    
+
+
+
 private:
     void processH3Sample();
     void possible(H3Index idx);
     void walkBounds();
-    bool coordEq(CoordIJ a, CoordIJ b);
+
+    H3Index ij2h3(CoordIJ& ij);
+    void addEdge(Shape s, CoordIJ idx, H3Index next);
+    CoordIJ nextCoord(CoordIJ ij, int edge);
+    CoordIJ edgeCoord(CoordIJ ij, int edge);
+    Shape findShape();
 
     /// Count of points in H3-indexed hexagons
     int m_count;
     /// Map of hexagons based on H3 index
     typedef std::map<H3Index, int> H3Map;
     H3Map m_map;
-    /// hexagons with non-dense neighbors
-    std::map<H3Index, CoordIJ> m_possible;
+    /// hexagons with non-dense neighbors, and the IJ coordinates of the original and neighboring hexagon
+    std::map<H3Index, std::pair<CoordIJ, CoordIJ>> m_possible;
     /// H3 resolution of grid (0-15); -1 for auto edge length calculation
     int m_res;
     /// Number of points that must lie in a hexagon for it to be interesting 
@@ -54,9 +73,22 @@ private:
     H3Index m_origin;
     /// Vector of localIJ coordinates as strings, in the same order as m_map
     std::vector<std::string> m_ij_coords;
+    ///
+    std::vector<Shape> m_boundary;
+
+
+
 
     H3Index m_idx;
     LatLng m_loc;
 };
+typedef std::vector<H3Index> Shape;
+CoordIJ operator+(CoordIJ const& c1, CoordIJ const& c2)
+    {   return {c1.i + c2.i, c1.j + c2.j};  }
+bool operator!=(CoordIJ const& c1, CoordIJ const& c2)
+    {   if (c1.i == c2.i && c1.j == c2.j)
+            return true;
+        else
+            return false;    }
 
 } // namepsace hexer
