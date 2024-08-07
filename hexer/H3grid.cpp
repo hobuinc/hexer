@@ -78,11 +78,12 @@ namespace hexer
         const CoordIJ orig = m_possible.begin()->second;
         int in_counter(0);
         do {
-            std::cout << "edge: " << edge << std::endl;
+            std::cout << "edge at START of loop: " << edge << std::endl;
             if (edge == 0)
                 m_possible.erase(ij2h3(cur));
             addEdge(s, cur, edge);
             CoordIJ next = nextCoord(cur, edge);
+            std::cout << "next ; " << next.i << ", " << next.j << std::endl;
             // if next is dense: go left
             if (m_map.find(ij2h3(next)) != m_map.end()) {
                 cur = next;
@@ -96,9 +97,10 @@ namespace hexer
                 else
                     edge++;
             }
-            std::cout << in_counter << " . " << s[in_counter] << "\n"<< std::endl;
+            std::cout << in_counter << " . " << s[in_counter] << std::endl;
             in_counter++;
-        } while ((cur != orig) && (edge != 0));
+            std::cout << "edge at END of loop: " << edge << std::endl;
+        } while (cur != orig && edge != 0);
         return s;
     }
 
@@ -142,7 +144,7 @@ namespace hexer
         H3Index src = ij2h3(idx);
         CoordIJ next_ij = edgeCoord(idx, edge);
         H3Index dirEdge;
-        std::cout << "current: " << idx.i << ", " << idx.j << "; new: " << next_ij.i << ", " << next_ij.j << std::endl;
+        std::cout << "current: " << idx.i << ", " << idx.j << "; across: " << next_ij.i << ", " << next_ij.j << std::endl;
         if (cellsToDirectedEdge(src, ij2h3(next_ij), &dirEdge) != E_SUCCESS)
             throw hexer_error("Couldn't get directed edge.");
         s.push_back(dirEdge); 
