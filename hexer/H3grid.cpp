@@ -43,7 +43,13 @@ namespace hexer
             throw hexer_error("No areas of sufficient density - no shapes. "
                 "Decrease density or area size.");
         }
-        findBounds();
+        int counter(0);
+        while (!m_possible.empty()) {
+            std::vector<H3Index> shape = findShape();
+            m_boundary.push_back(shape);
+            std::cout << "s size: " << shape.size() << "; iteration " << counter << "\n" << std::endl;
+            counter++;
+        }
         std::cerr << m_map.size() << " . " << m_possible.size() << std::endl;
     }
 
@@ -64,46 +70,39 @@ namespace hexer
             return;
     }
 
-    void H3Grid::findBounds()
+    std::vector<H3Index> H3Grid::findShape()
     {
-        int counter(0);
-        for (auto it = m_possible.begin(); it != m_possible.end();) {
-            std::vector<H3Index> s;
-            int edge(0);
-            CoordIJ m_cur = it->second;
-            CoordIJ orig = m_cur;
-            int in_counter(0);
-            do {
-                std::cout << "edge: " << edge << std::endl;
-                if (edge == 0)
-                    m_possible.erase(ij2h3(m_cur));
-                addEdge(s, m_cur, edge);
-                CoordIJ next = nextCoord(m_cur, edge);
-                // if next is dense: go left
-                if (m_map.find(ij2h3(next)) != m_map.end()) {
-                    m_cur = next;
-                    edge--;
-                    if (edge < 0)
-                        edge = 5;
-                }
-                else {
-                    if (edge == 5)
-                        edge = 0;
-                    else
-                        edge++;
-                }
-                std::cout << in_counter << " . " << s[in_counter] << std::endl;
-                in_counter++;
-            } while (m_cur != orig && edge != 0);
-
-            m_boundary.push_back(s);
-            counter++;
-            std::cout << "s size: " << s.size() << "; iteration " << counter << std::endl;
-        }
-        std::cout << "boundary size " << m_boundary.size() << std::endl;
+        std::vector<H3Index> s;
+        int edge(0);
+        CoordIJ cur = m_possible.begin()->second;
+        const CoordIJ orig = m_possible.begin()->second;
+        int in_counter(0);
+        do {
+            std::cout << "edge: " << edge << std::endl;
+            if (edge == 0)
+                m_possible.erase(ij2h3(cur));
+            addEdge(s, cur, edge);
+            CoordIJ next = nextCoord(cur, edge);
+            // if next is dense: go left
+            if (m_map.find(ij2h3(next)) != m_map.end()) {
+                cur = next;
+                edge--;
+                if (edge < 0)
+                    edge = 5;
+            }
+            else {
+                if (edge == 5)
+                    edge = 0;
+                else
+                    edge++;
+            }
+            std::cout << in_counter << " . " << s[in_counter] << "\n"<< std::endl;
+            in_counter++;
+        } while ((cur != orig) && (edge != 0));
+        return s;
     }
 
-    int H3Grid::walkBounds(int edge, std::vector<H3Index>& s) 
+/*    int H3Grid::walkBounds(int edge, std::vector<H3Index>& s) 
     {
         addEdge(s, m_cur, edge);
         if (edge == 0)
@@ -120,7 +119,7 @@ namespace hexer
             edge++;
 
         return edge;
-    }
+    }  */
 
     // Return the IJ coordinate of the next cell we're checking for density (going clockwise).
     CoordIJ H3Grid::nextCoord(CoordIJ ij, int edge)

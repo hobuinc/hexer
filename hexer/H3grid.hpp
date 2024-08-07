@@ -46,7 +46,7 @@ public:
 private:
     void processH3Sample();
     void possible(H3Index idx);
-    void findBounds();
+    std::vector<H3Index> findShape();
     int walkBounds(int edge, std::vector<H3Index> &s);
     void addEdge(std::vector<H3Index> &s, CoordIJ idx, int edge);
     CoordIJ nextCoord(CoordIJ ij, int edge);
@@ -82,9 +82,9 @@ static CoordIJ operator+(CoordIJ const& c1, CoordIJ const& c2)
     {   return {c1.i + c2.i, c1.j + c2.j};  }
 
 static bool operator!=(CoordIJ const& c1, CoordIJ const& c2)
-    {   if (c1.i == c2.i && c1.j == c2.j)
-            return false;
+    {   if (c1.i != c2.i || c1.j != c2.j)
+            return true;
         else
-            return true;    }
+            return false;    }
 
 } // namepsace hexer
