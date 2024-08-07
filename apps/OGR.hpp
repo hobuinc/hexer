@@ -184,5 +184,3 @@ private:
 } // namespace writer
 
 } // namespace hexer
-
-#endif // file guard

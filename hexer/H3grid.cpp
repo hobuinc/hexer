@@ -22,16 +22,11 @@ namespace hexer
         }
 
         H3Index index(0);
-        H3Error err = latLngToCell(ll, m_res, &index);
-
-        if (err == E_SUCCESS) {
-            if (m_map.size() == 0)
-                m_origin = index;
-            ++m_map[index];
-        }
-        else {
-            throw hexer_error("H3 index not found!");
-        }
+        if (latLngToCell(ll, m_res, &index) != E_SUCCESS)
+           throw hexer_error("H3 index not found!"); 
+        if (m_map.size() == 0)
+            m_origin = index;
+        ++m_map[index];
     }
 
     void H3Grid::processGrid()
@@ -48,6 +43,7 @@ namespace hexer
             throw hexer_error("No areas of sufficient density - no shapes. "
                 "Decrease density or area size.");
         }
+        findBounds();
         std::cerr << m_map.size() << " . " << m_possible.size() << std::endl;
     }
 
@@ -57,69 +53,75 @@ namespace hexer
         if (cellToLocalIj(m_origin, idx, 0, &c) != E_SUCCESS) 
             throw hexer_error("Cannot find IJ coordinates!");
         
-        CoordIJ shift;
-        shift.i = c.i + 1;
-        shift.j = c.j;
+        CoordIJ shift = edgeCoord(c, 0);
         H3Index shift_idx;
         if (localIjToCell(m_origin, &shift, 0, &shift_idx) != E_SUCCESS) 
             throw hexer_error("Cannot find neighbor H3 cell!");
 
         if (m_map.find(shift_idx) == m_map.end())
-            m_possible[idx] = std::pair(c, shift);
+            m_possible[idx] = c;
         else
             return;
     }
 
-    void H3Grid::walkBounds()
+    void H3Grid::findBounds()
     {
-        for(auto it = m_possible.begin(); it != m_possible.end();) {
-            Shape s;
-            CoordIJ cur = it->second.first;
-            CoordIJ next = it->second.second;
+        int counter(0);
+        for (auto it = m_possible.begin(); it != m_possible.end();) {
+            std::vector<H3Index> s;
             int edge(0);
-            H3Index start_idx;
-            H3Index cur_idx = it->first;
-            H3Index next_idx = ij2h3(next);
-            H3Index cur_edge;
+            CoordIJ m_cur = it->second;
+            CoordIJ orig = m_cur;
+            int in_counter(0);
+            do {
+                std::cout << "edge: " << edge << std::endl;
+                if (edge == 0)
+                    m_possible.erase(ij2h3(m_cur));
+                addEdge(s, m_cur, edge);
+                CoordIJ next = nextCoord(m_cur, edge);
+                // if next is dense: go left
+                if (m_map.find(ij2h3(next)) != m_map.end()) {
+                    m_cur = next;
+                    edge--;
+                    if (edge < 0)
+                        edge = 5;
+                }
+                else {
+                    if (edge == 5)
+                        edge = 0;
+                    else
+                        edge++;
+                }
+                std::cout << in_counter << " . " << s[in_counter] << std::endl;
+                in_counter++;
+            } while (m_cur != orig && edge != 0);
 
-            if (localIjToCell(m_origin, &it->second.first, 0, &start_idx) != E_SUCCESS) 
-                throw hexer_error("Cannot find neighbor H3 cell!"); 
-            if (cellsToDirectedEdge(cur_idx, next_idx, &cur_edge) != E_SUCCESS)
-                throw hexer_error("Cannot find directed edge!");
-            s.push_back(cur_edge);
+            m_boundary.push_back(s);
+            counter++;
+            std::cout << "s size: " << s.size() << "; iteration " << counter << std::endl;
+        }
+        std::cout << "boundary size " << m_boundary.size() << std::endl;
+    }
+
+    int H3Grid::walkBounds(int edge, std::vector<H3Index>& s) 
+    {
+        addEdge(s, m_cur, edge);
+        if (edge == 0)
+            m_possible.erase(ij2h3(m_cur));
+        CoordIJ next = nextCoord(m_cur, edge);
+        // if next is dense: go left
+        if (m_map.find(ij2h3(next)) != m_map.end()) {
+            m_cur = next;
+            edge--;
+            if (edge < 0)
+                edge = 5;
+        }
+        else
             edge++;
 
-            while (cur != it->second.first && edge != 0) {
-                if (edge == 0) {
-                    next = edgeCoord(cur, 0);
-                    next_idx = ij2h3(next);
-                    if (m_map.find(next_idx) == m_map.end()) {
-                        addEdge(s, cur, edge);
-                        m_possible.erase(ij2h3(cur));
-                        edge++;
-                    }
-                    else {
-                        cur = next;
-                        edge = 4;
-                    }
-                }
-                if (edge == 1) {
-                    next = edgeCoord(cur, 1);
-                    next_idx = ij2h3(next);
-                    if (m_map.find(next_idx) == m_map.end()) {
-                        addEdge(s, cur, edge);
-                        edge++;
-                    }
-                    else {
-                        cur = next;
-                        edge = 5;
-                    }
-                }
-            }
-            m_boundary.push_back(s);
-            m_possible.erase(it);
-        }
+        return edge;
     }
+
     // Return the IJ coordinate of the next cell we're checking for density (going clockwise).
     CoordIJ H3Grid::nextCoord(CoordIJ ij, int edge)
     {
@@ -136,57 +138,16 @@ namespace hexer
         return ij + offsets[edge];  
     }
 
-    void H3Grid::addEdge(Shape s, CoordIJ idx, H3Index next)
+    void H3Grid::addEdge(std::vector<H3Index>& s, CoordIJ idx, int edge)
     {
         H3Index src = ij2h3(idx);
+        CoordIJ next_ij = edgeCoord(idx, edge);
         H3Index dirEdge;
-        if (cellsToDirectedEdge(src, next, &dirEdge) != E_SUCCESS)
+        std::cout << "current: " << idx.i << ", " << idx.j << "; new: " << next_ij.i << ", " << next_ij.j << std::endl;
+        if (cellsToDirectedEdge(src, ij2h3(next_ij), &dirEdge) != E_SUCCESS)
             throw hexer_error("Couldn't get directed edge.");
         s.push_back(dirEdge); 
     }
-/*
-    Shape H3Grid::findShape()
-    {
-        Shape s;
-
-//
-//     __3_
-//  2 /    \ 4
-//   /      \
-//   \      /
-//  1 \____/ 5
-//      0
-//
-
-        if (m_possible.empty())
-            return s;
-
-        CoordIJ start = m_possible.front().second.first;
-        CoordIJ edge = start;
-        CoordIJ idx = 
-
-        int edge = 0;
-        addEdge(s, idx, edge);
-        while (idx != start && edge != 0)
-        {
-            s.addEdge(idx, edge);
-            // If we traversed a possible root, remove it as we've dealt with its potential
-            // shape.
-            if (edge == 0)
-                m_possible.erase(ij2h3(idx));
-            CoordIJ next = nextCoord(idx, edge);
-            if (isDense(next)) // Go left
-            {
-                idx = next;
-                edge--;
-                if (edge < 0)
-                    edge = 5;
-            }
-            else  // Go right
-                edge++;
-        }
-        return s;
-    } */
 
     void H3Grid::processH3Sample()
     {

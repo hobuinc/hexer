@@ -2,6 +2,9 @@
 
 #include <map>
 #include <vector>
+#include <sstream>
+
+#include <hexer/hexer.hpp>
 
 #include "Mathpair.hpp"
 #include "export.hpp"
@@ -30,7 +33,7 @@ public:
     void processGrid();
     void findIJ();
 
-    H3Index ij2h3(CoordIJ& ij)
+    H3Index ij2h3(CoordIJ ij)
         {   H3Index h3;
             if (localIjToCell(m_origin, &ij, 0, &h3) != E_SUCCESS) {
                 std::ostringstream oss;
@@ -39,20 +42,15 @@ public:
                 throw hexer_error(oss.str()); 
             }
             return h3;  }
-    
-
-
 
 private:
     void processH3Sample();
     void possible(H3Index idx);
-    void walkBounds();
-
-    H3Index ij2h3(CoordIJ& ij);
-    void addEdge(Shape s, CoordIJ idx, H3Index next);
+    void findBounds();
+    int walkBounds(int edge, std::vector<H3Index> &s);
+    void addEdge(std::vector<H3Index> &s, CoordIJ idx, int edge);
     CoordIJ nextCoord(CoordIJ ij, int edge);
     CoordIJ edgeCoord(CoordIJ ij, int edge);
-    Shape findShape();
 
     /// Count of points in H3-indexed hexagons
     int m_count;
@@ -60,7 +58,7 @@ private:
     typedef std::map<H3Index, int> H3Map;
     H3Map m_map;
     /// hexagons with non-dense neighbors, and the IJ coordinates of the original and neighboring hexagon
-    std::map<H3Index, std::pair<CoordIJ, CoordIJ>> m_possible;
+    std::map<H3Index, CoordIJ> m_possible;
     /// H3 resolution of grid (0-15); -1 for auto edge length calculation
     int m_res;
     /// Number of points that must lie in a hexagon for it to be interesting 
@@ -73,22 +71,20 @@ private:
     H3Index m_origin;
     /// Vector of localIJ coordinates as strings, in the same order as m_map
     std::vector<std::string> m_ij_coords;
-    ///
-    std::vector<Shape> m_boundary;
+    /// full boundary of h3 cells
+    std::vector<std::vector<H3Index>> m_boundary;
+    /// current IJ coordinates for boundary walk
+    CoordIJ m_cur;
 
-
-
-
-    H3Index m_idx;
-    LatLng m_loc;
 };
-typedef std::vector<H3Index> Shape;
-CoordIJ operator+(CoordIJ const& c1, CoordIJ const& c2)
+
+static CoordIJ operator+(CoordIJ const& c1, CoordIJ const& c2)
     {   return {c1.i + c2.i, c1.j + c2.j};  }
-bool operator!=(CoordIJ const& c1, CoordIJ const& c2)
+
+static bool operator!=(CoordIJ const& c1, CoordIJ const& c2)
     {   if (c1.i == c2.i && c1.j == c2.j)
-            return true;
+            return false;
         else
-            return false;    }
+            return true;    }
 
 } // namepsace hexer
