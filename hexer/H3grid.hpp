@@ -14,6 +14,17 @@
 namespace hexer 
 {
 
+using DirEdge = H3Index;
+
+static CoordIJ operator+(CoordIJ const& c1, CoordIJ const& c2)
+    {   return {c1.i + c2.i, c1.j + c2.j};  }
+
+static bool operator==(CoordIJ const& c1, CoordIJ const& c2)
+    {   if (c1.i == c2.i && c1.j == c2.j)
+            return true;
+        else
+            return false;    }
+
 class HEXER_DLL H3Grid
 {
 public:
@@ -28,6 +39,8 @@ public:
         { return m_res; }
     std::vector<std::string> getIJArr() const
         { return m_ij_coords; }
+    std::vector<std::vector<DirEdge>> getBoundary() const
+        { return m_boundary; } 
     void setSampleSize(unsigned sampleSize)
         { m_maxSample = sampleSize; }
     void processGrid();
@@ -46,9 +59,9 @@ public:
 private:
     void processH3Sample();
     void possible(H3Index idx);
-    std::vector<H3Index> findShape();
+    std::vector<DirEdge> findShape();
     int walkBounds(int edge, std::vector<H3Index> &s);
-    void addEdge(std::vector<H3Index> &s, CoordIJ idx, int edge);
+    void addEdge(std::vector<DirEdge> &s, CoordIJ idx, int edge);
     CoordIJ nextCoord(CoordIJ ij, int edge);
     CoordIJ edgeCoord(CoordIJ ij, int edge);
 
@@ -72,19 +85,10 @@ private:
     /// Vector of localIJ coordinates as strings, in the same order as m_map
     std::vector<std::string> m_ij_coords;
     /// full boundary of h3 cells
-    std::vector<std::vector<H3Index>> m_boundary;
+    std::vector<std::vector<DirEdge>> m_boundary;
     /// current IJ coordinates for boundary walk
     CoordIJ m_cur;
 
 };
-
-static CoordIJ operator+(CoordIJ const& c1, CoordIJ const& c2)
-    {   return {c1.i + c2.i, c1.j + c2.j};  }
-
-static bool operator!=(CoordIJ const& c1, CoordIJ const& c2)
-    {   if (c1.i != c2.i || c1.j != c2.j)
-            return true;
-        else
-            return false;    }
 
 } // namepsace hexer

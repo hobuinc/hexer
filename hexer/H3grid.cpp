@@ -45,12 +45,11 @@ namespace hexer
         }
         int counter(0);
         while (!m_possible.empty()) {
-            std::vector<H3Index> shape = findShape();
+            std::vector<DirEdge> shape = findShape();
             m_boundary.push_back(shape);
             std::cout << "s size: " << shape.size() << "; iteration " << counter << "\n" << std::endl;
             counter++;
         }
-        std::cerr << m_map.size() << " . " << m_possible.size() << std::endl;
     }
 
     void H3Grid::possible(H3Index idx)
@@ -70,9 +69,9 @@ namespace hexer
             return;
     }
 
-    std::vector<H3Index> H3Grid::findShape()
+    std::vector<DirEdge> H3Grid::findShape()
     {
-        std::vector<H3Index> s;
+        std::vector<DirEdge> s;
         int edge(0);
         CoordIJ cur = m_possible.begin()->second;
         const CoordIJ orig = m_possible.begin()->second;
@@ -84,7 +83,7 @@ namespace hexer
             addEdge(s, cur, edge);
             CoordIJ next = nextCoord(cur, edge);
             std::cout << "next ; " << next.i << ", " << next.j << std::endl;
-            // if next is dense: go left
+            // if next is dense: go right
             if (m_map.find(ij2h3(next)) != m_map.end()) {
                 cur = next;
                 edge--;
@@ -99,8 +98,8 @@ namespace hexer
             }
             std::cout << in_counter << " . " << s[in_counter] << std::endl;
             in_counter++;
-            std::cout << "edge at END of loop: " << edge << std::endl;
-        } while (cur != orig && edge != 0);
+            std::cout << "edge at END of loop: " << edge << "\n"<< std::endl;
+        } while (!(cur == orig && edge == 0));
         return s;
     }
 
@@ -135,15 +134,15 @@ namespace hexer
     // Return the IJ coordinate of the cell across the edge.
     CoordIJ H3Grid::edgeCoord(CoordIJ ij, int edge)
     {
-        std::vector<CoordIJ> offsets {{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
+        std::vector<CoordIJ> offsets {{1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, 0}}; //{{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
         return ij + offsets[edge];  
     }
 
-    void H3Grid::addEdge(std::vector<H3Index>& s, CoordIJ idx, int edge)
+    void H3Grid::addEdge(std::vector<DirEdge>& s, CoordIJ idx, int edge)
     {
         H3Index src = ij2h3(idx);
         CoordIJ next_ij = edgeCoord(idx, edge);
-        H3Index dirEdge;
+        DirEdge dirEdge;
         std::cout << "current: " << idx.i << ", " << idx.j << "; across: " << next_ij.i << ", " << next_ij.j << std::endl;
         if (cellsToDirectedEdge(src, ij2h3(next_ij), &dirEdge) != E_SUCCESS)
             throw hexer_error("Couldn't get directed edge.");

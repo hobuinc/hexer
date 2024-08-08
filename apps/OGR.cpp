@@ -379,7 +379,7 @@ OGRGeometryH OGR::collectH3(CellBoundary b)
 	return polygon; 
 }
 
-void OGR::writeH3Density(H3Grid *grid)
+void OGR::writeDensity(H3Grid *grid)
 {
     std::map<H3Index, int> hex_map = grid->getMap();
     std::vector<std::string> ij_arr = grid->getIJArr();
@@ -408,6 +408,68 @@ void OGR::writeH3Density(H3Grid *grid)
     }
 }
 
+void OGR::writeBoundary(H3Grid *grid)
+{
+    OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
+
+    const std::vector<std::vector<hexer::DirEdge>>& paths = grid->getBoundary();
+    for (auto pi = paths.begin(); pi != paths.end(); ++pi)
+    {
+        OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
+        collectPath(&(*pi), polygon);
+
+        if( OGR_G_AddGeometryDirectly(multi, polygon ) != OGRERR_NONE )
+        {
+            std::ostringstream oss;
+            oss << "Unable to add polygon to multipolygon with error '"
+                << CPLGetLastErrorMsg() << "'";
+            throw hexer_error(oss.str());
+        }
+    }
+
+    OGRFeatureH hFeature;
+
+    hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
+    OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"), 0);
+
+    OGR_F_SetGeometry(hFeature, multi);
+    OGR_G_DestroyGeometry(multi);
+
+    if( OGR_L_CreateFeature( m_layer, hFeature ) != OGRERR_NONE )
+    {
+        std::ostringstream oss;
+        oss << "Unable to create feature for multipolygon with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_F_Destroy( hFeature );
+}
+
+void OGR::collectPath(const std::vector<hexer::DirEdge>* path, OGRGeometryH polygon)
+{
+    OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
+            
+    CellBoundary bound;
+    for (auto pi = path->begin(); pi != path->end(); ++pi)
+    {
+        if (directedEdgeToBoundary(*pi, &bound) != E_SUCCESS)
+            throw hexer_error("unable to convert dirEdge to boundary!");
+        for (int a = 0; a < bound.numVerts; a++)
+            OGR_G_AddPoint_2D(ring, radsToDegs(bound.verts[a].lng), radsToDegs(bound.verts[a].lat));
+    }
+    hexer::DirEdge edge = path->front();
+    if (directedEdgeToBoundary(edge, &bound) != E_SUCCESS)
+        throw hexer_error("unable to convert dirEdge to boundary!");
+    OGR_G_AddPoint_2D(ring, radsToDegs(bound.verts[0].lng), radsToDegs(bound.verts[0].lat));
+
+    if( OGR_G_AddGeometryDirectly(polygon, ring) != OGRERR_NONE )
+    {
+        std::ostringstream oss;
+        oss << "Unable to add geometry with error '" <<
+            CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+}
 OGR::~OGR()
 {
     OGR_DS_Destroy(m_ds);

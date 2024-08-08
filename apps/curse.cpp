@@ -229,7 +229,37 @@ void density(   std::string const& input,
         process(grid.get(), o.reader);
     }
     writer::OGR o(output);
-    o.writeDensity(grid.get());
+    o.writeBoundary(grid.get());
+}
+
+void boundaryH3( std::string const& input,
+                std::string const& output,
+                int res,
+                int density)
+{
+    using namespace hexer;
+        std::unique_ptr<H3Grid> grid;
+
+    if (density == 0)
+        density = 10;
+    if (res > 15 || res < -1) {
+        std::cerr << "Input an H3 grid cell size between 0 and 15." 
+         << "Info on H3 cell specifications can be found at https://h3geo.org/docs/core-library/restable" << std::endl;
+    }
+    else
+        grid.reset(new H3Grid(density, res));
+
+    FormatType t = getDriver(input);
+    if (t == Format_LAS) {
+        std::ifstream file(input, std::ios::binary);
+        processH3(grid.get(), file); 
+    }
+    else {
+        std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;
+    }
+
+    writer::h3::OGR o(output);
+    o.writeBoundary(grid.get());
 }
 
 void densityH3( std::string const& input,
@@ -260,7 +290,7 @@ void densityH3( std::string const& input,
     }
 
     writer::h3::OGR o(output);
-    o.writeH3Density(grid.get());
+    o.writeDensity(grid.get());
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
@@ -349,6 +379,11 @@ int main(int argc, char* argv[])
             if (hexer::Utils::iequals(command, "DENSITY"))
             {
                 densityH3(input, output, res, count);
+                return 0;
+            }
+            if (hexer::Utils::iequals(command, "BOUNDARY"))
+            {
+                boundaryH3(input, output, res, count);
                 return 0;
             }
             else

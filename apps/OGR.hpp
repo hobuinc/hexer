@@ -168,7 +168,8 @@ public:
     OGR(std::string const& filename);
 	~OGR();
 
-    void writeH3Density(H3Grid *grid);
+    void writeDensity(H3Grid *grid);
+    void writeBoundary(H3Grid *grid);
 
 private:
     std::string m_filename;
@@ -178,6 +179,7 @@ private:
     void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
     void createLayer(std::string const& basename);
     OGRGeometryH collectH3(CellBoundary b);
+    void collectPath(const std::vector<hexer::DirEdge>* path, OGRGeometryH polygon);
 
 }; 
 } // namespace h3
