@@ -31,11 +31,20 @@ namespace hexer
 
     void H3Grid::processGrid()
     {
+        CoordIJ c;
+
         for (auto it = m_map.begin(); it != m_map.end();) {
             if (it->second < m_dense_limit)
                 it = m_map.erase(it);
             else {
-                possible(it->first);
+                // add cell IJ coordinates:
+                if (cellToLocalIj(m_origin, it->first, 0, &c) != E_SUCCESS) 
+                    throw hexer_error("H3 index not found!");
+                std::ostringstream coords;
+                coords << "(" << (int)c.i <<
+                    ", " << (int)c.j << ")";
+                m_ij_coords.push_back(coords.str());
+
                 ++it;
             }
         }
@@ -43,11 +52,29 @@ namespace hexer
             throw hexer_error("No areas of sufficient density - no shapes. "
                 "Decrease density or area size.");
         }
-        int counter(0);
+    }
+
+    void H3Grid::processPaths()
+    {
+        for (auto it = m_map.begin(); it != m_map.end(); ++it) {
+            H3Index idx = it->first;
+            CoordIJ c;
+            if (cellToLocalIj(m_origin, idx, 0, &c) != E_SUCCESS) 
+                throw hexer_error("Cannot find IJ coordinates!");
+            
+            CoordIJ shift = edgeCoord(c, 0);
+            H3Index shift_idx;
+            if (localIjToCell(m_origin, &shift, 0, &shift_idx) != E_SUCCESS) 
+                throw hexer_error("Cannot find neighbor H3 cell!");
+
+            if (m_map.find(shift_idx) == m_map.end())
+                m_possible[idx] = c;
+        }
+
         m_min_i = m_possible.begin()->second.i;
+
         while (!m_possible.empty()) {
             findShape();
-            counter++;
         }
         organizePaths();
     }
@@ -66,23 +93,6 @@ namespace hexer
             path_strip.push_back(Point(x, y));
         }
         return path_strip;
-    }
-
-    void H3Grid::possible(H3Index idx)
-    {
-        CoordIJ c;
-        if (cellToLocalIj(m_origin, idx, 0, &c) != E_SUCCESS) 
-            throw hexer_error("Cannot find IJ coordinates!");
-        
-        CoordIJ shift = edgeCoord(c, 0);
-        H3Index shift_idx;
-        if (localIjToCell(m_origin, &shift, 0, &shift_idx) != E_SUCCESS) 
-            throw hexer_error("Cannot find neighbor H3 cell!");
-
-        if (m_map.find(shift_idx) == m_map.end())
-            m_possible[idx] = c;
-        else
-            return;
     }
 
     void H3Grid::organizePaths()
@@ -162,21 +172,6 @@ namespace hexer
             in_counter++;
         } while (!(cur == orig && edge == 0));
         m_paths.push_back(p);
-    }
-    // Return the IJ coordinate of the next cell we're checking for density (going clockwise).
-    CoordIJ H3Grid::nextCoord(CoordIJ ij, int edge)
-    {
-        edge++;
-        if (edge == 6)
-            edge = 0;
-        return edgeCoord(ij, edge);  
-    }
-
-    // Return the IJ coordinate of the cell across the edge.
-    CoordIJ H3Grid::edgeCoord(CoordIJ ij, int edge)
-    {
-        std::vector<CoordIJ> offsets {{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
-        return ij + offsets[edge];  
     }
 
     void H3Grid::addEdge(H3Path * p, CoordIJ idx, int edge)

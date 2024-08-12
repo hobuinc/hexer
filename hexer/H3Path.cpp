@@ -6,7 +6,7 @@ namespace hexer
     std::vector<Point> H3Path::getPoints() const
     {
         std::vector<Point> path_strip;
-        if (m_direction == H3CLOCKWISE) {
+        if (m_direction == H3ANTICLOCKWISE) {
             for (int i = 0; i < m_segs.size(); ++i) {
                 DirEdge edge = m_segs[i];
                 CellBoundary edge_bound;

@@ -53,8 +53,10 @@ public:
     std::vector<H3Path *> const& rootPaths() const
         { return m_paths; }
     void processGrid();
+    void processPaths();
     void findIJ();
 
+    // Convert IJ coordinates to H3 index
     H3Index ij2h3(CoordIJ ij)
         {   H3Index h3;
             if (localIjToCell(m_origin, &ij, 0, &h3) != E_SUCCESS) {
@@ -65,15 +67,24 @@ public:
             }
             return h3;  }
 
+    // Return the IJ coordinate of the next cell we're checking for density (going clockwise).
+    CoordIJ nextCoord(CoordIJ ij, int edge)
+        {   edge++;
+            if (edge == 6)
+                edge = 0;
+            return edgeCoord(ij, edge);  }
+
+    // Return the IJ coordinate of the cell across the edge.
+    CoordIJ edgeCoord(CoordIJ ij, int edge)
+        {   std::vector<CoordIJ> offsets {{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
+            return ij + offsets[edge];  }
+
 private:
     void organizePaths();
     void parentOrChild(H3Path *p);
     void processH3Sample();
-    void possible(H3Index idx);
     void findShape();
     void addEdge(H3Path * p, CoordIJ idx, int edge);
-    CoordIJ nextCoord(CoordIJ ij, int edge);
-    CoordIJ edgeCoord(CoordIJ ij, int edge);
     std::vector<Point> organizeBounds(std::vector<DirEdge> shape);
 
     /// minimum I in IJ coordinates of grid

@@ -252,7 +252,7 @@ void boundaryH3( std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS) {
         std::ifstream file(input, std::ios::binary);
-        processH3(grid.get(), file); 
+        processH3(grid.get(), file, true); 
     }
     else {
         std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;

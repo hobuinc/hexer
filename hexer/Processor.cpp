@@ -139,7 +139,7 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     grid->findParentPaths();
 }
 
-void processH3(H3Grid *grid, std::ifstream& file) 
+void processH3(H3Grid *grid, std::ifstream& file, bool boundary) 
 {
     lazperf::reader::generic_file l(file);
 
@@ -176,6 +176,8 @@ void processH3(H3Grid *grid, std::ifstream& file)
     }
     grid->processGrid();
     grid->findIJ();
+    if (boundary)
+        grid->processPaths();
 }
 
 void processHexes(HexGrid *grid, HexReader reader)
