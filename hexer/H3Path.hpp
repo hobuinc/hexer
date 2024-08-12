@@ -36,7 +36,7 @@ public:
         for (std::vector<H3Path*>::size_type i = 0; i < m_children.size(); ++i)
             delete m_children[i];
     }
-    
+
     H3Path *parent()
         { return m_parent; }
     void push_back(const DirEdge& s)
@@ -71,7 +71,7 @@ private:
     H3Orientation m_direction;
     /// segments
     std::vector<DirEdge> m_segs;
-    ///
+    /// example hexagon along path
     const CoordIJ m_root_hex;
 
 };

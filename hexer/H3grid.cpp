@@ -47,7 +47,6 @@ namespace hexer
         m_min_i = m_possible.begin()->second.i;
         while (!m_possible.empty()) {
             findShape();
-            std::cout << m_paths[counter]->pathLength() << " = path " << counter << " length. \n" << m_paths[counter]->getPath(1) << std::endl;
             counter++;
         }
         organizePaths();
@@ -91,7 +90,6 @@ namespace hexer
         std::vector<H3Path *> roots;
         for (size_t i = 0; i < m_paths.size(); ++i)
         {
-            std::cout << "iterating thru paths:" << std::endl;
             H3Path *p = m_paths[i];
             parentOrChild(p);
             // Either add the path to the root list or the parent's list of
@@ -104,7 +102,6 @@ namespace hexer
         // In the end, the list of paths is just the root paths.  Children can
         // be retrieved from their parents.
         m_paths = roots;
-        std::cout << "num roots: " << roots.size() << " out of " << m_paths.size() <<std::endl;
     }
 
     void H3Grid::parentOrChild(H3Path *p)
@@ -126,7 +123,7 @@ namespace hexer
                 p->setParent(parentPath);
                 }
             }
-            hex = edgeCoord(hex, 2);
+            hex = edgeCoord(hex, 3);
             hex_idx = ij2h3(hex);
             i = hex.i;
         }
@@ -141,14 +138,11 @@ namespace hexer
         H3Path *p = new H3Path(this, H3CLOCKWISE, orig);
 
         do {
-            //std::cout << "edge at START of loop: " << edge << std::endl;
             if (edge == 0)
                 m_possible.erase(ij2h3(cur));
             addEdge(p, cur, edge);
 
             CoordIJ next = nextCoord(cur, edge);
-            //std::cout << "current ; " << cur.i << ", " << cur.j << std::endl;
-            //std::cout << "next ; " << next.i << ", " << next.j << std::endl;
             // if next is dense: go right
             if (m_map.find(ij2h3(next)) != m_map.end()) {
                 cur = next;
@@ -165,9 +159,7 @@ namespace hexer
                 else
                     edge++;
             }
-            //std::cout << in_counter << " . " << p->getPath(in_counter) << std::endl;
             in_counter++;
-            //std::cout << "edge at END of loop: " << edge << "\n"<< std::endl;
         } while (!(cur == orig && edge == 0));
         m_paths.push_back(p);
     }
@@ -214,7 +206,6 @@ namespace hexer
 
         for (int i = 0; i < resHeights.size(); ++i) {
             if (height < resHeights[i]) {
-                std::cout << height << " < " << resHeights[i] <<std::endl;
                 m_res = i + 8;
             }
         }
