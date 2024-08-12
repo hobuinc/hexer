@@ -22,6 +22,7 @@
 #include <hexer/HexGrid.hpp>
 #include <hexer/HexIter.hpp>
 #include <hexer/H3grid.hpp>
+#include <hexer/H3Path.hpp>
 
 #include <h3/include/h3api.h>
 #include <functional>
@@ -412,11 +413,11 @@ void OGR::writeBoundary(H3Grid *grid)
 {
     OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
 
-    const std::vector<std::vector<hexer::DirEdge>>& paths = grid->getBoundary();
+    const std::vector<hexer::H3Path *> paths = grid->rootPaths();
     for (auto pi = paths.begin(); pi != paths.end(); ++pi)
     {
         OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
-        collectPath(&(*pi), polygon);
+        collectPath(*pi, polygon);
 
         if( OGR_G_AddGeometryDirectly(multi, polygon ) != OGRERR_NONE )
         {
@@ -445,22 +446,17 @@ void OGR::writeBoundary(H3Grid *grid)
     OGR_F_Destroy( hFeature );
 }
 
-void OGR::collectPath(const std::vector<hexer::DirEdge>* path, OGRGeometryH polygon)
+void OGR::collectPath(H3Path* path, OGRGeometryH polygon)
 {
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
-            
-    CellBoundary bound;
-    for (auto pi = path->begin(); pi != path->end(); ++pi)
+    vector<Point> pts = path->getPoints();
+
+    vector<Point>::const_iterator i;
+    for (i = pts.begin(); i != pts.end(); ++i)
     {
-        if (directedEdgeToBoundary(*pi, &bound) != E_SUCCESS)
-            throw hexer_error("unable to convert dirEdge to boundary!");
-        for (int a = 0; a < bound.numVerts; a++)
-            OGR_G_AddPoint_2D(ring, radsToDegs(bound.verts[a].lng), radsToDegs(bound.verts[a].lat));
+        OGR_G_AddPoint_2D(ring, i->m_x, i->m_y);
     }
-    hexer::DirEdge edge = path->front();
-    if (directedEdgeToBoundary(edge, &bound) != E_SUCCESS)
-        throw hexer_error("unable to convert dirEdge to boundary!");
-    OGR_G_AddPoint_2D(ring, radsToDegs(bound.verts[0].lng), radsToDegs(bound.verts[0].lat));
+    OGR_G_AddPoint_2D(ring, pts[0].m_x, pts[0].m_y);
 
     if( OGR_G_AddGeometryDirectly(polygon, ring) != OGRERR_NONE )
     {
@@ -468,6 +464,13 @@ void OGR::collectPath(const std::vector<hexer::DirEdge>* path, OGRGeometryH poly
         oss << "Unable to add geometry with error '" <<
             CPLGetLastErrorMsg() << "'";
         throw hexer_error(oss.str());
+    }
+
+    vector<H3Path *> paths = path->subPaths();
+    for (int pi = 0; pi != paths.size(); ++pi)
+    {
+        H3Path* p = paths[pi];
+        collectPath(p, polygon);
     }
 }
 OGR::~OGR()

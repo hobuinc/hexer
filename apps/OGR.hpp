@@ -179,7 +179,7 @@ private:
     void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
     void createLayer(std::string const& basename);
     OGRGeometryH collectH3(CellBoundary b);
-    void collectPath(const std::vector<hexer::DirEdge>* path, OGRGeometryH polygon);
+    void collectPath(H3Path* path, OGRGeometryH polygon);
 
 }; 
 } // namespace h3
