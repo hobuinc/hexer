@@ -56,6 +56,7 @@ namespace hexer
 
     void H3Grid::processPaths()
     {
+        // find cells with side 0 bordering empty space
         for (auto it = m_map.begin(); it != m_map.end(); ++it) {
             H3Index idx = it->first;
             CoordIJ c;
@@ -79,22 +80,6 @@ namespace hexer
         organizePaths();
     }
 
-    std::vector<Point> H3Grid::organizeBounds(std::vector<DirEdge> shape)
-    {
-        std::vector<Point> path_strip;
-        for (int i = 0; i < shape.size(); ++i) {
-            DirEdge edge = shape[i];
-            CellBoundary edge_bound;
-
-            if (directedEdgeToBoundary(edge, &edge_bound) != E_SUCCESS)
-                throw hexer_error("unable to get cell boundary from directed edge!");
-            double x = radsToDegs(edge_bound.verts[1].lng);
-            double y = radsToDegs(edge_bound.verts[1].lat);
-            path_strip.push_back(Point(x, y));
-        }
-        return path_strip;
-    }
-
     void H3Grid::organizePaths()
     {
         std::vector<H3Path *> roots;
@@ -106,8 +91,9 @@ namespace hexer
             // children.
             !p->parent() ?  roots.push_back(p) : p->parent()->addChild(p);
         }
-        for (size_t i = 0; i < roots.size(); ++i)
-        roots[i]->finalize(H3CLOCKWISE);
+        for (size_t i = 0; i < roots.size(); ++i) {
+            roots[i]->finalize(H3CLOCKWISE);
+        }
 
         // In the end, the list of paths is just the root paths.  Children can
         // be retrieved from their parents.
@@ -117,24 +103,22 @@ namespace hexer
     void H3Grid::parentOrChild(H3Path *p)
     {
         CoordIJ hex = p->rootHex();
-        H3Index hex_idx = ij2h3(hex);
         int i = hex.i;
         while (i >= m_min_i) {
             // make m_hex_paths work with coordIJ as keys: need to be able to
             // overload operator< (can't figure out how)
+            CoordIJ next_hex = edgeCoord(hex, 3);
+            H3Index hex_idx = ij2h3(hex);
+            
             IJPathMap::iterator it = m_hex_paths.find(hex_idx);
-            if (it != m_hex_paths.end()) {
+            if (it != m_hex_paths.end() && m_map.find(ij2h3(next_hex)) == m_map.end()) {
                 H3Path *parentPath = it->second;
 
-                if (parentPath == p->parent()) {
-                p->setParent(NULL);
-                } 
-                else if (!p->parent() && parentPath != p) {
-                p->setParent(parentPath);
+                if (!p->parent() && parentPath != p) {
+                    p->setParent(parentPath);
                 }
             }
-            hex = edgeCoord(hex, 3);
-            hex_idx = ij2h3(hex);
+            hex = next_hex;
             i = hex.i;
         }
     }

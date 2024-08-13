@@ -229,7 +229,7 @@ void density(   std::string const& input,
         process(grid.get(), o.reader);
     }
     writer::OGR o(output);
-    o.writeBoundary(grid.get());
+    o.writeDensity(grid.get());
 }
 
 void boundaryH3( std::string const& input,

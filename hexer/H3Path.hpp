@@ -4,9 +4,7 @@
 
 #include "export.hpp"
 #include "Mathpair.hpp"
-//#include "Path.hpp"
 #include "exception.hpp"
-//#include "H3Grid.hpp"
 
 #include <h3/include/h3api.h>
 
@@ -45,8 +43,8 @@ public:
         { m_parent = p; }
     size_t pathLength() const
         { return m_segs.size(); }
-    DirEdge getPath(int i) const
-        { return m_segs[i];}
+    DirEdge getPath(int idx) const
+        { return m_segs[idx];}
     void addChild(H3Path *p)
         { m_children.push_back(p); }
     void finalize(H3Orientation o)
@@ -69,7 +67,7 @@ private:
     std::vector<H3Path *> m_children;
     /// Orientation: counter-clockwise (outer path), or clockwise (inner path)
     H3Orientation m_direction;
-    /// segments
+    /// directed edge segments
     std::vector<DirEdge> m_segs;
     /// example hexagon along path
     const CoordIJ m_root_hex;

@@ -67,6 +67,17 @@ public:
             }
             return h3;  }
 
+    // Convert H3 index to IJ coordinates
+    CoordIJ h32ij(H3Index h3)
+        {   CoordIJ ij;
+            if (cellToLocalIj(m_origin, h3, 0, &ij) != E_SUCCESS) {
+                std::ostringstream oss;
+                oss << "Can't convert H3 index " << std::to_string(h3) << 
+                    " to IJ.";
+                throw hexer_error(oss.str()); 
+            }
+            return ij;  }
+
     // Return the IJ coordinate of the next cell we're checking for density (going clockwise).
     CoordIJ nextCoord(CoordIJ ij, int edge)
         {   edge++;
@@ -85,7 +96,6 @@ private:
     void processH3Sample();
     void findShape();
     void addEdge(H3Path * p, CoordIJ idx, int edge);
-    std::vector<Point> organizeBounds(std::vector<DirEdge> shape);
 
     /// minimum I in IJ coordinates of grid
     int m_min_i;
@@ -94,7 +104,7 @@ private:
     /// Map of hexagons based on H3 index
     typedef std::map<H3Index, int> H3Map;
     H3Map m_map;
-    /// hexagons with non-dense neighbors, and its IJ coordinates
+    /// hexagons with non-dense neighbors at side 0, and its IJ coordinates
     std::map<H3Index, CoordIJ> m_possible;
     /// H3 resolution of grid (0-15); -1 for auto edge length calculation
     int m_res;
