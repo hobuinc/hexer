@@ -107,10 +107,12 @@ void H3Grid::parentOrChild(H3Path *p)
         H3Index hex_idx = ij2h3(hex);
         
         IJPathMap::iterator it = m_hex_paths.find(hex_idx);
-        if (it != m_hex_paths.end() && m_map.find(ij2h3(next_hex)) == m_map.end()) {
+        if (it != m_hex_paths.end()) {
             H3Path *parentPath = it->second;
-
-            if (!p->parent() && parentPath != p) {
+            if (parentPath == p->parent()) {
+                p->setParent(NULL);
+            } 
+            else if (!p->parent() && parentPath != p) {
                 p->setParent(parentPath);
             }
         }
@@ -133,20 +135,31 @@ void H3Grid::findShape()
     int edge(0);
     CoordIJ cur = m_possible.begin()->second;
     const CoordIJ orig = m_possible.begin()->second;
-    int in_counter(0);
     H3Path *p = new H3Path(this, H3CLOCKWISE, orig);
 
     do {
-        if (edge == 0)
+        if (edge == 0) {
             m_possible.erase(ij2h3(cur));
+            CoordIJ edge_coord = edgeCoord(cur, 0);
+            if (m_map.find(ij2h3(edgeCoord(edge_coord, 0))) == m_map.end()) {
+                IJPathMap::value_type addpath(ij2h3(edge_coord), p);
+                m_hex_paths.insert(addpath); 
+            }
+        }
+        else if (edge == 3) {
+            CoordIJ edge_coord = edgeCoord(cur, 3);
+            if (m_map.find(ij2h3(edgeCoord(edge_coord, 3))) == m_map.end()) {
+                IJPathMap::value_type addpath(ij2h3(edge_coord), p);
+                m_hex_paths.insert(addpath); 
+            }
+        }
+
         addEdge(p, cur, edge);
 
         CoordIJ next = nextCoord(cur, edge);
         // if next is dense:
         if (m_map.find(ij2h3(next)) != m_map.end()) {
             cur = next;
-            IJPathMap::value_type addpath(ij2h3(cur), p);
-            m_hex_paths.insert(addpath);
             m_min_i = std::min(m_min_i, cur.i);
             edge--;
             if (edge < 0)
@@ -158,7 +171,6 @@ void H3Grid::findShape()
             else
                 edge++;
         }
-        in_counter++;
     } while (!(cur == orig && edge == 0));
     m_paths.push_back(p);
 }
