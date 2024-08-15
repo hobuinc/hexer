@@ -361,9 +361,15 @@ OGRGeometryH OGR::collectH3(CellBoundary b)
 {
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
 
+    //OGRSpatialReferenceH oSRS = OSRNewSpatialReference( NULL );
+    //std::string crs{"WGS84"};
+    //if (OSRSetWellKnownGeogCS(oSRS, crs.c_str()) != OGRERR_NONE)
+    //    throw hexer_error("Could not set crs to WGS84!");
+    //OGR_G_AssignSpatialReference(ring, oSRS);
+    //OSRDestroySpatialReference(oSRS);
+
     for (int i = 0; i <= b.numVerts - 1; ++i) {
         LatLng ll = b.verts[i];
-        //std::cout << ll.lng << " " << ll.lat << std::endl;
         OGR_G_AddPoint_2D(ring, radsToDegs(ll.lng), radsToDegs(ll.lat));
     }
     OGR_G_AddPoint_2D(ring, radsToDegs(b.verts[0].lng), radsToDegs(b.verts[0].lat));
@@ -377,6 +383,7 @@ OGRGeometryH OGR::collectH3(CellBoundary b)
         throw hexer_error(oss.str());
     }
 
+
 	return polygon; 
 }
 
@@ -384,6 +391,7 @@ void OGR::writeDensity(H3Grid *grid)
 {
     std::map<H3Index, int> hex_map = grid->getMap();
     std::vector<std::string> ij_arr = grid->getIJArr();
+
     int counter(0);
     for (auto iter = hex_map.begin(); iter != hex_map.end(); ++iter) {
         CellBoundary bounds;
@@ -392,7 +400,6 @@ void OGR::writeDensity(H3Grid *grid)
             OGRGeometryH polygon = collectH3(bounds);
             OGRFeatureH hFeature;
             hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
-            // H3 id: make new string field in createLayer
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
                 counter);
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
@@ -400,7 +407,7 @@ void OGR::writeDensity(H3Grid *grid)
             OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
                 iter->first);
             OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "IJ"),
-                ij_arr[counter].c_str());  
+                ij_arr[counter].c_str()); 
             processGeometry(m_layer, hFeature, polygon);
             counter++;
         }

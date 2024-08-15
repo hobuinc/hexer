@@ -5,32 +5,48 @@ hexbin density surfaces and [multipolygon] boundaries for large point sets. I us
 the code for generating boundary polygons of large [LiDAR] collections, but it is 
 useful in other contexts.
 
+Hexer also offers support for creating boundaries and density surfaces using Uber's [H3] 
+geospatial indexing library. By specifying <b>--grid h3</b>, points can be summarized
+inside of H3's existing global hexagon grid. H3 [resolution] can be specified with <b>-r</b>,
+or Hexer can calculate an appropriate cell size based on the input. <b>H3 processing
+currently only supports .LAS and .LAZ files with WGS84 (EPSG:4326) CRS</b>.
+
 Hexer supports two operations at this time, <i>density</i> and <i>boundary</i>. You 
 use hexer through the <b>curse</b> command:
 
 ```
 [howardbutler@ardere hexer (master)]$ ./bin/curse --help
 --------------------------------------------------------------------
-    curse (hexer 1.0.0 at revision eca953 with GDAL 1.10dev)
+    curse (hexer 1.4.0 at revision e2d559 with GDAL 3.9.1)
 --------------------------------------------------------------------
+  command [boundary]
+      Command to run on points ('boundary' or 'density')
 
-Command:
-  --input arg           Input point set to curse
-  --command arg         Command to run on points ('boundary' or 'density')
-  --output arg          Specify an OGR-compatible output filename to write
-                        boundary. stdout used if none specified.
+  input
+      Input point set to curse
 
-Basic:
-  -h [ --help ]         This help message
-  --version             Show version info
+  output, o []
+      Specify an OGR-compatible output filename to write boundary. stdout used if none specified.
 
-Boundary:
-  --edge arg (=0)       Edge distance of hexagon
-  --count arg (=0)      Number of points that must be in polygon for it to be
-                        positive space
+  edge [0]
+      Edge distance of hexagon (hexgrid only)
+
+  count [0]
+      Number of points that must be in polygon for it to be positive space
+
+  resolution, r [-1]
+      H3 grid resolution: 0 (coarsest) - 15 (finest)
+
+  grid [hexgrid]
+      Grid type ('hexgrid' or 'h3'): proprietary HexGrid hexagons, or H3 indexed grid
 
 For more information, see the full documentation for hexer at:
  http://github.com/hobu/hexer
+
+```
+## H3 
+```
+$ curse density mypointfile.shp --output myboundary.shp --grid h3
 ```
 
 ```
@@ -43,6 +59,8 @@ $ curse density mylasfile.las --output myhexagons.shp --edge 100
 [LGPL]: http://www.gnu.org/licenses/lgpl-2.1.html
 [LiDAR]: https://en.wikipedia.org/wiki/LIDAR
 [multipolygon]: http://en.wikipedia.org/wiki/Well-known_text
+[H3]: https://h3geo.org/
+[resolution]: https://h3geo.org/docs/core-library/restable 
 
 [map]: http://a.tiles.mapbox.com/v3/hobu.serpent-mound.html#16.00/39.0346/-83.4353
 

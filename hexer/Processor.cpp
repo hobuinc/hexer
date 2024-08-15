@@ -36,6 +36,7 @@
 #include <sstream>
 #include <cmath>
 #include <map>
+#include <chrono>
 
 #include <hexer/Processor.hpp>
 
@@ -141,6 +142,8 @@ void processLaz(HexGrid *grid, std::ifstream& file)
 
 void processH3(H3Grid *grid, std::ifstream& file, bool boundary) 
 {
+    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+
     lazperf::reader::generic_file l(file);
 
     size_t count = l.pointCount();
@@ -155,7 +158,8 @@ void processH3(H3Grid *grid, std::ifstream& file, bool boundary)
     else 
         grid->setSampleSize(10000);
 
-    // add support for CRS read and reprojection -- from VLR ?
+    // add support for CRS read and reprojection ?
+    // at least verify WGS84
 
     for(size_t i = 0; i < count; i ++) {
         l.readPoint(buf_data);
@@ -175,9 +179,18 @@ void processH3(H3Grid *grid, std::ifstream& file, bool boundary)
         grid->addLatLng(&loc);
     }
     grid->processGrid();
-    grid->findIJ();
-    if (boundary)
+    std::string p;
+    if (boundary) {
         grid->processPaths();
+        p = "boundary";
+    }
+    else 
+        p = "density";
+
+    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+    std::cout << "time to process H3 " << p << ": " << time_span.count() << " seconds for " << count << " points and "
+        << grid->numHex() << " hexagons.\n";
 }
 
 void processHexes(HexGrid *grid, HexReader reader)

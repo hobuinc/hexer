@@ -52,9 +52,10 @@ public:
         { m_maxSample = sampleSize; }
     std::vector<H3Path *> const& rootPaths() const
         { return m_paths; }
+    int numHex()
+        { return m_numdense; }
     void processGrid();
     void processPaths();
-    void findIJ();
 
     // Convert IJ coordinates to H3 index
     H3Index ij2h3(CoordIJ ij)
@@ -125,6 +126,8 @@ private:
     /// map of pointers to paths w/ h3 cell index as keys
     typedef std::map<H3Index, H3Path *> IJPathMap;
     IJPathMap m_hex_paths;
+    /// number of dense h3 cells in the grid
+    int m_numdense;
 
 };
 

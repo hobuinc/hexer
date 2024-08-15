@@ -11,205 +11,198 @@
 
 namespace hexer 
 {
-    
-    void H3Grid::addLatLng(LatLng *ll)
-    {
-        if(m_res == -1) {
-            m_sample.push_back(*ll);
-            if (m_sample.size() >= m_maxSample)
-                processH3Sample();
-            return;
-        }
 
-        H3Index index(0);
-        if (latLngToCell(ll, m_res, &index) != E_SUCCESS)
-           throw hexer_error("H3 index not found!"); 
-        if (m_map.size() == 0)
-            m_origin = index;
-        ++m_map[index];
+void H3Grid::addLatLng(LatLng *ll)
+{
+    if(m_res == -1) {
+        m_sample.push_back(*ll);
+        if (m_sample.size() >= m_maxSample)
+            processH3Sample();
+        return;
     }
 
-    void H3Grid::processGrid()
-    {
-        CoordIJ c;
+    H3Index index(0);
+    if (latLngToCell(ll, m_res, &index) != E_SUCCESS)
+        throw hexer_error("H3 index not found!"); 
+    if (m_map.size() == 0)
+        m_origin = index;
+    ++m_map[index];
+}
 
-        for (auto it = m_map.begin(); it != m_map.end();) {
-            if (it->second < m_dense_limit)
-                it = m_map.erase(it);
-            else {
-                // add cell IJ coordinates:
-                if (cellToLocalIj(m_origin, it->first, 0, &c) != E_SUCCESS) 
-                    throw hexer_error("H3 index not found!");
-                std::ostringstream coords;
-                coords << "(" << (int)c.i <<
-                    ", " << (int)c.j << ")";
-                m_ij_coords.push_back(coords.str());
+void H3Grid::processGrid()
+{
+    CoordIJ c;
 
-                ++it;
-            }
-        }
-        if (m_map.empty()) {
-            throw hexer_error("No areas of sufficient density - no shapes. "
-                "Decrease density or area size.");
-        }
-    }
-
-    void H3Grid::processPaths()
-    {
-        // find cells with side 0 bordering empty space
-        for (auto it = m_map.begin(); it != m_map.end(); ++it) {
-            H3Index idx = it->first;
-            CoordIJ c;
-            if (cellToLocalIj(m_origin, idx, 0, &c) != E_SUCCESS) 
-                throw hexer_error("Cannot find IJ coordinates!");
-            
-            CoordIJ shift = edgeCoord(c, 0);
-            H3Index shift_idx;
-            if (localIjToCell(m_origin, &shift, 0, &shift_idx) != E_SUCCESS) 
-                throw hexer_error("Cannot find neighbor H3 cell!");
-
-            if (m_map.find(shift_idx) == m_map.end())
-                m_possible[idx] = c;
-        }
-
-        m_min_i = m_possible.begin()->second.i;
-
-        while (!m_possible.empty()) {
-            findShape();
-        }
-        organizePaths();
-    }
-
-    void H3Grid::organizePaths()
-    {
-        std::vector<H3Path *> roots;
-        for (size_t i = 0; i < m_paths.size(); ++i)
-        {
-            H3Path *p = m_paths[i];
-            parentOrChild(p);
-            // Either add the path to the root list or the parent's list of
-            // children.
-            !p->parent() ?  roots.push_back(p) : p->parent()->addChild(p);
-        }
-        for (size_t i = 0; i < roots.size(); ++i) {
-            roots[i]->finalize(H3CLOCKWISE);
-        }
-
-        // In the end, the list of paths is just the root paths.  Children can
-        // be retrieved from their parents.
-        m_paths = roots;
-    }
-
-    void H3Grid::parentOrChild(H3Path *p)
-    {
-        CoordIJ hex = p->rootHex();
-        int i = hex.i;
-        while (i >= m_min_i) {
-            // make m_hex_paths work with coordIJ as keys: need to be able to
-            // overload operator< (can't figure out how)
-            CoordIJ next_hex = edgeCoord(hex, 3);
-            H3Index hex_idx = ij2h3(hex);
-            
-            IJPathMap::iterator it = m_hex_paths.find(hex_idx);
-            if (it != m_hex_paths.end() && m_map.find(ij2h3(next_hex)) == m_map.end()) {
-                H3Path *parentPath = it->second;
-
-                if (!p->parent() && parentPath != p) {
-                    p->setParent(parentPath);
-                }
-            }
-            hex = next_hex;
-            i = hex.i;
-        }
-    }
-
-    void H3Grid::findShape()
-    {
-        int edge(0);
-        CoordIJ cur = m_possible.begin()->second;
-        const CoordIJ orig = m_possible.begin()->second;
-        int in_counter(0);
-        H3Path *p = new H3Path(this, H3CLOCKWISE, orig);
-
-        do {
-            if (edge == 0)
-                m_possible.erase(ij2h3(cur));
-            addEdge(p, cur, edge);
-
-            CoordIJ next = nextCoord(cur, edge);
-            // if next is dense: go right
-            if (m_map.find(ij2h3(next)) != m_map.end()) {
-                cur = next;
-                IJPathMap::value_type addpath(ij2h3(cur), p);
-                m_hex_paths.insert(addpath);
-                m_min_i = std::min(m_min_i, cur.i);
-                edge--;
-                if (edge < 0)
-                    edge = 5;
-            }
-            else {
-                if (edge == 5)
-                    edge = 0;
-                else
-                    edge++;
-            }
-            in_counter++;
-        } while (!(cur == orig && edge == 0));
-        m_paths.push_back(p);
-    }
-
-    void H3Grid::addEdge(H3Path * p, CoordIJ idx, int edge)
-    {
-        H3Index src = ij2h3(idx);
-        CoordIJ next_ij = edgeCoord(idx, edge);
-        DirEdge dirEdge;
-
-        if (cellsToDirectedEdge(src, ij2h3(next_ij), &dirEdge) != E_SUCCESS)
-            throw hexer_error("Couldn't get directed edge.");
-        p->push_back(dirEdge); 
-    }
-
-    void H3Grid::processH3Sample()
-    {
-        if (m_res > 0 || m_sample.empty())
-            return;
-        double height = computeHexSize(m_sample, m_dense_limit);
-
-        // bins for H3 auto resolution:
-        // - H3 level ~roughly~ equivalent to hexer hexagon size at same edge value
-        //     - (since our coords are in degrees, the appropriate values will vary based on
-        //       location. Some way of scaling this by latitude would be more accurate)
-        // - does not automatically make very large (>1km^2) or very small (<6m^2) hexagons
-        // We ignore resolutions 1 through 7, so add 8 to the entry we find..
-        const std::array<double, 7> resHeights { 2.0, 2.62e-4, 6.28e-5, 2.09e-5, 8.73e-6, 3.32e-6, 1.4e-6 };
-
-        for (int i = 0; i < resHeights.size(); ++i) {
-            if (height < resHeights[i]) {
-                m_res = i + 8;
-            }
-        }
-        if (m_res == -1)
-            throw hexer_error("unable to calculate H3 grid size!");
-        
-        for (auto pi = m_sample.begin(); pi != m_sample.end(); ++pi) {
-            LatLng ll = *pi;
-            addLatLng(&ll);
-        }
-        m_sample.clear();
-        std::cout << "res: " << m_res <<std::endl; 
-    }
-
-    void H3Grid::findIJ()
-    {
-        for(auto it = m_map.begin(); it != m_map.end(); ++it) {
-            CoordIJ c;
-            if (cellToLocalIj(m_origin, it->first, 0, &c) != E_SUCCESS) 
-                throw hexer_error("H3 index not found!");
+    for (auto it = m_map.begin(); it != m_map.end();) {
+        if (it->second < m_dense_limit)
+            it = m_map.erase(it);
+        else {
+            // add cell IJ coordinates:
+            c = h32ij(it->first);
             std::ostringstream coords;
             coords << "(" << (int)c.i <<
                 ", " << (int)c.j << ")";
             m_ij_coords.push_back(coords.str());
-        } 
+            ++m_numdense;
+            ++it;
+        }
     }
+    if (m_map.empty()) {
+        throw hexer_error("No areas of sufficient density - no shapes. "
+            "Decrease density or area size.");
+    }
+}
+
+void H3Grid::processPaths()
+{
+    // find cells with side 0 bordering empty space
+    for (auto it = m_map.begin(); it != m_map.end(); ++it) {
+        H3Index idx = it->first;
+        CoordIJ c = h32ij(idx);
+        
+        CoordIJ shift = edgeCoord(c, 0);
+        H3Index shift_idx;
+        if (localIjToCell(m_origin, &shift, 0, &shift_idx) != E_SUCCESS) 
+            throw hexer_error("Cannot find neighbor H3 cell!");
+
+        if (m_map.find(shift_idx) == m_map.end())
+            m_possible[idx] = c;
+    }
+
+    m_min_i = m_possible.begin()->second.i;
+
+    while (!m_possible.empty()) {
+        findShape();
+    }
+    organizePaths();
+}
+
+void H3Grid::organizePaths()
+{
+    std::vector<H3Path *> roots;
+    for (size_t i = 0; i < m_paths.size(); ++i) {
+        H3Path *p = m_paths[i];
+        parentOrChild(p);
+        // Either add the path to the root list or the parent's list of
+        // children.
+        !p->parent() ?  roots.push_back(p) : p->parent()->addChild(p);
+    }
+    for (size_t i = 0; i < roots.size(); ++i) {
+        roots[i]->finalize(H3CLOCKWISE);
+    }
+
+    // In the end, the list of paths is just the root paths.  Children can
+    // be retrieved from their parents.
+    m_paths = roots;
+}
+
+void H3Grid::parentOrChild(H3Path *p)
+{
+    CoordIJ hex = p->rootHex();
+    int i = hex.i;
+    while (i >= m_min_i) {
+        // make m_hex_paths work with coordIJ as keys: need to be able to
+        // overload operator< (can't figure out how)
+        CoordIJ next_hex = edgeCoord(hex, 3);
+        H3Index hex_idx = ij2h3(hex);
+        
+        IJPathMap::iterator it = m_hex_paths.find(hex_idx);
+        if (it != m_hex_paths.end() && m_map.find(ij2h3(next_hex)) == m_map.end()) {
+            H3Path *parentPath = it->second;
+
+            if (!p->parent() && parentPath != p) {
+                p->setParent(parentPath);
+            }
+        }
+        hex = next_hex;
+        i = hex.i;
+    }
+}
+
+// Walk the outside of the hexagons to make a path.  Hexagon sides are labeled:
+//
+//     __3_
+//  2 /    \ 4
+//   /      \
+//   \      /
+//  1 \____/ 5
+//      0
+//
+void H3Grid::findShape()
+{
+    int edge(0);
+    CoordIJ cur = m_possible.begin()->second;
+    const CoordIJ orig = m_possible.begin()->second;
+    int in_counter(0);
+    H3Path *p = new H3Path(this, H3CLOCKWISE, orig);
+
+    do {
+        if (edge == 0)
+            m_possible.erase(ij2h3(cur));
+        addEdge(p, cur, edge);
+
+        CoordIJ next = nextCoord(cur, edge);
+        // if next is dense:
+        if (m_map.find(ij2h3(next)) != m_map.end()) {
+            cur = next;
+            IJPathMap::value_type addpath(ij2h3(cur), p);
+            m_hex_paths.insert(addpath);
+            m_min_i = std::min(m_min_i, cur.i);
+            edge--;
+            if (edge < 0)
+                edge = 5;
+        }
+        else {
+            if (edge == 5)
+                edge = 0;
+            else
+                edge++;
+        }
+        in_counter++;
+    } while (!(cur == orig && edge == 0));
+    m_paths.push_back(p);
+}
+
+void H3Grid::addEdge(H3Path * p, CoordIJ idx, int edge)
+{
+    H3Index src = ij2h3(idx);
+    CoordIJ next_ij = edgeCoord(idx, edge);
+    DirEdge dirEdge;
+
+    if (cellsToDirectedEdge(src, ij2h3(next_ij), &dirEdge) != E_SUCCESS)
+        throw hexer_error("Couldn't get directed edge.");
+    p->push_back(dirEdge); 
+}
+
+void H3Grid::processH3Sample()
+{
+    if (m_res > 0 || m_sample.empty())
+        return;
+    double height = computeHexSize(m_sample, m_dense_limit);
+
+    // bins for H3 auto resolution:
+    // - H3 level ~roughly~ equivalent to hexer hexagon size at same edge value
+    //     - (since our coords are in degrees, the appropriate values will vary based on
+    //       location. Some way of scaling this by latitude would be more accurate)
+    // - does not automatically make very large (>1km^2) or very small (<6m^2) hexagons
+    // We ignore resolutions 1 through 7, so add 8 to the entry we find..
+    const std::array<double, 7> resHeights { 2.0, 2.62e-4, 6.28e-5, 2.09e-5, 8.73e-6,
+                                             3.32e-6, 1.4e-6 };
+
+    for (int i = 0; i < resHeights.size(); ++i) {
+        if (height < resHeights[i]) {
+            m_res = i + 8;
+        }
+    }
+    if (m_res == -1)
+        throw hexer_error("unable to calculate H3 grid size!");
+    
+    for (auto pi = m_sample.begin(); pi != m_sample.end(); ++pi) {
+        LatLng ll = *pi;
+        addLatLng(&ll);
+    }
+    m_sample.clear();
+    std::cout << "H3 resolution: " << m_res <<std::endl; 
+}
 
 } // namespace hexer
