@@ -58,6 +58,7 @@ public:
     std::vector<H3Path *> subPaths() const
         { return m_children; }
     std::vector<Point> getPoints() const;
+    
 private:
     /// Grid that owns the path.
     H3Grid *m_grid;

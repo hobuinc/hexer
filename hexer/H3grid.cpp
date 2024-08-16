@@ -26,7 +26,7 @@ void H3Grid::addLatLng(LatLng *ll)
         throw hexer_error("H3 index not found!"); 
     if (m_map.size() == 0)
         m_origin = index;
-    ++m_map[index];
+    ++m_map[h32ij(index)];
 }
 
 void H3Grid::processGrid()
@@ -37,12 +37,6 @@ void H3Grid::processGrid()
         if (it->second < m_dense_limit)
             it = m_map.erase(it);
         else {
-            // add cell IJ coordinates:
-            c = h32ij(it->first);
-            std::ostringstream coords;
-            coords << "(" << (int)c.i <<
-                ", " << (int)c.j << ")";
-            m_ij_coords.push_back(coords.str());
             ++m_numdense;
             ++it;
         }
@@ -57,19 +51,13 @@ void H3Grid::processPaths()
 {
     // find cells with side 0 bordering empty space
     for (auto it = m_map.begin(); it != m_map.end(); ++it) {
-        H3Index idx = it->first;
-        CoordIJ c = h32ij(idx);
-        
+        CoordIJ c = it->first;
         CoordIJ shift = edgeCoord(c, 0);
-        H3Index shift_idx;
-        if (localIjToCell(m_origin, &shift, 0, &shift_idx) != E_SUCCESS) 
-            throw hexer_error("Cannot find neighbor H3 cell!");
-
-        if (m_map.find(shift_idx) == m_map.end())
-            m_possible[idx] = c;
+        if (m_map.find(shift) == m_map.end())
+            m_possible.push_back(c);
     }
 
-    m_min_i = m_possible.begin()->second.i;
+    m_min_i = m_possible[0].i;
 
     while (!m_possible.empty()) {
         findShape();
@@ -98,15 +86,13 @@ void H3Grid::organizePaths()
 
 void H3Grid::parentOrChild(H3Path *p)
 {
+    // Get an arbitrary dense hexagon that borders our path
     CoordIJ hex = p->rootHex();
     int i = hex.i;
+    // Keep moving down i until we find more hexagons bordering paths.
+    // Then assign ours as root or child based on the paths it passes through
     while (i >= m_min_i) {
-        // make m_hex_paths work with coordIJ as keys: need to be able to
-        // overload operator< (can't figure out how)
-        CoordIJ next_hex = edgeCoord(hex, 3);
-        H3Index hex_idx = ij2h3(hex);
-        
-        IJPathMap::iterator it = m_hex_paths.find(hex_idx);
+        IJPathMap::iterator it = m_hex_paths.find(hex);
         if (it != m_hex_paths.end()) {
             H3Path *parentPath = it->second;
             if (parentPath == p->parent()) {
@@ -116,7 +102,7 @@ void H3Grid::parentOrChild(H3Path *p)
                 p->setParent(parentPath);
             }
         }
-        hex = next_hex;
+        hex = edgeCoord(hex, 3);
         i = hex.i;
     }
 }
@@ -133,38 +119,29 @@ void H3Grid::parentOrChild(H3Path *p)
 void H3Grid::findShape()
 {
     int edge(0);
-    CoordIJ cur = m_possible.begin()->second;
-    const CoordIJ orig = m_possible.begin()->second;
+    CoordIJ cur = m_possible[0];
+    const CoordIJ orig = cur;
     H3Path *p = new H3Path(this, H3CLOCKWISE, orig);
 
     do {
         if (edge == 0) {
-            m_possible.erase(ij2h3(cur));
-            CoordIJ edge_coord = edgeCoord(cur, 0);
-            if (m_map.find(ij2h3(edgeCoord(edge_coord, 0))) == m_map.end()) {
-                IJPathMap::value_type addpath(ij2h3(edge_coord), p);
-                m_hex_paths.insert(addpath); 
-            }
+            std::vector<CoordIJ>::iterator it = std::find(m_possible.begin(), 
+                                                      m_possible.end(), cur);
+            if (it != m_possible.end()) 
+                m_possible.erase(it);
         }
-        else if (edge == 3) {
-            CoordIJ edge_coord = edgeCoord(cur, 3);
-            if (m_map.find(ij2h3(edgeCoord(edge_coord, 3))) == m_map.end()) {
-                IJPathMap::value_type addpath(ij2h3(edge_coord), p);
-                m_hex_paths.insert(addpath); 
-            }
-        }
-
         addEdge(p, cur, edge);
 
         CoordIJ next = nextCoord(cur, edge);
-        // if next is dense:
-        if (m_map.find(ij2h3(next)) != m_map.end()) {
+        // if next is dense: go left
+        if (m_map.find(next) != m_map.end()) {
             cur = next;
             m_min_i = std::min(m_min_i, cur.i);
             edge--;
             if (edge < 0)
                 edge = 5;
         }
+        // if next not dense: keep moving around our current hex
         else {
             if (edge == 5)
                 edge = 0;
@@ -176,7 +153,8 @@ void H3Grid::findShape()
 }
 
 void H3Grid::addEdge(H3Path * p, CoordIJ idx, int edge)
-{
+{    
+    // get H3 directed edge of our current hexagon at a given edge
     H3Index src = ij2h3(idx);
     CoordIJ next_ij = edgeCoord(idx, edge);
     DirEdge dirEdge;
@@ -184,6 +162,15 @@ void H3Grid::addEdge(H3Path * p, CoordIJ idx, int edge)
     if (cellsToDirectedEdge(src, ij2h3(next_ij), &dirEdge) != E_SUCCESS)
         throw hexer_error("Couldn't get directed edge.");
     p->push_back(dirEdge); 
+
+    // if edge is 0 or 3, add our edge to the list of paths so it can be used
+    // to find parent and child paths
+    if (edge == 0)
+        m_hex_paths.insert({idx, p});
+    // if edge == 3: we need to normalize this so it can be processed as another
+    // hexagon. Adds the edge as edge 0 of neighbor
+    else if (edge == 3)
+        m_hex_paths.insert({next_ij, p});
 }
 
 void H3Grid::processH3Sample()

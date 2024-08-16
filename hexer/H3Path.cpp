@@ -28,7 +28,7 @@ std::vector<Point> H3Path::getPoints() const
             double x = radsToDegs(edge_bound.verts[1].lng);
             double y = radsToDegs(edge_bound.verts[1].lat);
             path_strip.push_back(Point(x, y));
-    }
+        }
     }
     return path_strip;
 }

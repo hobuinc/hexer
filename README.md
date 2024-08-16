@@ -46,7 +46,7 @@ For more information, see the full documentation for hexer at:
 ```
 ## H3 
 ```
-$ curse density mypointfile.shp --output myboundary.shp --grid h3
+$ curse density mylasfile.las --output myboundary.shp --grid h3
 ```
 
 ```

@@ -389,30 +389,33 @@ OGRGeometryH OGR::collectH3(CellBoundary b)
 
 void OGR::writeDensity(H3Grid *grid)
 {
-    std::map<H3Index, int> hex_map = grid->getMap();
-    std::vector<std::string> ij_arr = grid->getIJArr();
+    std::map<CoordIJ, int> hex_map = grid->getMap();
 
     int counter(0);
     for (auto iter = hex_map.begin(); iter != hex_map.end(); ++iter) {
+        CoordIJ c = iter->first;
+        std::ostringstream coords;
+        coords << "(" << (int)c.i <<
+                ", " << (int)c.j << ")";
+        
+        H3Index idx = grid->ij2h3(c);
         CellBoundary bounds;
-        H3Error err = cellToBoundary(iter->first, &bounds);
-        if (err == E_SUCCESS) {
-            OGRGeometryH polygon = collectH3(bounds);
-            OGRFeatureH hFeature;
-            hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
-            OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
-                counter);
-            OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
-                iter->second);
-            OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
-                iter->first);
-            OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "IJ"),
-                ij_arr[counter].c_str()); 
-            processGeometry(m_layer, hFeature, polygon);
-            counter++;
-        }
-        else
-            throw hexer_error("Unable to collect H3 boundary!"); 
+        if (cellToBoundary(idx, &bounds) != E_SUCCESS)
+            throw hexer_error("Unable to collect H3 boundary!");
+
+        OGRGeometryH polygon = collectH3(bounds);
+        OGRFeatureH hFeature;
+        hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
+        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
+            counter);
+        OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
+            iter->second);
+        OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
+            idx);
+        OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "IJ"),
+            coords.str().c_str()); 
+        processGeometry(m_layer, hFeature, polygon);
+        counter++;
     }
 }
 
@@ -478,7 +481,7 @@ void OGR::collectPath(H3Path* path, OGRGeometryH polygon)
     {
         H3Path* p = paths[pi];
         collectPath(p, polygon);
-    }
+    } 
 }
 OGR::~OGR()
 {
