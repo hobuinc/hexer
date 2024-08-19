@@ -44,11 +44,15 @@ For more information, see the full documentation for hexer at:
  http://github.com/hobu/hexer
 
 ```
-## H3 
+### H3 Processing
 ```
-$ curse density mylasfile.las --output myboundary.shp --grid h3
+$ curse density mylasfile.las --output myhexagons.shp --grid h3
+$ curse boundary mylasfile.las --output myboundary.shp --grid h3 -r 12
 ```
+<img src="https://github.com/hobu/hexer/raw/master/images/h3bounds.png?raw=true"  alt="Uncompahgre boundary at H3 resolution 11" /></a>
 
+
+### Default Processing
 ```
 $ curse boundary mypointfile.shp --output myboundary.shp
 $ curse density mylasfile.las --output myhexagons.shp --edge 100
