@@ -49,7 +49,7 @@ For more information, see the full documentation for hexer at:
 $ curse density mylasfile.las --output myhexagons.shp --grid h3
 $ curse boundary mylasfile.las --output myboundary.shp --grid h3 -r 12
 ```
-<img src="https://github.com/hobu/hexer/raw/master/images/h3bounds.png?raw=true"  alt="Uncompahgre boundary at H3 resolution 11" />
+<img src="https://github.com/ibell13/hexer/raw/h3/images/h3bounds.png?raw=true"  alt="Uncompahgre boundary at H3 resolution 11" />
 
 
 ### Default Processing
