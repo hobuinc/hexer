@@ -258,12 +258,12 @@ void boundaryH3( std::string const& input,
     else {
         std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;
     }
-    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+
+    if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
+        std::cerr << "Provide a filename for output!\n";
+    }
     writer::h3::OGR o(output);
     o.writeBoundary(grid.get());
-    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-    std::cout << "time to write H3 boundary: " << time_span.count() << " seconds\n";
 }
 
 void densityH3( std::string const& input,
@@ -292,12 +292,12 @@ void densityH3( std::string const& input,
     else {
         std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;
     }
-    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+
+    if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
+        std::cerr << "Provide a filename for output!\n";
+    }
     writer::h3::OGR o(output);
     o.writeDensity(grid.get());
-    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-    std::cout << "time to write H3 density: " << time_span.count() << " seconds\n";
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
