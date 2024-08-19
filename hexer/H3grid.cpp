@@ -33,6 +33,7 @@ void H3Grid::processGrid()
 {
     CoordIJ c;
 
+    // remove hexagons with fewer points than the density threshold
     for (auto it = m_map.begin(); it != m_map.end();) {
         if (it->second < m_dense_limit)
             it = m_map.erase(it);
@@ -43,7 +44,7 @@ void H3Grid::processGrid()
     }
     if (m_map.empty()) {
         throw hexer_error("No areas of sufficient density - no shapes. "
-            "Decrease density or area size.");
+            "Decrease density or H3 resolution.");
     }
 }
 
@@ -107,14 +108,17 @@ void H3Grid::parentOrChild(H3Path *p)
     }
 }
 
-// Walk the outside of the hexagons to make a path.  Hexagon sides are labeled:
+// Walk the outside of the hexagons to make a path.  
+// Relative to H3 IJ coordinates, hexagon sides are labeled:
 //
-//     __3_
-//  2 /    \ 4
-//   /      \
-//   \      /
-//  1 \____/ 5
-//      0
+//               (- I)
+//                __3_
+// (- I, - J)  2 /    \ 4  (+ J)
+//              /      \
+//              \      /
+//      (- J)  1 \____/ 5   (+ I, + J)
+//                  0
+//               (+ I)
 //
 void H3Grid::findShape()
 {
@@ -201,7 +205,7 @@ void H3Grid::processH3Sample()
         addLatLng(&ll);
     }
     m_sample.clear();
-    std::cout << "H3 resolution: " << m_res <<std::endl; 
+    std::cout << "H3 resolution: " << m_res << std::endl; 
 }
 
 } // namespace hexer

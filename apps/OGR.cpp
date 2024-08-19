@@ -477,9 +477,9 @@ void OGR::collectPath(H3Path* path, OGRGeometryH polygon)
     }
 
     vector<H3Path *> paths = path->subPaths();
-    for (int pi = 0; pi != paths.size(); ++pi)
+    for (int i = 0; i != paths.size(); ++i)
     {
-        H3Path* p = paths[pi];
+        H3Path* p = paths[i];
         collectPath(p, polygon);
     } 
 }

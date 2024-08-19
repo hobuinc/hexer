@@ -1,7 +1,7 @@
 #include "test_main.hpp"
 #include <hexer/HexGrid.hpp>
 #include <h3/include/h3api.h>
-/*
+
 namespace hexer 
 {
 std::vector<H3Path *> insertGrid(H3Grid *grid) {
@@ -37,9 +37,18 @@ TEST(pathstest, test_paths) {
     std::unique_ptr<H3Grid> grid;
     grid.reset(new H3Grid(1, 10));
     std::vector<H3Path *> paths = insertGrid(grid.get());
-    int counter(0);
-    for (auto pi = paths.begin(); pi != paths.end(); ++pi) {
-        std::cout << "root path " << counter << " = "
-    } 
+
+    EXPECT_EQ(paths[0]->numSegs(), 38);
+    EXPECT_EQ(paths[0]->numChildren(), 2);
+    EXPECT_EQ(paths[1]->numSegs(), 14);
+    EXPECT_EQ(paths[2]->numSegs(), 54);
+
+    std::vector<H3Path *> child_0 = paths[0]->subPaths();
+    EXPECT_EQ(child_0[0]->numSegs(), 18);
+    EXPECT_EQ(child_0[0]->numChildren(), 1);
+    EXPECT_EQ(child_0[1]->numSegs(), 6);
+
+    std::vector<H3Path *> child_0_0 = child_0[0]->subPaths();
+    EXPECT_EQ(child_0_0[0]->numSegs(), 6);
 }
-} // namespace hexer */
+} // namespace hexer 

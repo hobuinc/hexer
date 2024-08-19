@@ -57,6 +57,10 @@ public:
         { return m_root_hex; }
     std::vector<H3Path *> subPaths() const
         { return m_children; }
+    int numChildren() const
+        { return m_children.size(); }
+    int numSegs() const
+        { return m_segs.size(); }
     std::vector<Point> getPoints() const;
     
 private:
