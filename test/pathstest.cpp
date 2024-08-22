@@ -4,7 +4,8 @@
 
 namespace hexer 
 {
-std::vector<H3Path *> insertGrid(H3Grid *grid) {
+std::vector<H3Path *> insertGrid(H3Grid *grid) 
+{
     for (CoordIJ ij : std::vector<CoordIJ>(
             {
                 {5, 2}, {5, 3},
@@ -33,22 +34,29 @@ std::vector<H3Path *> insertGrid(H3Grid *grid) {
     return paths;
 }
 
-TEST(pathstest, test_paths) {
+TEST(pathstest, test_paths) 
+{
     std::unique_ptr<H3Grid> grid;
     grid.reset(new H3Grid(1, 10));
     std::vector<H3Path *> paths = insertGrid(grid.get());
 
-    EXPECT_EQ(paths[0]->numSegs(), 38);
+    EXPECT_EQ(paths[0]->numSegs(), 54);
     EXPECT_EQ(paths[0]->numChildren(), 2);
-    EXPECT_EQ(paths[1]->numSegs(), 14);
-    EXPECT_EQ(paths[2]->numSegs(), 54);
-
+    
     std::vector<H3Path *> child_0 = paths[0]->subPaths();
-    EXPECT_EQ(child_0[0]->numSegs(), 18);
-    EXPECT_EQ(child_0[0]->numChildren(), 1);
-    EXPECT_EQ(child_0[1]->numSegs(), 6);
-
+    EXPECT_EQ(child_0[0]->numSegs(), 38);
+    EXPECT_EQ(child_0[1]->numSegs(), 14);
+    EXPECT_EQ(child_0[0]->numChildren(), 2);
+    EXPECT_EQ(child_0[1]->numChildren(), 0);
+    
     std::vector<H3Path *> child_0_0 = child_0[0]->subPaths();
-    EXPECT_EQ(child_0_0[0]->numSegs(), 6);
+    EXPECT_EQ(child_0_0[0]->numSegs(), 18);
+    EXPECT_EQ(child_0_0[1]->numSegs(), 6);
+    EXPECT_EQ(child_0_0[0]->numChildren(), 1);
+    EXPECT_EQ(child_0_0[1]->numChildren(), 0);
+    
+    std::vector<H3Path *> child_0_0_0 = child_0_0[0]->subPaths();
+    EXPECT_EQ(child_0_0_0[0]->numSegs(), 6);
+    EXPECT_EQ(child_0_0_0[0]->numChildren(), 0);
 }
 } // namespace hexer 
