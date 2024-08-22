@@ -42,7 +42,7 @@ public:
         for (std::vector<H3Path*>::size_type i = 0; i < m_paths.size(); i++)
             delete m_paths[i];
     }
-    
+
     void addLatLng(LatLng *ll);
     std::map<CoordIJ, int> getMap() const 
         { return m_map; }
@@ -70,7 +70,7 @@ public:
                 std::ostringstream oss;
                 oss << "Can't convert IJ (" << std::to_string(ij.i) << 
                     ", " << std::to_string(ij.j) <<") to H3Index.";
-                throw hexer_error(oss.str()); 
+                throw hexer_error(oss.str());
             }
             return h3;  }
 
@@ -94,7 +94,7 @@ public:
 
     // Return the IJ coordinate of the cell across the edge.
     CoordIJ edgeCoord(CoordIJ ij, int edge)
-        {   std::vector<CoordIJ> offsets {{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
+        {   const CoordIJ offsets[] {{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
             return ij + offsets[edge];  }
 
 private:
@@ -125,7 +125,7 @@ private:
     H3Index m_origin;
     /// List of paths
     std::vector<H3Path *> m_paths;
-    /// map of pointers to paths w/ h3 cell index as keys
+    /// map of cell coordinates with associated paths at edge 0
     typedef std::map<CoordIJ, H3Path *> IJPathMap;
     IJPathMap m_hex_paths;
     /// number of dense h3 cells in the grid

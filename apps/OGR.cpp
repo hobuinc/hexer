@@ -174,12 +174,8 @@ void OGR::collectPath(Path* path, OGRGeometryH polygon)
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
 
     vector<Point> pts = path->points();
-
-    vector<Point>::const_iterator i;
-    for (i = pts.begin(); i != pts.end(); ++i)
-    {
-        OGR_G_AddPoint_2D(ring, i->m_x, i->m_y);
-    }
+    for (Point& p : pts)
+        OGR_G_AddPoint_2D(ring, p.m_x, p.m_y);
 
     if( OGR_G_AddGeometryDirectly(polygon, ring) != OGRERR_NONE )
     {
@@ -339,7 +335,15 @@ void OGR::createLayer(std::string const& basename)
     }
     OGR_Fld_Destroy(hFieldDefn);
 
-
+    hFieldDefn = OGR_Fld_Create("H3_STRING", OFTString);
+    if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
+    {
+        std::ostringstream oss;
+        oss << "Could not create H3_STRING field on layer with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_Fld_Destroy(hFieldDefn);
 }
 
 void OGR::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon)
@@ -399,6 +403,11 @@ void OGR::writeDensity(H3Grid *grid)
                 ", " << (int)c.j << ")";
         
         H3Index idx = grid->ij2h3(c);
+        char id[17];
+        char* id_ptr = id;
+        if (h3ToString(idx, id_ptr, 17) != E_SUCCESS)
+            throw hexer_error("could not convert H3 ID to string!");
+
         CellBoundary bounds;
         if (cellToBoundary(idx, &bounds) != E_SUCCESS)
             throw hexer_error("Unable to collect H3 boundary!");
@@ -413,7 +422,10 @@ void OGR::writeDensity(H3Grid *grid)
         OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
             idx);
         OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "IJ"),
-            coords.str().c_str()); 
+            coords.str().c_str());
+        OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_STRING"),
+            id_ptr);
+        
         processGeometry(m_layer, hFeature, polygon);
         counter++;
     }
@@ -460,12 +472,9 @@ void OGR::collectPath(H3Path* path, OGRGeometryH polygon)
 {
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
     vector<Point> pts = path->getPoints();
+    for (Point& p : pts)
+        OGR_G_AddPoint_2D(ring, p.m_x, p.m_y);
 
-    vector<Point>::const_iterator i;
-    for (i = pts.begin(); i != pts.end(); ++i)
-    {
-        OGR_G_AddPoint_2D(ring, i->m_x, i->m_y);
-    }
     OGR_G_AddPoint_2D(ring, pts[0].m_x, pts[0].m_y);
 
     if( OGR_G_AddGeometryDirectly(polygon, ring) != OGRERR_NONE )

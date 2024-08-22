@@ -83,6 +83,7 @@ namespace hexer
         return ((density * dist) / samples.size());
     }
 
+    // Hex size processing for H3 grids.
     double computeHexSize(const std::vector<LatLng>& samples, int density)
     {
         double dist = 0;
@@ -140,7 +141,7 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     grid->findParentPaths();
 }
 
-void processH3(H3Grid *grid, std::ifstream& file, bool boundary) 
+void processH3(H3Grid *grid, std::ifstream& file) 
 {
     lazperf::reader::generic_file l(file);
 
@@ -176,13 +177,7 @@ void processH3(H3Grid *grid, std::ifstream& file, bool boundary)
         grid->addLatLng(&loc);
     }
     grid->processGrid();
-    std::string p;
-    if (boundary) {
-        grid->processPaths();
-        p = "boundary";
-    }
-    else 
-        p = "density";
+    grid->processPaths();
 }
 
 void processHexes(HexGrid *grid, HexReader reader)

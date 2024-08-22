@@ -18,7 +18,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <chrono>
 
 #include <hexer/HexGrid.hpp>
 #include <hexer/HexIter.hpp>
@@ -33,112 +32,6 @@
 #include "OGR.hpp"
 
 std::string headline(hexer::Utils::screenWidth(), '-');
-
-
-
-bool readHex(int& x, int& y, void* ctx)
-{
-    static int pos = 0;
-
-    static int coords[] = {
-        0, 0,
-        1, 0,
-        2, 1,
-        3, 1,
-        4, 2,
-        4, 3,
-        4, 4,
-        3, 4,
-        2, 5,
-        1, 5,
-        0, 5,
-        -1, 4,
-        -2, 4,
-        -3, 3,
-        -3, 2,
-        -3, 1,
-        -2, 1,
-        -1, 0,
-        -1, 2,
-        0, 2,
-        1, 3,
-        2, 3
-    };
-
-    static int num_coords = sizeof(coords) / (sizeof(coords[0]));
-
-    if (pos + 1 < num_coords) {
-        x = coords[pos++];
-        y = coords[pos++];
-        return true;
-    }
-    return false;
-}
-
-
-std::string indent(int l)
-{
-    std::string tabs;
-
-    tabs.append(l * 2, ' ');
-    return tabs;
-}
-
-void dumpPath(hexer::Path *p)
-{
-    using namespace hexer;
-
-    static int level = 0;
-    Orientation o = p->orientation();
-    std::string ostring = ((o == CLOCKWISE) ? "CLOCKWISE" : "ANTICLOCKWISE");
-    indent(level);
-    std::cerr << indent(level) << "Path length = " << p->pathLength() << "!\n";
-    std::cerr << indent(level) << "Orientation = " << ostring << "!\n";
-    std::vector<Path *> paths = p->subPaths();
-    level++;
-    for (int pi = 0; pi != paths.size(); ++pi)
-    {
-        dumpPath(paths[pi]);
-    }
-    level--;
-}
-
-
-void hextest(std::string filename)
-{
-    using namespace hexer;
-
-    HexGrid grid(10, 10);
-
-    // LAS l(filename);
-    // l.open();
-    // process(infos, l.reader);
-
-    processHexes(&grid, readHex);
-
-    // Dump hexes.
-    for (HexIter iter = grid.hexBegin(); iter != grid.hexEnd(); ++iter)
-    {
-        HexInfo hi = *iter;
-        std::cerr << "Density/X/Y = " << hi.m_density << "/" <<
-            hi.m_center.m_x << "/" << hi.m_center.m_y << "!\n";
-    }
-}
-
-void pathtest(std::string filename)
-{
-    using namespace hexer;
-
-    HexGrid grid(10);
-
-    std::ifstream file(filename, std::ios::binary);
-    processLaz(&grid, file);
-
-    std::vector<Path *> paths = grid.rootPaths();
-
-    for (auto pi = paths.begin(); pi != paths.end(); ++pi)
-        dumpPath(*pi);
-}
 
 enum FormatType
 {
@@ -159,7 +52,8 @@ FormatType getDriver(std::string filename)
         return Format_OGR;
 }
 
-void boundary(  std::string const& input,
+void runHexer(  std::string const& command,
+                std::string const& input,
                 std::string const& output,
                 double edge,
                 int density)
@@ -186,87 +80,33 @@ void boundary(  std::string const& input,
         process(grid.get(), o.reader);
     }
 
-    if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
+    if (hexer::Utils::iequals(command, "BOUNDARY")) 
     {
-        std::ostringstream multi;
-        multi.setf(std::ios::fixed);
-        multi.precision(8);
+        if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
+        {
+            std::ostringstream multi;
+            multi.setf(std::ios::fixed);
+            multi.precision(8);
 
-        grid->toWKT(multi);
-        std::cout << multi.str() << std::endl;
+            grid->toWKT(multi);
+            std::cout << multi.str() << std::endl;
+        }
+        else
+        {
+            writer::OGR o(output);
+            o.writeBoundary(grid.get());
+        }
     }
     else
     {
         writer::OGR o(output);
-        o.writeBoundary(grid.get());
+        o.writeDensity(grid.get()); 
     }
+
 }
 
-
-void density(   std::string const& input,
-                std::string const& output,
-                double edge,
-                int density)
-{
-    using namespace hexer;
-
-    std::unique_ptr<HexGrid> grid;
-
-    if (density == 0)
-        density = 10;
-    if (edge == 0.0) 
-        grid.reset(new HexGrid(density));
-    else
-        grid.reset(new HexGrid(edge, density));
-
-    FormatType t = getDriver(input);
-    if (t == Format_LAS)
-    {
-        std::ifstream file(input, std::ios::binary);
-        processLaz(grid.get(), file);
-    } else {
-        reader::OGR o(input);
-        o.open();
-        process(grid.get(), o.reader);
-    }
-    writer::OGR o(output);
-    o.writeDensity(grid.get());
-}
-
-void boundaryH3( std::string const& input,
-                std::string const& output,
-                int res,
-                int density)
-{
-    using namespace hexer;
-        std::unique_ptr<H3Grid> grid;
-
-    if (density == 0)
-        density = 10;
-    if (res > 15 || res < -1) {
-        std::cerr << "Input an H3 grid cell size between 0 and 15." 
-         << "Info on H3 cell specifications can be found at https://h3geo.org/docs/core-library/restable" << std::endl;
-    }
-    else
-        grid.reset(new H3Grid(density, res));
-
-    FormatType t = getDriver(input);
-    if (t == Format_LAS) {
-        std::ifstream file(input, std::ios::binary);
-        processH3(grid.get(), file, true); 
-    }
-    else {
-        std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;
-    }
-
-    if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
-        std::cerr << "Provide a filename for output!\n";
-    }
-    writer::h3::OGR o(output);
-    o.writeBoundary(grid.get());
-}
-
-void densityH3( std::string const& input,
+void runH3(     std::string const& command,
+                std::string const& input,
                 std::string const& output,
                 int res,
                 int density) 
@@ -278,8 +118,8 @@ void densityH3( std::string const& input,
     if (density == 0)
         density = 10;
     if (res > 15 || res < -1) {
-        std::cerr << "Input an H3 grid cell size between 0 and 15." 
-         << "Info on H3 cell specifications can be found at https://h3geo.org/docs/core-library/restable" << std::endl;
+        throw hexer_error("Input an H3 grid cell size between 0 and 15." 
+        "Info on H3 cell specifications can be found at https://h3geo.org/docs/core-library/restable");
     }
     else
         grid.reset(new H3Grid(density, res));
@@ -287,17 +127,21 @@ void densityH3( std::string const& input,
     FormatType t = getDriver(input);
     if (t == Format_LAS) {
         std::ifstream file(input, std::ios::binary);
-        processH3(grid.get(), file); 
+        processH3(grid.get(), file);
     }
     else {
-        std::cerr << "H3 processing only supported for '.las' and '.laz' files!" << std::endl;
+        throw hexer_error("H3 processing only supported for '.las' and '.laz' files!");
     }
 
     if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
-        std::cerr << "Provide a filename for output!\n";
+        throw hexer_error("Provide a filename for output!");
     }
+
     writer::h3::OGR o(output);
-    o.writeDensity(grid.get());
+    if (hexer::Utils::iequals(command, "BOUNDARY"))
+        o.writeBoundary(grid.get());
+    else if (hexer::Utils::iequals(command, "DENSITY"))
+        o.writeDensity(grid.get());
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
@@ -328,8 +172,8 @@ int main(int argc, char* argv[])
     std::string command;
     bool showHelp(false);
     bool showVersion(false);
-    std::string input("");
-    std::string output("");
+    std::string input;
+    std::string output;
     double edge(0.0);
     int count(0);
     int res(-1);
@@ -381,49 +225,25 @@ int main(int argc, char* argv[])
 
     try
     {
-        if (hexer::Utils::iequals(grid, "H3")) 
+        if (hexer::Utils::iequals(command, "DENSITY") || hexer::Utils::iequals(command, "BOUNDARY"))
         {
-            if (hexer::Utils::iequals(command, "DENSITY"))
+            if (hexer::Utils::iequals(grid, "H3")) 
             {
-                densityH3(input, output, res, count);
+                runH3(command, input, output, res, count);
                 return 0;
             }
-            if (hexer::Utils::iequals(command, "BOUNDARY"))
+
+            if (hexer::Utils::iequals(grid, "HEXGRID")) 
             {
-                boundaryH3(input, output, res, count);
+                runHexer(command, input, output, res, count);
                 return 0;
-            }
-            else
-            {
-                std::cerr << "H3 support for " << command << " not active" << std::endl;
-                return 0;  
             }
         }
         else
         {
-            if (hexer::Utils::iequals(command, "BOUNDARY"))
-            {
-                boundary(input, output, edge, count);
-                return 0;
-            }
-
-            if (hexer::Utils::iequals(command, "DENSITY"))
-            {
-                density(input, output, edge, count);
-                return 0;
-            }
-
-            if (hexer::Utils::iequals(command, "PATH"))
-            {
-                pathtest(input);
-                return 0;
-            }
-
-            if (hexer::Utils::iequals(command, "HEX"))
-            {
-                hextest(input);
-                return 0;
-            }
+            std::cerr << "Command not accepted! Enter 'density' or 'boundary'\n";
+            OutputHelp(std::cout, args);
+            return 1; 
         }
 
 

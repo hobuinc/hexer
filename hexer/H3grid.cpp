@@ -31,8 +31,6 @@ void H3Grid::addLatLng(LatLng *ll)
 
 void H3Grid::processGrid()
 {
-    CoordIJ c;
-
     // remove hexagons with fewer points than the density threshold
     for (auto it = m_map.begin(); it != m_map.end();) {
         if (it->second < m_dense_limit)
@@ -87,12 +85,12 @@ void H3Grid::organizePaths()
 
 void H3Grid::parentOrChild(H3Path *p)
 {
-    // Get an arbitrary dense hexagon that borders our path
+    // Get an arbitrary dense hexagon that borders our path at edge 0
     CoordIJ hex = p->rootHex();
     int i = hex.i;
     // Keep moving down i until we find more hexagons bordering paths.
     // Then assign ours as root or child based on the paths it passes through
-    while (i >= m_min_i) {
+    while (i >= (m_min_i - 1)) {
         IJPathMap::iterator it = m_hex_paths.find(hex);
         if (it != m_hex_paths.end()) {
             H3Path *parentPath = it->second;
@@ -111,14 +109,14 @@ void H3Grid::parentOrChild(H3Path *p)
 // Walk the outside of the hexagons to make a path.  
 // Relative to H3 IJ coordinates, hexagon sides are labeled:
 //
-//               (- I)
-//                __3_
-// (- I, - J)  2 /    \ 4  (+ J)
+//               (+ I)
+//                __0_
+// (+ I, + J)  5 /    \ 1  (- J)
 //              /      \
 //              \      /
-//      (- J)  1 \____/ 5   (+ I, + J)
-//                  0
-//               (+ I)
+//      (+ J)  4 \____/ 2   (- I, - J)
+//                  3
+//               (- I)
 //
 void H3Grid::findShape()
 {
