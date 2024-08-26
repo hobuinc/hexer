@@ -72,9 +72,6 @@ public:
     void processSample();
     void findShapes();
     void findParentPaths();
-    void extractShapes();
-    void dumpInfo();
-    void drawHexagons();
     Hexagon *getHexagon(int x, int y);
     Hexagon *getHexagon(const Coord& c)
         { return getHexagon(c.m_x, c.m_y); }
@@ -104,7 +101,6 @@ private:
     void initialize(double height);
     Hexagon *findHexagon(Point p);
     void findShape(Hexagon *hex);
-    void findHole(Hexagon *hex);
     void cleanPossibleRoot(Segment s, Path *p);
     void findParentPath(Path *p);
     void markNeighborBelow(Hexagon *hex);
