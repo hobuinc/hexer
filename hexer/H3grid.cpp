@@ -90,7 +90,7 @@ void H3Grid::parentOrChild(H3Path *p)
     int i = hex.i;
     // Keep moving down i until we find more hexagons bordering paths.
     // Then assign ours as root or child based on the paths it passes through
-    while (i >= (m_min_i - 1)) {
+    while (i >= m_min_i) {
         IJPathMap::iterator it = m_hex_paths.find(hex);
         if (it != m_hex_paths.end()) {
             H3Path *parentPath = it->second;
@@ -138,7 +138,7 @@ void H3Grid::findShape()
         // if next is dense: go left
         if (m_map.find(next) != m_map.end()) {
             cur = next;
-            m_min_i = std::min(m_min_i, cur.i);
+            m_min_i = std::min(m_min_i, cur.i - 1);
             edge--;
             if (edge < 0)
                 edge = 5;
