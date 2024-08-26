@@ -35,26 +35,37 @@
 #include <assert.h>
 #include <sstream>
 #include <cmath>
+#include <map>
+#include <chrono>
 
 #include <hexer/Processor.hpp>
 
 #include <hexer/HexGrid.hpp>
 
-#include "../lazperf/readers.hpp"
-#include "../lazperf/las.hpp"
+#include <lazperf/readers.hpp>
+#include <lazperf/las.hpp>
 
-#ifdef HEXER_HAVE_GDAL
+#include <h3/include/h3api.h>
+#include <hexer/H3grid.hpp>
+
 #include "gdal.h"
-#endif
 
 #include <hexer/Mathpair.hpp>
 
 namespace hexer
 {
+
     double distance(const Point& p1, const Point& p2)
     {
         double xdist = p2.m_x - p1.m_x;
         double ydist = p2.m_y - p1.m_y;
+        return std::sqrt(xdist * xdist + ydist * ydist);
+    }
+
+    double distance(const LatLng& p1, const LatLng& p2)
+    {
+        double xdist = p2.lng - p1.lng;
+        double ydist = p2.lat - p1.lat;
         return std::sqrt(xdist * xdist + ydist * ydist);
     }
 
@@ -71,6 +82,19 @@ namespace hexer
         }
         return ((density * dist) / samples.size());
     }
+
+    // Hex size processing for H3 grids.
+    double computeHexSize(const std::vector<LatLng>& samples, int density)
+    {
+        double dist = 0;
+        for (std::vector<LatLng>::size_type i = 0; i < samples.size() - 1; ++i)
+        {
+           LatLng p1 = samples[i];
+           LatLng p2 = samples[i + 1];
+           dist += distance(p1, p2);
+        }
+        return ((density * dist) / samples.size());
+    } 
 
 
 void process(HexGrid *grid, PointReader reader)
@@ -95,6 +119,11 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
 
+    if(count < 10000)
+        grid->setSampleSize(count);
+    else 
+        grid->setSampleSize(10000);
+
     for(size_t i = 0; i < count; i ++) {
         l.readPoint(buf_data);
 
@@ -110,6 +139,45 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     }
     grid->findShapes();
     grid->findParentPaths();
+}
+
+void processH3(H3Grid *grid, std::ifstream& file) 
+{
+    lazperf::reader::generic_file l(file);
+
+    size_t count = l.pointCount();
+
+    lazperf::header14 h = l.header();
+    uint16_t len = h.point_record_length;
+    std::vector<char> buf(len, 0);
+    char* buf_data = buf.data();
+    
+    if(count < 10000)
+        grid->setSampleSize(count);
+    else 
+        grid->setSampleSize(10000);
+
+    // add: verify WGS84 w/ gdal
+
+    for(size_t i = 0; i < count; i ++) {
+        l.readPoint(buf_data);
+
+        int32_t *pos = (int32_t *)buf_data;
+        int32_t x_int = *pos;
+        pos++;
+        int32_t y_int = *pos;
+
+        LatLng loc;
+
+        double x_rad = degsToRads(x_int * h.scale.x + h.offset.x);
+        double y_rad = degsToRads(y_int * h.scale.y + h.offset.y);
+        loc.lat = y_rad;
+        loc.lng = x_rad;
+        
+        grid->addLatLng(&loc);
+    }
+    grid->processGrid();
+    grid->processPaths();
 }
 
 void processHexes(HexGrid *grid, HexReader reader)
@@ -140,9 +208,7 @@ std::string GetFullVersion( void )
 
     os << " at revision " << revs.str().substr(0, 6);
 
-#ifdef HEXER_HAVE_GDAL
     os << " with GDAL " << GDALVersionInfo("RELEASE_NAME");
-#endif
 
     return os.str();
 }

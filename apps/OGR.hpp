@@ -12,9 +12,7 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 *****************************************************************************/
-
-#ifndef INCLUDED_PSHAPE_OGR_HPP
-#define INCLUDED_PSHAPE_OGR_HPP
+#pragma once
 
 #include <hexer/hexer.hpp>
 
@@ -24,10 +22,8 @@
 #include <hexer/Mathpair.hpp>
 #include <hexer/export.hpp>
 
-
-#ifdef HEXER_HAVE_GDAL
-
 #include "ogr_api.h"
+#include "ogr_srs_api.h"
 #include "gdal.h"
 
 namespace hexer
@@ -159,14 +155,35 @@ private:
 
     void createLayer(std::string const& basename);
     void collectPath(Path* path, OGRGeometryH polygon);
+    void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon); 
 	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
 
 };
+namespace h3
+{
+class OGR
+{
 
-} // writer
 
-} // namespace
+public:
+    OGR(std::string const& filename);
+	~OGR();
 
-#endif // HEXER_HAVE_GDAL
+    void writeDensity(H3Grid *grid);
+    void writeBoundary(H3Grid *grid);
 
-#endif // file guard
+private:
+    std::string m_filename;
+
+    OGRDataSourceH m_ds;
+	OGRLayerH m_layer;
+    void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
+    void createLayer(std::string const& basename);
+    OGRGeometryH collectH3(CellBoundary b);
+    void collectPath(H3Path* path, OGRGeometryH polygon);
+
+}; 
+} // namespace h3
+} // namespace writer
+
+} // namespace hexer

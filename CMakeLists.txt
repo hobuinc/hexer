@@ -9,15 +9,12 @@ mark_as_advanced(CLEAR CMAKE_VERBOSE_MAKEFILE )
 
 ###############################################################################
 # Project setup
-project(hexer VERSION 1.90 LANGUAGES CXX)
+project(HEXER VERSION 1.4.0 LANGUAGES CXX C)
 
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+include(${HEXER_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
-include(${hexer_SOURCE_DIR}/cmake/hexer_utils.cmake)
-
-set(HEXER_VERSION 1.4.0 CACHE STRING "Hexer version")
-
-set(CMAKE_MODULE_PATH "${hexer_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${HEXER_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
@@ -30,6 +27,7 @@ SET(HEXER_LIB_SOVERSION "1.1.0")
 
 # Name of C++ library
 set(HEXER_LIB_NAME hexer)
+set(H3_LIB_NAME h3)
 
 message(STATUS "Configuring Hexer library - ${HEXER_LIB_NAME}")
 
@@ -65,20 +63,16 @@ if(WITH_DRAWING)
     set(HEXER_HAVE_CAIRO 1)
 endif(WITH_DRAWING)
 
-find_package(GDAL 1.9.0)
-if (GDAL_FOUND)
-    set(HEXER_HAVE_GDAL 1)
-endif()
+find_package(GDAL 1.9.0 REQUIRED)
 
-if (NOT WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ###############################################################################
 # Installation settings
 
-set(HEXER_OUTPUT_LIB_DIR ${hexer_BINARY_DIR}/${LIB_INSTALL_DIR})
-set(HEXER_OUTPUT_BIN_DIR ${hexer_BINARY_DIR}/${BIN_INSTALL_DIR})
+set(HEXER_OUTPUT_LIB_DIR ${HEXER_BINARY_DIR}/${LIB_INSTALL_DIR})
+set(HEXER_OUTPUT_BIN_DIR ${HEXER_BINARY_DIR}/${BIN_INSTALL_DIR})
 make_directory(${HEXER_OUTPUT_LIB_DIR})
 make_directory(${HEXER_OUTPUT_BIN_DIR})
 if(WIN32)
@@ -119,7 +113,18 @@ file(GLOB APP_SRCS
     apps/*.cpp
 )
 
+file(GLOB H3SRCS
+    h3/lib/*.c
+)
+
+add_library(${H3_LIB_NAME} OBJECT ${H3SRCS}) 
+
 add_executable(curse ${APP_SRCS} ${LIB_SRCS} ${LAZPERF_SRCS})
+
+target_include_directories(${H3_LIB_NAME}
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/h3/include"
+)
 
 target_include_directories(curse
     PRIVATE
@@ -131,5 +136,8 @@ target_link_libraries(curse
     PRIVATE
         ${CAIRO_LIBRARIES}
         ${GDAL_LIBRARY}
+        ${H3_LIB_NAME}
 )
 
+enable_testing()
+add_subdirectory(test)
