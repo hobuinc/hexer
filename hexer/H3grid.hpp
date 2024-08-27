@@ -9,6 +9,7 @@
 #include "Mathpair.hpp"
 #include "export.hpp"
 #include "H3Path.hpp"
+#include "H3Hex.hpp"
 
 #include <h3/include/h3api.h>
 
@@ -29,7 +30,7 @@ using DirEdge = H3Index;
 static CoordIJ operator+(CoordIJ const& c1, CoordIJ const& c2)
     {   return {c1.i + c2.i, c1.j + c2.j};  }
 
-class HEXER_DLL H3Grid
+class HEXER_DLL H3Grid : protected BaseGrid
 {
 public:
     H3Grid(int dense_limit, int resolution)
@@ -42,6 +43,9 @@ public:
         for (std::vector<H3Path*>::size_type i = 0; i < m_paths.size(); i++)
             delete m_paths[i];
     }
+
+    bool sampling()
+        { return m_res == -1; }
 
     void addLatLng(LatLng *ll);
     std::map<CoordIJ, int> getMap() const 
@@ -60,8 +64,12 @@ public:
     // debug function, specify origin for H3 grid
     void setOrigin(H3Index idx)
         { m_origin = idx; }
+    H3Index getOrigin()
+        { return m_origin; }
     void processGrid();
     void processPaths();
+    Hexagon* findHexagon(Point p);
+    Hexagon* getHexagon(CoordIJ ij);
 
     // Convert IJ coordinates to H3 index
     H3Index ij2h3(CoordIJ ij)
@@ -100,7 +108,7 @@ public:
 private:
     void organizePaths();
     void parentOrChild(H3Path *p);
-    void processH3Sample();
+    void processSample();
     void findShape();
     void addEdge(H3Path * p, CoordIJ idx, int edge);
 
@@ -118,7 +126,7 @@ private:
     /// Number of points that must lie in a hexagon for it to be interesting 
     int m_dense_limit;
     /// Vector of points to use to determine hex height.
-    std::vector<LatLng> m_sample;
+    //std::vector<LatLng> m_sample;
     /// Maximum sample size.
     unsigned m_maxSample;
     /// Origin H3 index for finding IJ coordinates

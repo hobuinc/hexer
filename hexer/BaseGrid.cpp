@@ -2,16 +2,18 @@
 
 namespace hexer
 {
+
 bool BaseGrid::isDense(Hexagon * h)
 {
     return h->count() >= m_dense_limit;
 }
+
 void BaseGrid::addPoint(Point p)
 {
     if (sampling())
     {
         m_sample.push_back(p);
-        if (m_sample.size() >= m_maxSample)
+        if (m_sample.size() >= m_max_sample)
             processSample();
         return;
     }
@@ -30,6 +32,8 @@ void BaseGrid::addPoint(Point p)
         }
     }
 }
+
+
 
 void BaseGrid::findShapes()
 {
@@ -52,10 +56,11 @@ void BaseGrid::findShape(Hexagon *hex)
         throw hexer_error("hexagon was null!");
 
     Path *p = createPath(); //new Path(this, CLOCKWISE);
+    // make sure correct segment type is created
     Segment first(hex, 0);
     Segment cur(first);
     do {
-        cleanPossibleRoot(cur, p);
+        addSegment(cur, p);
         p->push_back(cur);
         Segment next = cur.leftClockwise(this);
         if (!next.hex()->dense())
@@ -64,4 +69,17 @@ void BaseGrid::findShape(Hexagon *hex)
     } while (cur != first);
     m_paths.push_back(p);
 }
+
+void BaseGrid::addSegment(Segment s, Path *p)
+{
+    if (s.possibleRoot(this))
+        m_pos_roots.erase(s.hex());
+    if (s.horizontal())
+    {
+        s.normalize(this);
+        HexPathMap::value_type hexpath(s.hex(), p);
+        m_hex_paths.insert(hexpath);
+    }
+}
+
 } // namespace hexer

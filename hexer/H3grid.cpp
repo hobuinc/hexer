@@ -12,7 +12,7 @@
 namespace hexer 
 {
 
-void H3Grid::addLatLng(LatLng *ll)
+/*void H3Grid::addLatLng(LatLng *ll)
 {
     if(m_res == -1) {
         m_sample.push_back(*ll);
@@ -20,6 +20,7 @@ void H3Grid::addLatLng(LatLng *ll)
             processH3Sample();
         return;
     }
+
 
     H3Index index(0);
     if (latLngToCell(ll, m_res, &index) != E_SUCCESS)
@@ -44,6 +45,38 @@ void H3Grid::processGrid()
         throw hexer_error("No areas of sufficient density - no shapes. "
             "Decrease density or H3 resolution.");
     }
+} */
+
+Hexagon *H3Grid::findHexagon(Point p)
+{
+    H3Index index(0);
+    LatLng ll{p.m_y, p.m_x};
+    if (latLngToCell(&ll, m_res, &index) != E_SUCCESS)
+        throw hexer_error("H3 index not found!");
+    return getHexagon(h32ij(index));
+}
+
+Hexagon *H3Grid::getHexagon(CoordIJ ij)
+{
+    // Stick a hexagon into the map if necessary.
+    HexMap::value_type hexpair(Hexagon::key(ij.i, ij.j), H3Hex(ij.i, ij.j));
+    std::pair<HexMap::iterator,bool> retval;
+    retval = m_hexes.insert(hexpair);
+    HexMap::iterator it = retval.first;
+
+    Hexagon *hex_p = &(it->second);
+
+    // Return a pointer to the located hexagon.
+    return hex_p;
+}
+
+void H3Grid::markNeighborBelow(Hexagon *h)
+{
+    CoordIJ c = h->neighborCoord(3);
+    H3Hex *neighbor = H3Hex(c);
+    neighbor->setDenseNeighbor(0);
+    if (neighbor->dense() && !neighbor->possibleRoot())
+        m_pos_roots.erase(neighbor);
 }
 
 void H3Grid::processPaths()
@@ -66,7 +99,6 @@ void H3Grid::processPaths()
 
 void H3Grid::organizePaths()
 {
-    std::vector<H3Path *> roots;
     for (size_t i = 0; i < m_paths.size(); ++i) {
         H3Path *p = m_paths[i];
         parentOrChild(p);
@@ -175,7 +207,7 @@ void H3Grid::addEdge(H3Path * p, CoordIJ idx, int edge)
         m_hex_paths.insert({next_ij, p});
 }
 
-void H3Grid::processH3Sample()
+void H3Grid::processSample()
 {
     if (m_res > 0 || m_sample.empty())
         return;
