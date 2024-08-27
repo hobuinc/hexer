@@ -17,13 +17,12 @@ class HEXER_DLL H3Hex : public Hexagon
 
 public:
     H3Hex(CoordIJ ij)
-        : m_ij{ij}    
+        : m_ij{ij}
     {}
     
 
 private:
     ///
     CoordIJ m_ij;
-    H3Grid m_grid;
 };
 } // namespace hexer

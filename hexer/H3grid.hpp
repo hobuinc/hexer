@@ -10,6 +10,7 @@
 #include "export.hpp"
 #include "H3Path.hpp"
 #include "H3Hex.hpp"
+#include "BaseGrid.hpp"
 
 #include <h3/include/h3api.h>
 
@@ -52,8 +53,6 @@ public:
         { return m_map; }
     int getRes() const
         { return m_res; }
-    void setSampleSize(unsigned sampleSize)
-        { m_maxSample = sampleSize; }
     std::vector<H3Path *> const& rootPaths() const
         { return m_paths; }
     int numHex()
@@ -68,8 +67,8 @@ public:
         { return m_origin; }
     void processGrid();
     void processPaths();
-    Hexagon* findHexagon(Point p);
-    Hexagon* getHexagon(CoordIJ ij);
+    Hexagon *findHexagon(Point p);
+    Hexagon *getHexagon(CoordIJ ij);
 
     // Convert IJ coordinates to H3 index
     H3Index ij2h3(CoordIJ ij)
@@ -107,7 +106,7 @@ public:
 
 private:
     void organizePaths();
-    void parentOrChild(H3Path *p);
+    void findParentPath(H3Path *p);
     void processSample();
     void findShape();
     void addEdge(H3Path * p, CoordIJ idx, int edge);
@@ -124,11 +123,11 @@ private:
     /// H3 resolution of grid (0-15); -1 for auto edge length calculation
     int m_res;
     /// Number of points that must lie in a hexagon for it to be interesting 
-    int m_dense_limit;
+    //int m_dense_limit;
     /// Vector of points to use to determine hex height.
     //std::vector<LatLng> m_sample;
     /// Maximum sample size.
-    unsigned m_maxSample;
+    //unsigned m_maxSample;
     /// Origin H3 index for finding IJ coordinates
     H3Index m_origin;
     /// List of paths

@@ -82,4 +82,23 @@ void BaseGrid::addSegment(Segment s, Path *p)
     }
 }
 
+void BaseGrid::findParentPaths()
+{
+    std::vector<Path *> roots;
+    for (size_t i = 0; i < m_paths.size(); ++i)
+    {
+        Path *p = m_paths[i];
+        findParentPath(p);
+        // Either add the path to the root list or the parent's list of
+        // children.
+        !p->parent() ?  roots.push_back(p) : p->parent()->addChild(p);
+    }
+    for (size_t i = 0; i < roots.size(); ++i)
+       roots[i]->finalize(CLOCKWISE);
+
+    // In the end, the list of paths is just the root paths.  Children can
+    // be retrieved from their parents.
+    m_paths = roots;
+}
+
 } // namespace hexer

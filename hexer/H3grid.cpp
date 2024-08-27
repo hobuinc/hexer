@@ -115,7 +115,7 @@ void H3Grid::organizePaths()
     m_paths = roots;
 }
 
-void H3Grid::parentOrChild(H3Path *p)
+void H3Grid::findParentPath(H3Path *p)
 {
     // Get an arbitrary dense hexagon that borders our path at edge 0
     CoordIJ hex = p->rootHex();

@@ -28,6 +28,7 @@ protected:
     HexMap m_hexes;
 private:
     bool isDense(Hexagon *h);
+    void findParentPaths();
     void findShape(Hexagon *h);
     void addSegment(Segment s, Path *p);
     void markNeighborBelow(Hexagon *h);

@@ -43,6 +43,7 @@
 #include "Path.hpp"
 #include "Segment.hpp"
 #include "export.hpp"
+#include "BaseGrid.hpp"
 
 namespace hexer
 {
@@ -64,6 +65,9 @@ public:
         for (std::vector<Path*>::size_type i = 0; i < m_paths.size(); i++)
             delete m_paths[i];
     }
+
+    bool sampling()
+        { return m_width < 0; }
 
     bool dense(Hexagon *h);
     void addPoint(double x, double y)
