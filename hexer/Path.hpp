@@ -38,8 +38,6 @@
 
 #include "Mathpair.hpp"
 #include "Segment.hpp"
-#include "export.hpp"
-#include "H3grid.hpp"
 
 namespace hexer
 {
@@ -50,61 +48,34 @@ enum Orientation
     ANTICLOCKWISE  // Hole
 };
 
-class HexGrid;
-class H3Grid;
-
-class HEXER_DLL Path
+class Path
 {
 public:
-    Path(HexGrid *m_grid, Orientation orient) :
-        m_grid(m_grid), m_parent(NULL), m_orientation(orient)
+    Path(int pathNum) : m_pathNum(pathNum)
     {}
 
-    ~Path()
-    {
-        for (std::vector<Path*>::size_type i = 0; i < m_children.size(); ++i)
-            delete m_children[i];
-    }
-
-    void push_back(const Segment& s)
-        { m_segs.push_back(s); }
-    Segment rootSegment()
-        { return m_segs[0]; }
-    Path *parent()
-        { return m_parent; }
-    void setParent(Path *p)
-        { m_parent = p; }
-    void addChild(Path *p)
-        { m_children.push_back(p); }
-    void finalize(Orientation o)
-    {
-        m_orientation = o;
-        for (size_t i = 0; i < m_children.size(); ++i)
-            m_children[i]->finalize(o == CLOCKWISE ? ANTICLOCKWISE : CLOCKWISE);
-    }
-    size_t pathLength() const
-        { return m_segs.size(); }
-    Point getPoint(size_t pointnum) const;
-    Orientation orientation() const
-        { return m_orientation; }
-    std::vector<Point> points() const;
-    std::vector<Path *> subPaths() const
+    void add(const Segment& s)
+        { m_segments.push_back(s); }
+    void addChild(Path&& path)
+        { m_children.push_back(path); }
+    const std::vector<Path>& subPaths() const
         { return m_children; }
-    void toWKT( std::ostream& output) const;
+    const std::vector<Point> points() const
+    {
+        //ABELL
+        return std::vector<Point>();
+    }
 
 private:
-    /// Grid that owns the path.
-    HexGrid *m_grid;
-    /// Parent path (NULL if root path)
-    Path *m_parent;
     /// Children
-    std::vector<Path *> m_children;
+    std::vector<Path> m_children;
     /// Orientation of path AT EXTRACTION - segments are ALWAYS ordered
     /// clockwise.
     Orientation m_orientation;
     /// List of segments that make up the path.
-    std::vector<Segment> m_segs;
+    std::vector<Segment> m_segments;
+    /// ABELL - ?
+    int m_pathNum;
 };
 
 } //namespace hexer
-

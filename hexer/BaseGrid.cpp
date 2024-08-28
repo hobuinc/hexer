@@ -1,5 +1,8 @@
 #include <hexer/BaseGrid.hpp>
 
+#include "Path.hpp"
+#include "exception.hpp"
+
 namespace hexer
 {
 
@@ -11,12 +14,12 @@ void BaseGrid::addPoint(Point p)
         return;
     }
 
-    CoordIJ h = findHexagon(p);
+    HexId h = findHexagon(p);
     int count = increment(h);
     if (count == m_denseLimit)
     {
-        CoordIJ below = edgeHex(h, 0);
-        CoordIJ above = edgeHex(h, 3);
+        HexId below = edgeHex(h, 0);
+        HexId above = edgeHex(h, 3);
         if (!isDense(below))
             addRoot(h);
         removeRoot(above);
@@ -36,24 +39,24 @@ void BaseGrid::handleSamplePoint(Point p)
     }
 }
 
-void BaseGrid::addRoot(CoordIJ h)
+void BaseGrid::addRoot(HexId h)
 {
     m_possibleRoots.insert(h);
 }
 
-void BaseGrid::removeRoot(CoordIJ h)
+void BaseGrid::removeRoot(HexId h)
 {
     m_possibleRoots.erase(h);
 }
 
-int BaseGrid::increment(CoordIJ h)
+int BaseGrid::increment(HexId h)
 {
     int& i = m_counts[h];
     i++;
     return i;
 }
 
-bool BaseGrid::isDense(CoordIJ h)
+bool BaseGrid::isDense(HexId h)
 {
     return m_counts[h] > m_denseLimit;
 }
@@ -67,12 +70,12 @@ void BaseGrid::findShapes()
     int shapeNum = 0;
     while (m_possibleRoots.size())
     {
-        CoordIJ root = *m_possibleRoots.begin();
+        HexId root = *m_possibleRoots.begin();
         findShape(root, shapeNum++);
     }
 }
 
-void BaseGrid::findShape(CoordIJ root, int pathNum)
+void BaseGrid::findShape(HexId root, int pathNum)
 {
     Path path(pathNum);
 
@@ -81,9 +84,9 @@ void BaseGrid::findShape(CoordIJ root, int pathNum)
     do {
         if (cur.horizontal())
         {
-            m_possibleRoots.erase(cur);
-            CoordIJ pathHex = (cur.edge == 0 ? cur.hex : edgeHex(cur, 3));
-            m_hexPaths.insert(pathHex, pathNum);
+            m_possibleRoots.erase(cur.hex);
+            HexId pathHex = (cur.edge == 0 ? cur.hex : edgeHex(cur.hex, 3));
+            m_hexPaths.emplace(pathHex, pathNum);
         }
         path.add(cur);
         Segment next = leftClockwiseSegment(cur);
@@ -91,7 +94,7 @@ void BaseGrid::findShape(CoordIJ root, int pathNum)
             next = rightClockwiseSegment(cur);
         cur = next;
     } while (cur != first);
-    m_paths.push_back(std::move(p));
+    m_paths.push_back(std::move(path));
 }
 
 } // namespace hexer

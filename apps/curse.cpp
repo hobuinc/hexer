@@ -20,7 +20,7 @@
 #include <vector>
 
 #include <hexer/HexGrid.hpp>
-#include <hexer/HexIter.hpp>
+//#include <hexer/HexIter.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
 #include "ProgramArgs.hpp"
@@ -75,7 +75,7 @@ void runHexer(  std::string const& command,
         std::ifstream file(input, std::ios::binary);
         processLaz(grid.get(), file);
     } else {
-        reader::OGR o(input);
+        OGRReader o(input);
         o.open();
         process(grid.get(), o.reader);
     }
@@ -93,13 +93,13 @@ void runHexer(  std::string const& command,
         }
         else
         {
-            writer::OGR o(output);
+            OGRWriter o(output);
             o.writeBoundary(grid.get());
         }
     }
     else
     {
-        writer::OGR o(output);
+        OGRWriter o(output);
         o.writeDensity(grid.get()); 
     }
 
@@ -137,11 +137,11 @@ void runH3(     std::string const& command,
         throw hexer_error("Provide a filename for output!");
     }
 
-    writer::h3::OGR o(output);
+/*     writer::h3::OGR o(output);
     if (hexer::Utils::iequals(command, "BOUNDARY"))
         o.writeBoundary(grid.get());
     else if (hexer::Utils::iequals(command, "DENSITY"))
-        o.writeDensity(grid.get());
+        o.writeDensity(grid.get()); */
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)

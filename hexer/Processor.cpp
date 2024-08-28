@@ -166,20 +166,6 @@ void processH3(H3Grid *grid, std::ifstream& file)
     grid->processPaths();
 }
 
-void processHexes(HexGrid *grid, HexReader reader)
-{
-    int x, y;
-    void* ctx;
-
-    assert(grid->width() > 0);
-    assert(grid->denseLimit() < 0);
-
-    while (reader(x, y, ctx))
-        grid->addDenseHexagon(x, y);
-    grid->findShapes();
-    grid->findParentPaths();
-}
-
 std::string GetFullVersion( void )
 {
     std::ostringstream os;

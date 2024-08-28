@@ -15,26 +15,26 @@
 
 #include "OGR.hpp"
 
-#include <iostream>
+#include <functional>
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 
 #include <hexer/HexGrid.hpp>
+/**
 #include <hexer/HexIter.hpp>
 #include <hexer/H3grid.hpp>
 #include <hexer/H3Path.hpp>
+**/
 
 #include <h3/include/h3api.h>
-#include <functional>
 
 using namespace std;
 
 namespace hexer
 {
-namespace reader
-{
 
-OGR::OGR(std::string filename)
+OGRReader::OGRReader(std::string filename)
     : m_filename(filename)
     , m_index(0)
 	, m_ds(0)
@@ -42,23 +42,17 @@ OGR::OGR(std::string filename)
 	, m_current_feature(0)
 	, m_current_geometry(0)
 {
-reader = std::bind(&OGR::read, std::placeholders::_1, std::placeholders::_2, this);
-
+    reader = std::bind(&OGRReader::read, std::placeholders::_1, std::placeholders::_2, this);
 }
 
-OGR::~OGR()
+OGRReader::~OGRReader()
 {
-if (m_current_feature)
-    OGR_F_Destroy(m_current_feature);
+    if (m_current_feature)
+        OGR_F_Destroy(m_current_feature);
 
-if (m_ds)
-    OGR_DS_Destroy(m_ds);
+    if (m_ds)
+        OGR_DS_Destroy(m_ds);
 }
-
-} // reader
-
-namespace writer
-{
 
 
 std::string getBasename(const std::string& path)
@@ -80,7 +74,7 @@ std::string getBasename(const std::string& path)
             name.end()};
 }
 
-OGR::OGR(std::string const& filename)
+OGRWriter::OGRWriter(std::string const& filename)
     : m_filename(filename)
 	, m_ds(0)
 	, m_layer(0)
@@ -88,7 +82,7 @@ OGR::OGR(std::string const& filename)
     createLayer(getBasename(filename));
 }
 
-void OGR::createLayer(std::string const& basename)
+void OGRWriter::createLayer(std::string const& basename)
 {
     OGRSFDriverH driver = OGRGetDriverByName("ESRI Shapefile");
     if (driver == NULL)
@@ -132,17 +126,17 @@ void OGR::createLayer(std::string const& basename)
 
 }
 
-void OGR::writeBoundary(HexGrid *grid)
+void OGRWriter::writeBoundary(HexGrid *grid)
 {
     OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
 
-    const std::vector<hexer::Path *>& paths = grid->rootPaths();
-    for (auto pi = paths.begin(); pi != paths.end(); ++pi)
+    const std::vector<Path>& paths = grid->rootPaths();
+    for (const Path& path : paths)
     {
         OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
-        collectPath(*pi, polygon);
+        collectPath(path, polygon);
 
-        if( OGR_G_AddGeometryDirectly(multi, polygon ) != OGRERR_NONE )
+        if( OGR_G_AddGeometryDirectly(multi, polygon) != OGRERR_NONE )
         {
             std::ostringstream oss;
             oss << "Unable to add polygon to multipolygon with error '"
@@ -169,12 +163,11 @@ void OGR::writeBoundary(HexGrid *grid)
     OGR_F_Destroy( hFeature );
 }
 
-void OGR::collectPath(Path* path, OGRGeometryH polygon)
+void OGRWriter::collectPath(const Path& path, OGRGeometryH polygon)
 {
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
 
-    vector<Point> pts = path->points();
-    for (Point& p : pts)
+    for (const Point& p : path.points())
         OGR_G_AddPoint_2D(ring, p.m_x, p.m_y);
 
     if( OGR_G_AddGeometryDirectly(polygon, ring) != OGRERR_NONE )
@@ -185,23 +178,22 @@ void OGR::collectPath(Path* path, OGRGeometryH polygon)
         throw hexer_error(oss.str());
     }
 
-    vector<Path *> paths = path->subPaths();
-    for (int pi = 0; pi != paths.size(); ++pi)
-    {
-        Path* p = paths[pi];
-        collectPath(p, polygon);
-    }
+    for (const Path& path : path.subPaths())
+        collectPath(path, polygon);
 }
 
-OGRGeometryH OGR::collectHexagon(HexInfo const& info, HexGrid const* grid)
+OGRGeometryH OGRWriter::collectHexagon(HexInfo const& info, HexGrid const* grid)
 {
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
-
+//ABELL
+return ring;
+//ABELL
+    /**
     Point pos = info.m_center;
 	pos += grid->origin();
 
 
-    OGR_G_AddPoint_2D(ring, pos.m_x, pos.m_y);
+    OGR_G_AddPoint_2D(ring, pos.x, pos.y);
     for (int i = 1; i <= 5; ++i)
     {
         Point p = pos + grid->offset(i);
@@ -219,12 +211,13 @@ OGRGeometryH OGR::collectHexagon(HexInfo const& info, HexGrid const* grid)
     }
 
 	return polygon;
-
+    **/
 }
 
 
-void OGR::writeDensity(HexGrid *grid)
+void OGRWriter::writeDensity(HexGrid *grid)
 {
+    /**ABELL
     int counter(0);
     for (HexIter iter = grid->hexBegin(); iter != grid->hexEnd(); ++iter)
     {
@@ -241,9 +234,10 @@ void OGR::writeDensity(HexGrid *grid)
         processGeometry(m_layer, hFeature, polygon);
         counter++;
     }
+    **/
 }
 
-void OGR::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon)
+void OGRWriter::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon)
 {
     OGR_F_SetGeometry(feature, polygon);
     OGR_G_DestroyGeometry(polygon);
@@ -255,14 +249,15 @@ void OGR::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH pol
             << CPLGetLastErrorMsg() << "'";
         throw hexer_error(oss.str());
     }
-    OGR_F_Destroy( feature ); 
+    OGR_F_Destroy( feature );
 }
 
-OGR::~OGR()
+OGRWriter::~OGRWriter()
 {
     OGR_DS_Destroy(m_ds);
 }
 
+/**
 namespace h3
 {
 
@@ -348,7 +343,7 @@ void OGR::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH pol
             << CPLGetLastErrorMsg() << "'";
         throw hexer_error(oss.str());
     }
-    OGR_F_Destroy( feature ); 
+    OGR_F_Destroy( feature );
 }
 
 OGRGeometryH OGR::collectH3(CellBoundary b)
@@ -378,7 +373,7 @@ OGRGeometryH OGR::collectH3(CellBoundary b)
     }
 
 
-	return polygon; 
+	return polygon;
 }
 
 void OGR::writeDensity(H3Grid *grid)
@@ -408,7 +403,7 @@ void OGR::writeDensity(H3Grid *grid)
             idx);
         OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_STRING"),
             id_ptr);
-        
+
         processGeometry(m_layer, hFeature, polygon);
         counter++;
     }
@@ -473,7 +468,7 @@ void OGR::collectPath(H3Path* path, OGRGeometryH polygon)
     {
         H3Path* p = paths[i];
         collectPath(p, polygon);
-    } 
+    }
 }
 OGR::~OGR()
 {
@@ -481,5 +476,6 @@ OGR::~OGR()
 }
 
 } // namespace h3
-} // namespace writer
+**/
+
 } // namespace hexer

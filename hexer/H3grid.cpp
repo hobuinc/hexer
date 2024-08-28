@@ -32,7 +32,7 @@ void H3Grid::processSample(double height)
     std::cout << "H3 resolution: " << m_res << std::endl; 
 }
 
-CoordIJ H3Grid::findHexagon(Point p)
+HexId H3Grid::findHexagon(Point p)
 {
     H3Index index(0);
     LatLng ll{p.m_y, p.m_x};
@@ -43,10 +43,10 @@ CoordIJ H3Grid::findHexagon(Point p)
     return h32ij(index);
 }
 
-CoordIJ H3Grid::edgeHex(CoordIJ hex, int edge)
+HexId H3Grid::edgeHex(HexId hex, int edge)
 {
     // these offsets are in the same order as hexer and not H3Grid. need to be careful in findShape
-    const CoordIJ offsets[] {{1, 0}, {1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {0, -1}};
+    const HexId offsets[] {{1, 0}, {1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {0, -1}};
     return hex + offsets[edge]; 
 }
 

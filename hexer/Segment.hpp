@@ -33,20 +33,33 @@
  ****************************************************************************/
 #pragma once
 
-#include <h3/include/h3api.h>
+#include "HexId.hpp"
 
 namespace hexer
 {
 
 struct Segment
 {
-+   Segment(CoordIJ hex, int side) : hex(hex), side(side)
-+   {}
+    Segment(HexId hex, int edge) : hex(hex), edge(edge)
+    {}
+
+    bool horizontal() const
+    { return edge == 0 || edge == 3; }
+
     /// Hexagon who's side is the segment.
-    CoordIJ m_hex;
+    HexId hex;
     /// Which side of the hexagon.
-    int m_side;
+    int edge;
 };
 
-} // namespace
+bool operator == (const Segment& s1, const Segment& s2)
+{
+    return s1.hex == s2.hex && s1.edge == s2.edge;
+}
 
+bool operator != (const Segment& s1, const Segment& s2)
+{
+    return !(s1 == s2);
+}
+
+} // namespace hexer
