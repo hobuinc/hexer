@@ -83,20 +83,6 @@ namespace hexer
         return ((density * dist) / samples.size());
     }
 
-    // Hex size processing for H3 grids.
-    double computeHexSize(const std::vector<LatLng>& samples, int density)
-    {
-        double dist = 0;
-        for (std::vector<LatLng>::size_type i = 0; i < samples.size() - 1; ++i)
-        {
-           LatLng p1 = samples[i];
-           LatLng p2 = samples[i + 1];
-           dist += distance(p1, p2);
-        }
-        return ((density * dist) / samples.size());
-    } 
-
-
 void process(HexGrid *grid, PointReader reader)
 {
     double x, y;

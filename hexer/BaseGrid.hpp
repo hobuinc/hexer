@@ -1,48 +1,56 @@
 #pragma once
 
-#include <set>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "Hexagon.hpp"
 #include "Mathpair.hpp"
 #include "Path.hpp"
-#include "Segment.hpp"
+#include "Processor.hpp"
 #include "export.hpp"
+
+#include <h3/include/h3api.h>
 
 namespace hexer
 {
 
-class HEXER_DLL BaseGrid
+class BaseGrid
 {
 public:
-    std::vector<Point> getSamples() const
-        { return m_sample; }
-    void setSampleSize(unsigned sampleSize)
-        { m_max_sample = sampleSize; }
+    BaseGrid(int dense_limit = 10) : m_denseLimit{dense_limit}
+    {}
+
     void addPoint(Point p);
     void findShapes();
+    void setSampleSize(int num)
+        {m_maxSample = num; }
 
 protected:
-    std::vector<Point> m_sample;
-    /// Map of hexagons based on keys.
-    typedef std::unordered_map<uint64_t, Hexagon> HexMap;
-    HexMap m_hexes;
-private:
-    bool isDense(Hexagon *h);
-    void findParentPaths();
-    void findShape(Hexagon *h);
-    void addSegment(Segment s, Path *p);
-    void markNeighborBelow(Hexagon *h);
+    int increment(CoordIJ hex);
+    int m_maxSample;
 
-    int m_dense_limit;
-    int m_max_sample;
-    /// Set of dense hexagons with non-dense neighbors above.
-    // need to make sure HexCompare operates on subclass (h->less() virtual function)
-    typedef std::set<Hexagon *, HexCompare> HexSet;
-    HexSet m_pos_roots;
-    /// Map of roots and their associated paths.
-    typedef std::unordered_map<Hexagon *, Path *> HexPathMap;
-    HexPathMap m_hex_paths;
-    std::vector<Path *> m_paths;
+private:
+    //ABELL - Fix these.
+    virtual bool sampling() const
+        { return true; }
+    virtual CoordIJ findHexagon(Point p) = 0;
+    virtual CoordIJ edgeHex(CoordIJ hex, int edge) = 0;
+    virtual void processSample(double height)
+    {}
+    void handleSamplePoint(Point p)
+    {}
+
+    void addRoot(CoordIJ hex);
+    void removeRoot(CoordIJ hex);
+    bool isDense(CoordIJ hex);
+    void findShape(CoordIJ root, int pathNum);
+
+    std::vector<Point> m_sample;
+    std::unordered_map<CoordIJ, int> m_counts;
+    std::unordered_set<CoordIJ> m_possibleRoots;
+    std::unordered_map<CoordIJ, int> m_hexPaths;
+    int m_denseLimit;
 };
 
 } // namespace hexer
