@@ -34,9 +34,12 @@ static HexId operator+(HexId const& c1, HexId const& c2)
 class HEXER_DLL H3Grid : protected BaseGrid
 {
 public:
+    H3Grid(int dense_limit) 
+        : BaseGrid{dense_limit}, m_res{-1}, m_origin{0}
+        {}
     H3Grid(int res, int dense_limit)
-        : BaseGrid{dense_limit}, m_res{res}
-    {}
+        : BaseGrid{dense_limit}, m_res{res}, m_origin{0}
+        {}
     
     H3Index ij2h3(HexId ij)
         {   H3Index h3;
@@ -61,13 +64,17 @@ public:
     
     HexId findHexagon(Point p);
     HexId edgeHex(HexId hex, int edge);
+    void parentOrChild(Path p);
 
 private:
-    void processSample(double height);
+    void processHeight(double height);
 
-    std::vector<Point> m_samples;
+    /// @brief H3 resolution of the grid (0-15)
     int m_res;
-    H3Index m_origin{0};
+    /// @brief minimum I value for iterating through parent paths
+    int m_minI;
+    /// @brief origin index for converting between H3Index and CoordIJ
+    H3Index m_origin;
 
 };
 

@@ -86,15 +86,40 @@ void BaseGrid::findShape(HexId root, int pathNum)
         {
             m_possibleRoots.erase(cur.hex);
             HexId pathHex = (cur.edge == 0 ? cur.hex : edgeHex(cur.hex, 3));
-            m_hexPaths.emplace(pathHex, pathNum);
+            m_hexPaths.emplace(pathHex, &path);
         }
         path.add(cur);
-        Segment next = leftClockwiseSegment(cur);
-        if (!hexDense(next.hex))
-            next = rightClockwiseSegment(cur);
-        cur = next;
+        const auto& [left, right] = nextSegments(cur);
+        cur = isDense(left.hex) ? left : right;
     } while (cur != first);
     m_paths.push_back(std::move(path));
+}
+
+std::pair<Segment, Segment> BaseGrid::nextSegments(const Segment& s) const
+{
+    static const int next[] { 1, 2, 3, 4, 5, 0 };
+    static const int prev[] { 5, 0, 1, 2, 3, 4 };
+
+    Segment right(s.hex, next[s.edge]);
+    Segment left(edgeHex(right.hex, right.edge), prev[s.edge]);
+    return { left, right };
+}
+
+void BaseGrid::findParentPaths()
+{
+    std::vector<Path> roots;
+    for (size_t i = 0; i < m_paths.size(); ++i) {
+        Path p = m_paths[i];
+        // the only difference between parentOrChild in the two grid types
+        // is whether they look down i or j, I think. 
+        parentOrChild(p);
+
+        !p.parent() ?  roots.push_back(p) : p.parent()->addChild(p);
+    }
+/*  for (size_t i = 0; i < roots.size(); ++i) {
+        roots[i].finalize(CLOCKWISE);
+    } */
+    m_paths = roots;
 }
 
 } // namespace hexer

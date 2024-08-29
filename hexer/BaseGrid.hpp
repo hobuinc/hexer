@@ -29,6 +29,8 @@ protected:
     {}
     int increment(HexId hex);
     int m_maxSample;
+    std::unordered_map<HexId, Path *> m_hexPaths;
+    std::unordered_map<HexId, int> m_counts;
 
 private:
     //ABELL - Fix these.
@@ -38,9 +40,10 @@ private:
     virtual HexId edgeHex(HexId hex, int edge) = 0;
     virtual void processSample(double height)
     {}
-    void handleSamplePoint(Point p)
+    virtual void parentOrChild(Path p)
     {}
 
+    void handleSamplePoint(Point p);
     void addRoot(HexId hex);
     void removeRoot(HexId hex);
     bool isDense(HexId hex);
@@ -48,9 +51,7 @@ private:
     std::pair<Segment, Segment> nextSegments(const Segment& s) const;
 
     std::vector<Point> m_sample;
-    std::unordered_map<HexId, int> m_counts;
     std::unordered_set<HexId> m_possibleRoots;
-    std::unordered_map<HexId, int> m_hexPaths;
     std::vector<Path> m_paths;
     int m_denseLimit;
 };

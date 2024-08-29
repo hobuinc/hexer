@@ -51,13 +51,17 @@ enum Orientation
 class Path
 {
 public:
-    Path(int pathNum) : m_pathNum(pathNum)
+    Path(int pathNum) : m_pathNum(pathNum), m_parent(NULL)
     {}
 
     void add(const Segment& s)
         { m_segments.push_back(s); }
-    void addChild(Path&& path)
+    void addChild(Path path)
         { m_children.push_back(path); }
+    void setParent(Path *p)
+        { m_parent = p; }
+    Path *parent()
+        { return m_parent; }
     const std::vector<Path>& subPaths() const
         { return m_children; }
     const std::vector<Point> points() const
@@ -65,8 +69,12 @@ public:
         //ABELL
         return std::vector<Point>();
     }
+    const HexId rootHex() const
+        { return m_segments[0].hex; }
 
 private:
+    /// Parent path (NULL if root)
+    Path *m_parent;
     /// Children
     std::vector<Path> m_children;
     /// Orientation of path AT EXTRACTION - segments are ALWAYS ordered

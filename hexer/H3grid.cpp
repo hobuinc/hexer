@@ -11,7 +11,7 @@
 
 namespace hexer 
 {
-void H3Grid::processSample(double height)
+void H3Grid::processHeight(double height)
 {
     // bins for H3 auto resolution:
     // - H3 level ~roughly~ equivalent to hexer hexagon size at same edge value
@@ -38,9 +38,34 @@ HexId H3Grid::findHexagon(Point p)
     LatLng ll{p.m_y, p.m_x};
     if (latLngToCell(&ll, m_res, &index) != E_SUCCESS)
         throw hexer_error("H3 index not found!");
-    if (m_origin == 0)
+    if (m_origin == 0) {
         m_origin = index;
+        m_minI = h32ij(index).i;
+    }
+    HexId ij = h32ij(index);
+    m_minI = std::min(m_minI, ij.i - 1 );
     return h32ij(index);
+}
+
+void H3Grid::parentOrChild(Path p)
+{
+    // need to think about whether this can go in basegrid
+    HexId hex = p.rootHex();
+    int i = hex.i;
+    while (i >= m_minI) {
+        std::unordered_map<HexId, Path *>::iterator it = m_hexPaths.find(hex);
+        if (it != m_hexPaths.end()) {
+            Path *parentPath = it->second;
+            if (parentPath == p.parent()) {
+                p.setParent(NULL);
+            } 
+            else if (!p.parent() && parentPath != &p) {
+                p.setParent(parentPath);
+            }
+        }
+        hex = edgeHex(hex, 3);
+        i = hex.i;
+    }
 }
 
 HexId H3Grid::edgeHex(HexId hex, int edge)
