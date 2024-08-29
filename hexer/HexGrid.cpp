@@ -86,26 +86,48 @@ HexId HexGrid::findHexagon(Point p)
             }
         }
     }
+
+    m_minY = std::min(m_minY, y - 1);
+
     return HexId{x, y};
 }
 
-HexId edgeHex(HexId hex, int edge)
+HexId HexGrid::edgeHex(HexId hex, int edge)
 {
-    static int evenx[] = { 0, -1, -1, 0, 1, 1 };
-    static int eveny[] = { -1, -1, 0, 1, 0, -1 };
-    static int oddx[] = { 0, -1, -1, 0, 1, 1 };
-    static int oddy[] = { -1, 0, 1, 1, 1, 0 };
+    const HexId even[] = {{0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}, {1, -1}};
+    //static int evenx[] = { 0, -1, -1, 0, 1, 1 };
+    //static int eveny[] = { -1, -1, 0, 1, 0, -1 };
+    const HexId odd[] = {{0, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}};
+    //static int oddx[] = { 0, -1, -1, 0, 1, 1 };
+    //static int oddy[] = { -1, 0, 1, 1, 1, 0 };
 
-    if (hex.i % 2 == 0) {
-        hex.i += evenx[edge];
-        hex.j += eveny[edge];
-    }
-    else {
-        hex.i += oddx[edge];
-        hex.j += oddy[edge];
-    }
+    if (hex.i % 2 == 0) 
+        return hex + even[edge];
+    else 
+        return hex + odd[edge];
 
-    return hex;
+}
+
+void HexGrid::parentOrChild(Path p)
+{
+    // p.rootHex() might need tweaks to return a useful hexagon
+    HexId hex = p.rootHex();
+    // j (should be) equivalent to y
+    int j = hex.j;
+    while (j >= m_minY) {
+        std::unordered_map<HexId, Path *>::iterator it = m_hexPaths.find(hex);
+        if (it != m_hexPaths.end()) {
+            Path *parentPath = it->second;
+            if (parentPath == p.parent()) {
+                p.setParent(NULL);
+            } 
+            else if (!p.parent() && parentPath != &p) {
+                p.setParent(parentPath);
+            }
+        }
+        --j;
+        hex = HexId{hex.i, j}; 
+    }
 }
 
 } // namespace hexer

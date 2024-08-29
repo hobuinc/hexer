@@ -31,11 +31,22 @@ void BaseGrid::handleSamplePoint(Point p)
     m_sample.push_back(p);
     if (m_sample.size() >= m_maxSample) {
         double height = computeHexSize(m_sample, m_denseLimit);
-        processSample(height);
+        processHeight(height);
         for (auto it = m_sample.begin(); it != m_sample.end(); ++it) {
             addPoint(*it);
         }
         m_sample.clear();
+    }
+}
+
+// debug function
+void BaseGrid::findPossibleRoots()
+{
+    for (auto it = m_counts.begin(); it != m_counts.end(); ++it) {
+        HexId hex = it->first;
+        HexId below = edgeHex(hex, 0);
+        if (!isDense(below))
+            addRoot(hex);
     }
 }
 
@@ -58,6 +69,7 @@ int BaseGrid::increment(HexId h)
 
 bool BaseGrid::isDense(HexId h)
 {
+    // does this work if m_counts[h] doesn't exist?
     return m_counts[h] > m_denseLimit;
 }
 
@@ -89,6 +101,7 @@ void BaseGrid::findShape(HexId root, int pathNum)
             m_hexPaths.emplace(pathHex, &path);
         }
         path.add(cur);
+        path.addPoint(findPoint(cur));
         const auto& [left, right] = nextSegments(cur);
         cur = isDense(left.hex) ? left : right;
     } while (cur != first);

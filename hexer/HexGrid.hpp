@@ -7,7 +7,7 @@ namespace hexer
 
 static const double SQRT_3 = 1.732050808;
 
-class HexGrid : protected BaseGrid
+class HexGrid : public BaseGrid
 {
 public:
     HexGrid(double height, int denseLimit) : BaseGrid(denseLimit) 
@@ -17,10 +17,12 @@ public:
 
     bool sampling()
         { return m_width < 0; }
+
 private:
     void processHeight(double height);
     HexId findHexagon(Point p);
     HexId edgeHex(HexId hex, int edge);
+    void parentOrChild(Path p);
  
     double m_height;
     double m_width;

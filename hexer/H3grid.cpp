@@ -68,9 +68,36 @@ void H3Grid::parentOrChild(Path p)
     }
 }
 
+Point H3Grid::findPoint(Segment s)
+{
+    DirEdge dir_edge;
+    if (cellsToDirectedEdge(ij2h3(s.hex), ij2h3(edgeHex(s.hex, s.edge)), &dir_edge) != E_SUCCESS)
+        throw hexer_error("Couldn't get directed edge.");
+
+    CellBoundary edge_bound;
+
+    if (directedEdgeToBoundary(dir_edge, &edge_bound) != E_SUCCESS)
+        throw hexer_error("unable to get cell boundary from directed edge!");
+    double x = radsToDegs(edge_bound.verts[1].lng);
+    double y = radsToDegs(edge_bound.verts[1].lat);
+
+    return Point{x, y}
+}
+
 HexId H3Grid::edgeHex(HexId hex, int edge)
 {
     // these offsets are in the same order as hexer and not H3Grid. need to be careful in findShape
+    // Relative to H3 IJ coordinates, hexagon sides are labeled:
+    //
+    //               (+ I)
+    //                __0_
+    // (+ I, + J)  1 /    \ 5  (- J)
+    //              /      \
+    //              \      /
+    //      (+ J)  2 \____/ 4   (- I, - J)
+    //                  3
+    //               (- I)
+    //
     const HexId offsets[] {{1, 0}, {1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {0, -1}};
     return hex + offsets[edge]; 
 }

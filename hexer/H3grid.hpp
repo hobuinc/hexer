@@ -14,24 +14,12 @@
 
 #include <h3/include/h3api.h>
 
-/* static bool operator<(HexId const& c1, HexId const& c2)
-    {
-        return (c1.i < c2.i) || ((c1.i == c2.i) && (c1.j < c2.j));
-    }
-static bool operator==(HexId const& c1, HexId const& c2)
-    {   
-        return ((c1.i == c2.i) && (c1.j == c2.j)); 
-    }
- */
 namespace hexer 
 {
 
 using DirEdge = H3Index;
 
-static HexId operator+(HexId const& c1, HexId const& c2)
-    {   return {c1.i + c2.i, c1.j + c2.j};  }
-
-class HEXER_DLL H3Grid : protected BaseGrid
+class H3Grid : public BaseGrid
 {
 public:
     H3Grid(int dense_limit) 
@@ -65,8 +53,16 @@ public:
     HexId findHexagon(Point p);
     HexId edgeHex(HexId hex, int edge);
     void parentOrChild(Path p);
+    
+    int getRes() const
+        { return m_res; }
+    void setOrigin(H3Index idx)
+        { m_origin = idx; }
+    H3Index getOrigin()
+        { return m_origin; }
 
 private:
+    Point findPoint(Segment s);
     void processHeight(double height);
 
     /// @brief H3 resolution of the grid (0-15)

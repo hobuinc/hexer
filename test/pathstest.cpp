@@ -1,12 +1,12 @@
 #include "test_main.hpp"
-#include <hexer/HexGrid.hpp>
-#include <h3/include/h3api.h>
+#include <hexer/H3grid.hpp>
+#include <hexer/HexId.hpp>
 
 namespace hexer 
 {
-std::vector<H3Path *> insertGrid(H3Grid *grid) 
+std::vector<Path> insertGrid(H3Grid *grid) 
 {
-    for (CoordIJ ij : std::vector<CoordIJ>(
+    for (HexId ij : std::vector<HexId>(
             {
                 {5, 2}, {5, 3},
                 {6, 2}, {6, 4},
@@ -29,8 +29,10 @@ std::vector<H3Path *> insertGrid(H3Grid *grid)
     H3Index index;
     EXPECT_EQ(latLngToCell(&location, resolution, &index), E_SUCCESS); 
     grid->setOrigin(index);
-    grid->processPaths();
-    const std::vector<hexer::H3Path *> paths = grid->rootPaths();
+    grid->findPossibleRoots();
+    grid->findShapes();
+    grid->findParentPaths();
+    const std::vector<Path> paths = grid->rootPaths();
     return paths;
 }
 
@@ -38,7 +40,7 @@ TEST(pathstest, test_paths)
 {
     std::unique_ptr<H3Grid> grid;
     grid.reset(new H3Grid(1, 10));
-    std::vector<H3Path *> paths = insertGrid(grid.get());
+    std::vector<Path> paths = insertGrid(grid.get());
 
     EXPECT_EQ(paths[0]->numSegs(), 54);
     EXPECT_EQ(paths[0]->numChildren(), 2);

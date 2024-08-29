@@ -23,6 +23,11 @@ public:
     void findParentPaths();
     void setSampleSize(int num)
         {m_maxSample = num; }
+    std::vector<Path> const& rootPaths() const
+        { return m_paths; }
+    void setGrid(std::pair<HexId, int> cell)
+        { m_counts.insert(cell); }
+    void findPossibleRoots();
 
 protected:
     BaseGrid(int dense_limit) : m_denseLimit{dense_limit}
@@ -38,10 +43,11 @@ private:
         { return true; }
     virtual HexId findHexagon(Point p) = 0;
     virtual HexId edgeHex(HexId hex, int edge) = 0;
-    virtual void processSample(double height)
+    virtual void processHeight(double height)
     {}
     virtual void parentOrChild(Path p)
     {}
+    virtual Point findPoint(Segment s) = 0; 
 
     void handleSamplePoint(Point p);
     void addRoot(HexId hex);

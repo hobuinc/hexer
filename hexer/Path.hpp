@@ -71,6 +71,8 @@ public:
     }
     const HexId rootHex() const
         { return m_segments[0].hex; }
+    const addPoint(Point p)
+        { m_points.push_back(p); }
 
 private:
     /// Parent path (NULL if root)
@@ -84,6 +86,8 @@ private:
     std::vector<Segment> m_segments;
     /// ABELL - ?
     int m_pathNum;
+    /// @brief points that make up the path
+    std::vector<Point> m_points;
 };
 
 } //namespace hexer
