@@ -4,16 +4,15 @@
 #include <vector>
 #include <sstream>
 
-#include <hexer/hexer.hpp>
 
 #include "Mathpair.hpp"
-#include "export.hpp"
-//#include "BaseGrid.hpp"
+#include "BaseGrid.hpp"
 #include "HexId.hpp"
+#include "exception.hpp"
 
 #include <h3/include/h3api.h>
 
-namespace hexer 
+namespace hexer
 {
 
 using DirEdge = H3Index;
@@ -21,18 +20,18 @@ using DirEdge = H3Index;
 class H3Grid : public BaseGrid
 {
 public:
-    H3Grid(int dense_limit) 
+    H3Grid(int dense_limit)
         : BaseGrid{dense_limit}, m_res{-1}, m_origin{0}
         {}
     H3Grid(int res, int dense_limit)
         : BaseGrid{dense_limit}, m_res{res}, m_origin{0}
         {}
-    
+
     H3Index ij2h3(HexId ij)
         {   H3Index h3;
             if (localIjToCell(m_origin, &ij, 0, &h3) != E_SUCCESS) {
                 std::ostringstream oss;
-                oss << "Can't convert IJ (" << std::to_string(ij.i) << 
+                oss << "Can't convert IJ (" << std::to_string(ij.i) <<
                     ", " << std::to_string(ij.j) <<") to H3Index.";
                 throw hexer_error(oss.str());
             }
@@ -43,16 +42,16 @@ public:
         {   HexId ij;
             if (cellToLocalIj(m_origin, h3, 0, &ij) != E_SUCCESS) {
                 std::ostringstream oss;
-                oss << "Can't convert H3 index " << std::to_string(h3) << 
+                oss << "Can't convert H3 index " << std::to_string(h3) <<
                     " to IJ.";
-                throw hexer_error(oss.str()); 
+                throw hexer_error(oss.str());
             }
-            return ij;  }    
-    
+            return ij;  }
+
     HexId findHexagon(Point p);
-    HexId edgeHex(HexId hex, int edge);
+    HexId edgeHex(HexId hex, int edge) const;
     void parentOrChild(Path p);
-    
+
     int getRes() const
         { return m_res; }
     void setOrigin(H3Index idx)

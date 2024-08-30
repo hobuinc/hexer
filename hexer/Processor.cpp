@@ -48,39 +48,16 @@
 #include <h3/include/h3api.h>
 #include <hexer/H3grid.hpp>
 
-#include "gdal.h"
-
 #include <hexer/Mathpair.hpp>
 
 namespace hexer
 {
-
-    double distance(const Point& p1, const Point& p2)
-    {
-        double xdist = p2.m_x - p1.m_x;
-        double ydist = p2.m_y - p1.m_y;
-        return std::sqrt(xdist * xdist + ydist * ydist);
-    }
 
     double distance(const LatLng& p1, const LatLng& p2)
     {
         double xdist = p2.lng - p1.lng;
         double ydist = p2.lat - p1.lat;
         return std::sqrt(xdist * xdist + ydist * ydist);
-    }
-
-    // Compute hex size based on distance between consecutive points and
-    // density.  The probably needs some work based on more data.
-    double computeHexSize(const std::vector<Point>& samples, int density)
-    {
-        double dist = 0;
-        for (std::vector<Point>::size_type i = 0; i < samples.size() - 1; ++i)
-        {
-           Point p1 = samples[i];
-           Point p2 = samples[i + 1];
-           dist += distance(p1, p2);
-        }
-        return ((density * dist) / samples.size());
     }
 
 /* void process(HexGrid *grid, PointReader reader)
@@ -107,7 +84,7 @@ void processLaz(HexGrid *grid, std::ifstream& file)
 
     if(count < 10000)
         grid->setSampleSize(count);
-    else 
+    else
         grid->setSampleSize(10000);
 
     for(size_t i = 0; i < count; i ++) {
@@ -127,7 +104,7 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     grid->findParentPaths();
 }
 
-void processH3(H3Grid *grid, std::ifstream& file) 
+void processH3(H3Grid *grid, std::ifstream& file)
 {
     lazperf::reader::generic_file l(file);
 
@@ -137,10 +114,10 @@ void processH3(H3Grid *grid, std::ifstream& file)
     uint16_t len = h.point_record_length;
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
-    
+
     if(count < 10000)
         grid->setSampleSize(count);
-    else 
+    else
         grid->setSampleSize(10000);
 
     // add: verify WGS84 w/ gdal
@@ -156,7 +133,7 @@ void processH3(H3Grid *grid, std::ifstream& file)
         double x_rad = degsToRads(x_int * h.scale.x + h.offset.x);
         double y_rad = degsToRads(y_int * h.scale.y + h.offset.y);
         Point p{x_rad, y_rad};
-        
+
         grid->addPoint(p);
     }
     grid->findShapes();
@@ -176,8 +153,6 @@ std::string GetFullVersion( void )
     revs << hexerSha;
 
     os << " at revision " << revs.str().substr(0, 6);
-
-    os << " with GDAL " << GDALVersionInfo("RELEASE_NAME");
 
     return os.str();
 }

@@ -6,8 +6,6 @@
 
 #include "Mathpair.hpp"
 #include "Path.hpp"
-#include "Processor.hpp"
-#include "export.hpp"
 #include "HexId.hpp"
 
 #include <h3/include/h3api.h>
@@ -45,12 +43,12 @@ private:
     virtual bool sampling() const
         { return true; }
     virtual HexId findHexagon(Point p) = 0;
-    virtual HexId edgeHex(HexId hex, int edge) = 0;
+    virtual HexId edgeHex(HexId hex, int edge) const = 0;
     virtual void processHeight(double height)
     {}
     virtual void parentOrChild(Path p)
     {}
-    virtual Point findPoint(Segment s) = 0; 
+    virtual Point findPoint(Segment s) = 0;
 
     void handleSamplePoint(Point p);
     void addRoot(HexId hex);
@@ -58,6 +56,7 @@ private:
     bool isDense(HexId hex);
     void findShape(HexId root, int pathNum);
     std::pair<Segment, Segment> nextSegments(const Segment& s) const;
+    double computeHexSize() const;
 
     std::vector<Point> m_sample;
     std::unordered_set<HexId> m_possibleRoots;

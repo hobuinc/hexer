@@ -55,10 +55,6 @@ namespace hexer
       void processLaz(HexGrid *grid, std::ifstream& file);
       void processH3(H3Grid *grid, std::ifstream& file);
 
-      double computeHexSize(const std::vector<Point>& samples,
-        int density);
-      double computeHexSize(const std::vector<LatLng>& samples,
-        int density);
       std::string GetFullVersion( void );
 } // namespace hexer
 

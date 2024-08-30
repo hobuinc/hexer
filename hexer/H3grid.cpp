@@ -10,7 +10,7 @@
 
 #include <h3/include/h3api.h>
 
-namespace hexer 
+namespace hexer
 {
 void H3Grid::processHeight(double height)
 {
@@ -29,8 +29,8 @@ void H3Grid::processHeight(double height)
     }
     if (m_res == -1)
         throw hexer_error("unable to calculate H3 grid size!");
-    
-    std::cout << "H3 resolution: " << m_res << std::endl; 
+
+    std::cout << "H3 resolution: " << m_res << std::endl;
 }
 
 HexId H3Grid::findHexagon(Point p)
@@ -59,7 +59,7 @@ void H3Grid::parentOrChild(Path p)
             Path *parentPath = it->second;
             if (parentPath == p.parent()) {
                 p.setParent(NULL);
-            } 
+            }
             else if (!p.parent() && parentPath != &p) {
                 p.setParent(parentPath);
             }
@@ -85,7 +85,7 @@ Point H3Grid::findPoint(Segment s)
     return Point{x, y};
 }
 
-HexId H3Grid::edgeHex(HexId hex, int edge)
+HexId H3Grid::edgeHex(HexId hex, int edge) const
 {
     // these offsets are in the same order as hexer and not H3Grid. need to be careful in findShape
     // Relative to H3 IJ coordinates, hexagon sides are labeled:
@@ -100,7 +100,7 @@ HexId H3Grid::edgeHex(HexId hex, int edge)
     //               (- I)
     //
     const HexId offsets[] {{1, 0}, {1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {0, -1}};
-    return hex + offsets[edge]; 
+    return hex + offsets[edge];
 }
 
 } // namespace hexer

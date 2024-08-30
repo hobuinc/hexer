@@ -93,7 +93,7 @@ HexId HexGrid::findHexagon(Point p)
     return HexId{x, y};
 }
 
-HexId HexGrid::edgeHex(HexId hex, int edge)
+HexId HexGrid::edgeHex(HexId hex, int edge) const
 {
     const HexId even[] = {{0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}, {1, -1}};
     //static int evenx[] = { 0, -1, -1, 0, 1, 1 };
@@ -102,9 +102,9 @@ HexId HexGrid::edgeHex(HexId hex, int edge)
     //static int oddx[] = { 0, -1, -1, 0, 1, 1 };
     //static int oddy[] = { -1, 0, 1, 1, 1, 0 };
 
-    if (hex.i % 2 == 0) 
+    if (hex.i % 2 == 0)
         return hex + even[edge];
-    else 
+    else
         return hex + odd[edge];
 
 }
@@ -121,13 +121,13 @@ void HexGrid::parentOrChild(Path p)
             Path *parentPath = it->second;
             if (parentPath == p.parent()) {
                 p.setParent(NULL);
-            } 
+            }
             else if (!p.parent() && parentPath != &p) {
                 p.setParent(parentPath);
             }
         }
         --j;
-        hex = HexId{hex.i, j}; 
+        hex = HexId{hex.i, j};
     }
 }
 
