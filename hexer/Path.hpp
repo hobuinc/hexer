@@ -67,12 +67,22 @@ public:
     const std::vector<Point> points() const
     {
         //ABELL
-        return std::vector<Point>();
+        return m_points;
     }
     const HexId rootHex() const
         { return m_segments[0].hex; }
-    const addPoint(Point p)
+    void addPoint(Point p)
         { m_points.push_back(p); }
+    void finalize(Orientation o)
+    {
+        m_orientation = o;
+        for (size_t i = 0; i < m_children.size(); ++i)
+            m_children[i].finalize(o == CLOCKWISE ? ANTICLOCKWISE : CLOCKWISE);
+        if (o == ANTICLOCKWISE){
+            std::reverse(m_segments.begin(), m_segments.end());
+            std::reverse(m_points.begin(), m_points.end());
+        }
+    }
 
 private:
     /// Parent path (NULL if root)

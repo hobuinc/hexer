@@ -20,7 +20,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <hexer/HexGrid.hpp>
+#include <hexer/BaseGrid.hpp>
 /**
 #include <hexer/HexIter.hpp>
 #include <hexer/H3grid.hpp>
@@ -126,7 +126,7 @@ void OGRWriter::createLayer(std::string const& basename)
 
 }
 
-void OGRWriter::writeBoundary(HexGrid *grid)
+void OGRWriter::writeBoundary(BaseGrid *grid)
 {
     OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
 

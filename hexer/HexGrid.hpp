@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BaseGrid.hpp"
+//#include "BaseGrid.hpp"
 
 namespace hexer
 {
@@ -23,6 +23,7 @@ private:
     HexId findHexagon(Point p);
     HexId edgeHex(HexId hex, int edge);
     void parentOrChild(Path p);
+    Point findPoint(Segment s);
  
     double m_height;
     double m_width;

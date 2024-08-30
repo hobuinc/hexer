@@ -124,14 +124,14 @@ void BaseGrid::findParentPaths()
     for (size_t i = 0; i < m_paths.size(); ++i) {
         Path p = m_paths[i];
         // the only difference between parentOrChild in the two grid types
-        // is whether they look down i or j, I think. 
+        // is whether they look down i or j, I think.
         parentOrChild(p);
 
         !p.parent() ?  roots.push_back(p) : p.parent()->addChild(p);
     }
-/*  for (size_t i = 0; i < roots.size(); ++i) {
+    for (size_t i = 0; i < roots.size(); ++i) {
         roots[i].finalize(CLOCKWISE);
-    } */
+    }
     m_paths = roots;
 }
 

@@ -15,6 +15,9 @@
 namespace hexer
 {
 
+class HexGrid;
+class H3Grid;
+
 class BaseGrid
 {
 public:

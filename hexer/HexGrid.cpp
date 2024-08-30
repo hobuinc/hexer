@@ -1,3 +1,4 @@
+#include <hexer/BaseGrid.hpp>
 #include <hexer/HexGrid.hpp>
 
 namespace hexer
@@ -128,6 +129,14 @@ void HexGrid::parentOrChild(Path p)
         --j;
         hex = HexId{hex.i, j}; 
     }
+}
+
+Point HexGrid::findPoint(Segment s)
+{
+    // inefficient. Re-calculates hex center position every time
+    HexId hex = s.hex;
+    // ADD
+    return Point{0,0};
 }
 
 } // namespace hexer

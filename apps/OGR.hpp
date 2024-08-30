@@ -132,7 +132,7 @@ public:
     OGRWriter(std::string const& filename);
 	~OGRWriter();
 
-    void writeBoundary(HexGrid *grid);
+    void writeBoundary(BaseGrid *grid);
 	void writeDensity(HexGrid *grid);
 
 private:

@@ -83,7 +83,7 @@ namespace hexer
         return ((density * dist) / samples.size());
     }
 
-void process(HexGrid *grid, PointReader reader)
+/* void process(HexGrid *grid, PointReader reader)
 {
     double x, y;
     void* context;
@@ -92,7 +92,7 @@ void process(HexGrid *grid, PointReader reader)
         grid->addPoint(x, y);
     grid->findShapes();
     grid->findParentPaths();
-}
+} */
 
 void processLaz(HexGrid *grid, std::ifstream& file)
 {
@@ -120,8 +120,8 @@ void processLaz(HexGrid *grid, std::ifstream& file)
 
         double x = x_int * h.scale.x + h.offset.x;
         double y = y_int * h.scale.y + h.offset.y;
-
-        grid->addPoint(x, y);
+        Point p{x, y};
+        grid->addPoint(p);
     }
     grid->findShapes();
     grid->findParentPaths();
@@ -153,17 +153,14 @@ void processH3(H3Grid *grid, std::ifstream& file)
         pos++;
         int32_t y_int = *pos;
 
-        LatLng loc;
-
         double x_rad = degsToRads(x_int * h.scale.x + h.offset.x);
         double y_rad = degsToRads(y_int * h.scale.y + h.offset.y);
-        loc.lat = y_rad;
-        loc.lng = x_rad;
+        Point p{x_rad, y_rad};
         
-        grid->addLatLng(&loc);
+        grid->addPoint(p);
     }
-    grid->processGrid();
-    grid->processPaths();
+    grid->findShapes();
+    grid->findParentPaths();
 }
 
 std::string GetFullVersion( void )

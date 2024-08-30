@@ -1,4 +1,4 @@
-#pragma once
+/* #pragma once
 
 #include <string>
 
@@ -25,4 +25,4 @@ private:
     ///
     CoordIJ m_ij;
 };
-} // namespace hexer
+} // namespace hexer  */

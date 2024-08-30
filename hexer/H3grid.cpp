@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 
+#include <hexer/BaseGrid.hpp>
 #include <hexer/H3grid.hpp>
 #include <hexer/exception.hpp>
 #include <hexer/Processor.hpp>
@@ -81,7 +82,7 @@ Point H3Grid::findPoint(Segment s)
     double x = radsToDegs(edge_bound.verts[1].lng);
     double y = radsToDegs(edge_bound.verts[1].lat);
 
-    return Point{x, y}
+    return Point{x, y};
 }
 
 HexId H3Grid::edgeHex(HexId hex, int edge)

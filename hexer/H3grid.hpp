@@ -8,8 +8,7 @@
 
 #include "Mathpair.hpp"
 #include "export.hpp"
-#include "H3Path.hpp"
-#include "BaseGrid.hpp"
+//#include "BaseGrid.hpp"
 #include "HexId.hpp"
 
 #include <h3/include/h3api.h>

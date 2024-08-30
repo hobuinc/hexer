@@ -19,14 +19,15 @@
 #include <string>
 #include <vector>
 
-#include <hexer/HexGrid.hpp>
 //#include <hexer/HexIter.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
 #include "ProgramArgs.hpp"
 #include <lazperf/readers.hpp>
 #include <lazperf/las.hpp>
+#include <hexer/BaseGrid.hpp>
 #include <hexer/H3grid.hpp>
+#include <hexer/HexGrid.hpp>
 
 
 #include "OGR.hpp"
@@ -84,12 +85,13 @@ void runHexer(  std::string const& command,
     {
         if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
         {
-            std::ostringstream multi;
+            throw hexer_error("STDOUT not supported.") 
+/*             std::ostringstream multi;
             multi.setf(std::ios::fixed);
             multi.precision(8);
 
             grid->toWKT(multi);
-            std::cout << multi.str() << std::endl;
+            std::cout << multi.str() << std::endl; */
         }
         else
         {

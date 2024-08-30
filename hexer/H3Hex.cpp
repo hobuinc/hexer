@@ -1,6 +1,6 @@
-#include <hexer/H3Hex.hpp>
+/*#include <hexer/H3Hex.hpp>
 
 namespace hexer
 {
 
-} // namespace hexer
+} // namespace hexer */
