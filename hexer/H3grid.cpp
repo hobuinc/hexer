@@ -85,7 +85,7 @@ Point H3Grid::findPoint(Segment s)
     return Point{x, y};
 }
 
-HexId H3Grid::edgeHex(HexId hex, int edge)
+HexId H3Grid::edgeHex(HexId hex, int edge) const
 {
     // these offsets are in the same order as hexer and not H3Grid. need to be careful in findShape
     // Relative to H3 IJ coordinates, hexagon sides are labeled:

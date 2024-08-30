@@ -93,7 +93,7 @@ HexId HexGrid::findHexagon(Point p)
     return HexId{x, y};
 }
 
-HexId HexGrid::edgeHex(HexId hex, int edge)
+HexId HexGrid::edgeHex(HexId hex, int edge) const
 {
     const HexId even[] = {{0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}, {1, -1}};
     //static int evenx[] = { 0, -1, -1, 0, 1, 1 };
@@ -133,10 +133,16 @@ void HexGrid::parentOrChild(Path p)
 
 Point HexGrid::findPoint(Segment s)
 {
-    // inefficient. Re-calculates hex center position every time
+    // inefficient. Re-calculates hex center position every time it's called
     HexId hex = s.hex;
-    // ADD
-    return Point{0,0};
+    Point pos;
+
+    pos.m_x = hex.i * m_width;
+    pos.m_y = hex.j * m_height;
+    if (hex.i % 2 != 0)
+        pos.m_y += (m_height / 2);
+    
+    return pos + offset(s.edge) + m_origin;
 }
 
 } // namespace hexer

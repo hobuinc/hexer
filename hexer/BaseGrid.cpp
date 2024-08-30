@@ -30,7 +30,7 @@ void BaseGrid::handleSamplePoint(Point p)
 {
     m_sample.push_back(p);
     if (m_sample.size() >= m_maxSample) {
-        double height = computeHexSize(m_sample, m_denseLimit);
+        double height = computeHexSize();
         processHeight(height);
         for (auto it = m_sample.begin(); it != m_sample.end(); ++it) {
             addPoint(*it);
@@ -133,6 +133,27 @@ void BaseGrid::findParentPaths()
         roots[i].finalize(CLOCKWISE);
     }
     m_paths = roots;
+}
+
+double BaseGrid::distance(const Point& p1, const Point& p2)
+{
+    double xdist = p2.m_x - p1.m_x;
+    double ydist = p2.m_y - p1.m_y;
+    return std::sqrt(xdist * xdist + ydist * ydist);
+}
+
+// Compute hex size based on distance between consecutive points and
+// density.  The probably needs some work based on more data.
+double BaseGrid::computeHexSize()
+{
+    double dist = 0;
+    for (std::vector<Point>::size_type i = 0; i < m_sample.size() - 1; ++i)
+    {
+        Point p1 = m_sample[i];
+        Point p2 = m_sample[i + 1];
+        dist += distance(p1, p2);
+    }
+    return ((m_denseLimit * dist) / m_sample.size());
 }
 
 } // namespace hexer

@@ -8,7 +8,7 @@
 
 #include "Mathpair.hpp"
 #include "export.hpp"
-//#include "BaseGrid.hpp"
+#include "BaseGrid.hpp"
 #include "HexId.hpp"
 
 #include <h3/include/h3api.h>
@@ -50,9 +50,11 @@ public:
             return ij;  }    
     
     HexId findHexagon(Point p);
-    HexId edgeHex(HexId hex, int edge);
+    HexId edgeHex(HexId hex, int edge) const;
     void parentOrChild(Path p);
-    
+
+    bool sampling() const
+        { return m_res < 0; }
     int getRes() const
         { return m_res; }
     void setOrigin(H3Index idx)
