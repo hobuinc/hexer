@@ -33,6 +33,7 @@ public:
 protected:
     BaseGrid(int dense_limit) : m_denseLimit{dense_limit}
     {}
+    virtual ~BaseGrid() = default;
     int increment(HexId hex);
     int m_maxSample;
     std::unordered_map<HexId, Path *> m_hexPaths;
@@ -40,14 +41,11 @@ protected:
 
 private:
     //ABELL - Fix these.
-    virtual bool sampling() const
-        { return true; }
+    virtual bool sampling() const = 0;
     virtual HexId findHexagon(Point p) = 0;
     virtual HexId edgeHex(HexId hex, int edge) const = 0;
-    virtual void processHeight(double height)
-    {}
-    virtual void parentOrChild(Path p)
-    {}
+    virtual void processHeight(double height) = 0;
+    virtual void parentOrChild(Path p) = 0;
     virtual Point findPoint(Segment s) = 0;
 
     void handleSamplePoint(Point p);
@@ -55,6 +53,8 @@ private:
     void removeRoot(HexId hex);
     bool isDense(HexId hex);
     void findShape(HexId root, int pathNum);
+    double distance(const Point& p1, const Point& p2);
+    double computeHexSize();
     std::pair<Segment, Segment> nextSegments(const Segment& s) const;
     double computeHexSize() const;
 

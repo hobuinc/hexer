@@ -52,12 +52,12 @@ struct Segment
     int edge;
 };
 
-bool operator == (const Segment& s1, const Segment& s2)
+inline bool operator == (const Segment& s1, const Segment& s2)
 {
     return s1.hex == s2.hex && s1.edge == s2.edge;
 }
 
-bool operator != (const Segment& s1, const Segment& s2)
+inline bool operator != (const Segment& s1, const Segment& s2)
 {
     return !(s1 == s2);
 }

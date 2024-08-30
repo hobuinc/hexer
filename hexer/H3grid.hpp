@@ -6,6 +6,7 @@
 
 
 #include "Mathpair.hpp"
+#include "export.hpp"
 #include "BaseGrid.hpp"
 #include "HexId.hpp"
 #include "exception.hpp"
@@ -52,6 +53,8 @@ public:
     HexId edgeHex(HexId hex, int edge) const;
     void parentOrChild(Path p);
 
+    bool sampling() const
+        { return m_res < 0; }
     int getRes() const
         { return m_res; }
     void setOrigin(H3Index idx)

@@ -53,13 +53,6 @@
 namespace hexer
 {
 
-    double distance(const LatLng& p1, const LatLng& p2)
-    {
-        double xdist = p2.lng - p1.lng;
-        double ydist = p2.lat - p1.lat;
-        return std::sqrt(xdist * xdist + ydist * ydist);
-    }
-
 /* void process(HexGrid *grid, PointReader reader)
 {
     double x, y;

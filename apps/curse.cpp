@@ -76,16 +76,17 @@ void runHexer(  std::string const& command,
         std::ifstream file(input, std::ios::binary);
         processLaz(grid.get(), file);
     } else {
-        OGRReader o(input);
+        throw hexer_error("input file error");
+    /*  OGRReader o(input);
         o.open();
-        process(grid.get(), o.reader);
+        process(grid.get(), o.reader); */
     }
 
     if (hexer::Utils::iequals(command, "BOUNDARY")) 
     {
         if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
         {
-            throw hexer_error("STDOUT not supported.") 
+            throw hexer_error("STDOUT not supported."); 
 /*             std::ostringstream multi;
             multi.setf(std::ios::fixed);
             multi.precision(8);

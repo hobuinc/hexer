@@ -137,6 +137,7 @@ target_link_libraries(curse
     PRIVATE
         ${GDAL_LIBRARY}
         ${H3_LIB_NAME}
+        ${HEXER_LIB_NAME}
 )
 
 #enable_testing()

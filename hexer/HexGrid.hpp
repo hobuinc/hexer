@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "BaseGrid.hpp"
+#include "BaseGrid.hpp"
 
 namespace hexer
 {
@@ -15,8 +15,10 @@ public:
     HexGrid(int denseLimit) : BaseGrid(denseLimit), m_width{-1.0}
         {}
 
-    bool sampling()
+    bool sampling() const
         { return m_width < 0; }
+    Point offset(int idx)
+        { return m_offsets[idx]; }
 
 private:
     void processHeight(double height);

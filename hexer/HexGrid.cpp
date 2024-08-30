@@ -133,10 +133,16 @@ void HexGrid::parentOrChild(Path p)
 
 Point HexGrid::findPoint(Segment s)
 {
-    // inefficient. Re-calculates hex center position every time
+    // inefficient. Re-calculates hex center position every time it's called
     HexId hex = s.hex;
-    // ADD
-    return Point{0,0};
+    Point pos;
+
+    pos.m_x = hex.i * m_width;
+    pos.m_y = hex.j * m_height;
+    if (hex.i % 2 != 0)
+        pos.m_y += (m_height / 2);
+    
+    return pos + offset(s.edge) + m_origin;
 }
 
 } // namespace hexer
