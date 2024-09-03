@@ -51,16 +51,21 @@ HexId H3Grid::findHexagon(Point p)
 void H3Grid::parentOrChild(Path p)
 {
     // need to think about whether this can go in basegrid
+    std::cout << "parentOrChild \n";
     HexId hex = p.rootHex();
     int i = hex.i;
     while (i >= m_minI) {
         std::unordered_map<HexId, Path *>::iterator it = m_hexPaths.find(hex);
         if (it != m_hexPaths.end()) {
             Path *parentPath = it->second;
+            if (parentPath->pathNum() == p.pathNum())
+                std::cout << "parentPath == p";
             if (parentPath == p.parent()) {
+                std::cout <<"root path ";
                 p.setParent(NULL);
-            } 
+            }
             else if (!p.parent() && parentPath != &p) {
+                std::cout << "child path ";
                 p.setParent(parentPath);
             }
         }

@@ -35,6 +35,7 @@
 
 #include <vector>
 #include <ostream>
+#include <iostream>
 
 #include "Mathpair.hpp"
 #include "Segment.hpp"
@@ -66,7 +67,6 @@ public:
         { return m_children; }
     const std::vector<Point> points() const
     {
-        //ABELL
         return m_points;
     }
     const HexId rootHex() const
@@ -79,10 +79,13 @@ public:
         for (size_t i = 0; i < m_children.size(); ++i)
             m_children[i].finalize(o == CLOCKWISE ? ANTICLOCKWISE : CLOCKWISE);
         if (o == ANTICLOCKWISE){
+            std::cout << "path " << m_pathNum << " writing anticlockwise \n"; 
             std::reverse(m_segments.begin(), m_segments.end());
             std::reverse(m_points.begin(), m_points.end());
         }
     }
+    int pathNum()
+        { return m_pathNum; }
 
 private:
     /// Parent path (NULL if root)
@@ -99,5 +102,6 @@ private:
     /// @brief points that make up the path
     std::vector<Point> m_points;
 };
+
 
 } //namespace hexer
