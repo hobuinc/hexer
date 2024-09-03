@@ -36,7 +36,9 @@ protected:
     virtual ~BaseGrid() = default;
     int increment(HexId hex);
     int m_maxSample;
+    /// @brief map of cells bordering paths at side 0 or 3
     std::unordered_map<HexId, Path *> m_hexPaths;
+    /// @brief 
     std::unordered_map<HexId, int> m_counts;
 
 private:
