@@ -19,13 +19,15 @@ public:
         { return m_width < 0; }
     Point offset(int idx)
         { return m_offsets[idx]; }
+    bool inGrid(int i)
+        { return i >= m_minY; }
+    Point findPoint(Segment& s);
 
 private:
     void processHeight(double height);
     HexId findHexagon(Point p);
     HexId edgeHex(HexId hex, int edge) const;
-    void parentOrChild(Path p);
-    Point findPoint(Segment s);
+    void parentOrChild(Path& p);
  
     double m_height;
     double m_width;

@@ -48,13 +48,13 @@ HexId H3Grid::findHexagon(Point p)
     return h32ij(index);
 }
 
-void H3Grid::parentOrChild(Path p)
+void H3Grid::parentOrChild(Path& p)
 {
     // need to think about whether this can go in basegrid
     std::cout << " /// /// parentOrChild " << p.pathNum() << std::endl;
     HexId hex = p.rootHex();
     int i = hex.i;
-    std::cout << "root hex (" << i << ", " <<hex.j << ") \n";
+    std::cout << "root hex (" << i << ", " << hex.j << ") \n";
     while (i >= m_minI) {
         std::unordered_map<HexId, Path *>::iterator it = m_hexPaths.find(hex);
         if (it != m_hexPaths.end()) {
@@ -73,9 +73,9 @@ void H3Grid::parentOrChild(Path p)
         hex = edgeHex(hex, 3);
         i = hex.i;
     }
-}
+} 
 
-Point H3Grid::findPoint(Segment s)
+Point H3Grid::findPoint(Segment& s)
 {
     DirEdge dir_edge;
     if (cellsToDirectedEdge(ij2h3(s.hex), ij2h3(edgeHex(s.hex, s.edge)), &dir_edge) != E_SUCCESS)

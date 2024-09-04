@@ -51,7 +51,7 @@ public:
     
     HexId findHexagon(Point p);
     HexId edgeHex(HexId hex, int edge) const;
-    void parentOrChild(Path p);
+    Point findPoint(Segment& s);
 
     bool sampling() const
         { return m_res < 0; }
@@ -61,9 +61,11 @@ public:
         { m_origin = idx; }
     H3Index getOrigin()
         { return m_origin; }
+    bool inGrid(int i)
+        { return i >= m_minI; }
 
 private:
-    Point findPoint(Segment s);
+    void parentOrChild(Path& p);
     void processHeight(double height);
 
     /// @brief H3 resolution of the grid (0-15)

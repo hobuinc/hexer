@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
 
             if (hexer::Utils::iequals(grid, "HEXGRID")) 
             {
-                runHexer(command, input, output, res, count);
+                runHexer(command, input, output, edge, count);
                 return 0;
             }
         }

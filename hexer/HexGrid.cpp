@@ -109,7 +109,7 @@ HexId HexGrid::edgeHex(HexId hex, int edge) const
 
 }
 
-void HexGrid::parentOrChild(Path p)
+void HexGrid::parentOrChild(Path& p)
 {
     // p.rootHex() might need tweaks to return a useful hexagon
     HexId hex = p.rootHex();
@@ -131,9 +131,9 @@ void HexGrid::parentOrChild(Path p)
     }
 }
 
-Point HexGrid::findPoint(Segment s)
+Point HexGrid::findPoint(Segment& s)
 {
-    // inefficient. Re-calculates hex center position every time it's called
+    // inefficient? Re-calculates hex center position every time it's called
     HexId hex = s.hex;
     Point pos;
 

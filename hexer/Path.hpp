@@ -57,13 +57,13 @@ public:
 
     void add(const Segment& s)
         { m_segments.push_back(s); }
-    void addChild(Path path)
+    void addChild(Path *path)
         { m_children.push_back(path); }
     void setParent(Path *p)
         { m_parent = p; }
     Path *parent()
         { return m_parent; }
-    const std::vector<Path>& subPaths() const
+    const std::vector<Path *> subPaths() const
         { return m_children; }
     const std::vector<Point> points() const
     {
@@ -77,7 +77,7 @@ public:
     {
         m_orientation = o;
         for (size_t i = 0; i < m_children.size(); ++i)
-            m_children[i].finalize(o == CLOCKWISE ? ANTICLOCKWISE : CLOCKWISE);
+            m_children[i]->finalize(o == CLOCKWISE ? ANTICLOCKWISE : CLOCKWISE);
         if (o == ANTICLOCKWISE){
             std::cout << "path " << m_pathNum << " writing anticlockwise \n"; 
             std::reverse(m_segments.begin(), m_segments.end());
@@ -86,12 +86,14 @@ public:
     }
     int pathNum()
         { return m_pathNum; }
+    int numChildren()
+        {return m_children.size(); }
 
 private:
     /// Parent path (NULL if root)
     Path *m_parent;
     /// Children
-    std::vector<Path> m_children;
+    std::vector<Path *> m_children;
     /// Orientation of path AT EXTRACTION - segments are ALWAYS ordered
     /// clockwise.
     Orientation m_orientation;
