@@ -74,7 +74,7 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     uint16_t len = h.point_record_length;
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
-
+    std::cout << "adding points: ";
     if(count < 10000)
         grid->setSampleSize(count);
     else
@@ -93,21 +93,23 @@ void processLaz(HexGrid *grid, std::ifstream& file)
         Point p{x, y};
         grid->addPoint(p);
     }
+    std::cout << "points added. finding shapes: ";
     grid->findShapes();
+    std::cout << "shapes found. finding paths: ";
     grid->findParentPaths();
+    std::cout << "paths found. ";
 }
 
 void processH3(H3Grid *grid, std::ifstream& file)
 {
     lazperf::reader::generic_file l(file);
 
-    size_t count = l.pointCount();
+    size_t count = 87800; //l.pointCount();
 
     lazperf::header14 h = l.header();
     uint16_t len = h.point_record_length;
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
-
     if(count < 10000)
         grid->setSampleSize(count);
     else
@@ -129,8 +131,11 @@ void processH3(H3Grid *grid, std::ifstream& file)
 
         grid->addPoint(p);
     }
+    std::cout << "points added. finding shapes: ";
     grid->findShapes();
+    std::cout << "shapes found. finding paths: ";
     grid->findParentPaths();
+    std::cout << "paths found. ";
 }
 
 std::string GetFullVersion( void )

@@ -125,7 +125,7 @@ void runH3(     std::string const& command,
         "Info on H3 cell specifications can be found at https://h3geo.org/docs/core-library/restable");
     }
     else
-        grid.reset(new H3Grid(density, res));
+        grid.reset(new H3Grid(res, density));
 
     FormatType t = getDriver(input);
     if (t == Format_LAS) {
@@ -140,10 +140,10 @@ void runH3(     std::string const& command,
         throw hexer_error("Provide a filename for output!");
     }
 
-/*     writer::h3::OGR o(output);
+    OGRWriter o(output);
     if (hexer::Utils::iequals(command, "BOUNDARY"))
         o.writeBoundary(grid.get());
-    else if (hexer::Utils::iequals(command, "DENSITY"))
+    /*else if (hexer::Utils::iequals(command, "DENSITY"))
         o.writeDensity(grid.get()); */
 }
 
