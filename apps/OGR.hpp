@@ -129,14 +129,16 @@ class OGRWriter
 
 
 public:
-    OGRWriter(std::string const& filename);
+    OGRWriter(std::string const& filename, bool h3 = false);
 	~OGRWriter();
 
     void writeBoundary(BaseGrid *grid);
+	void writeDensity(H3Grid *grid);
 	void writeDensity(HexGrid *grid);
 
 private:
     std::string m_filename;
+    bool m_isH3;
 
 
     OGRDataSourceH m_ds;
@@ -145,7 +147,8 @@ private:
     void createLayer(std::string const& basename);
     void collectPath(const Path *path, OGRGeometryH polygon);
     void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
-	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
+	OGRGeometryH collectHexagon(HexId const& id, BaseGrid *grid);
+    //OGRFeatureH setFieldsH3(OGRFeatureH& hFeature, const HexId& hex, H3Grid *grid);
 
 };
 

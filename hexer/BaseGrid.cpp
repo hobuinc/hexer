@@ -76,7 +76,6 @@ bool BaseGrid::isDense(HexId h)
 
 void BaseGrid::findShapes()
 {
-    std::cout << "running findShapes(): \n";
     if (m_possibleRoots.empty())
         throw hexer_error("No areas of sufficient density - no shapes. "
             "Decrease density or area size.");
@@ -87,14 +86,11 @@ void BaseGrid::findShapes()
     {
         HexId root = *m_possibleRoots.begin();
         findShape(root, shapeNum++);
-        std::cout << "while loop m_paths[" << shapeNum - 1 << "]: "<< &m_paths[shapeNum - 1] << "\n";
     }
-    std::cout << "end of findShapes m_paths[0]: " << &m_paths.front() << "\n";
 }
 
 void BaseGrid::findShape(HexId root, int pathNum)
 {
-    std::cout << "findShape() " << pathNum << "\n"; 
     m_paths.push_back(Path(pathNum));
     Path& path = m_paths.back();
 
@@ -119,8 +115,6 @@ void BaseGrid::findShape(HexId root, int pathNum)
 
     } while (cur != first);
     path.addPoint(findPoint(first));
-    std::cout << "path " << pathNum << " address: " << &path << std::endl;
-    std::cout << "m_paths at " << pathNum << " address: " << &m_paths[pathNum] << std::endl;
 }
 
 std::pair<Segment, Segment> BaseGrid::nextSegments(const Segment& s) const
@@ -135,17 +129,14 @@ std::pair<Segment, Segment> BaseGrid::nextSegments(const Segment& s) const
 
 void BaseGrid::findParentPaths()
 {
-    std::cout << "top of findParentPaths m_paths[0]: " << &m_paths[0] << "\n";
-    std::cout << m_paths.size() <<" paths\n";
-    for (size_t i = 0; i < m_paths.size(); ++i) {
-        std::cout << &m_paths[i] << " = &m_paths[" << i << "]\n";
-        Path& p = m_paths[i];
-        std::cout << &p << " = &p";
+    int counter(0);
+    for (auto& p : m_paths) {
         // the only difference between parentOrChild in the two grid types
         // is whether they look down i or j, I think.
         parentOrChild(p);
 
         !p.parent() ?  m_roots.push_back(&p) : p.parent()->addChild(&p);
+        counter++;
     }
     std::cout << m_roots.size() <<" roots\n";
     for (size_t i = 0; i < m_roots.size(); ++i) {

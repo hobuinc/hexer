@@ -87,7 +87,7 @@ void runHexer(  std::string const& command,
         if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
         {
             throw hexer_error("STDOUT not supported."); 
-/*             std::ostringstream multi;
+/*            std::ostringstream multi;
             multi.setf(std::ios::fixed);
             multi.precision(8);
 
@@ -140,11 +140,11 @@ void runH3(     std::string const& command,
         throw hexer_error("Provide a filename for output!");
     }
 
-    OGRWriter o(output);
+    OGRWriter o(output, true);
     if (hexer::Utils::iequals(command, "BOUNDARY"))
         o.writeBoundary(grid.get());
-    /*else if (hexer::Utils::iequals(command, "DENSITY"))
-        o.writeDensity(grid.get()); */
+    else if (hexer::Utils::iequals(command, "DENSITY"))
+        o.writeDensity(grid.get());
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)

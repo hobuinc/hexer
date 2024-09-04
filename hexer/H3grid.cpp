@@ -51,22 +51,16 @@ HexId H3Grid::findHexagon(Point p)
 void H3Grid::parentOrChild(Path& p)
 {
     // need to think about whether this can go in basegrid
-    std::cout << " /// /// parentOrChild " << p.pathNum() << std::endl;
     HexId hex = p.rootHex();
     int i = hex.i;
-    std::cout << "root hex (" << i << ", " << hex.j << ") \n";
     while (i >= m_minI) {
-        std::unordered_map<HexId, Path *>::iterator it = m_hexPaths.find(hex);
+        auto it = m_hexPaths.find(hex);
         if (it != m_hexPaths.end()) {
-            std::cout << "pathfinding hex (" << hex.i << ", " <<hex.j << ") \n";
             Path *parentPath = it->second;
-            std::cout << "pathfinding hex pathNum " << parentPath->pathNum() << "\n";
             if (parentPath == p.parent()) {
-                std::cout <<"root path \n";
                 p.setParent(NULL);
             }
             else if (!p.parent() && parentPath != &p) {
-                std::cout << "child path \n";
                 p.setParent(parentPath);
             }
         }
@@ -77,6 +71,7 @@ void H3Grid::parentOrChild(Path& p)
 
 Point H3Grid::findPoint(Segment& s)
 {
+    // this is also used for writing density, using H3 cellToBoundary might be more efficient for that
     DirEdge dir_edge;
     if (cellsToDirectedEdge(ij2h3(s.hex), ij2h3(edgeHex(s.hex, s.edge)), &dir_edge) != E_SUCCESS)
         throw hexer_error("Couldn't get directed edge.");

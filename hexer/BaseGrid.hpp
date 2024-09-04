@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <list>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -22,6 +23,8 @@ public:
     void addPoint(Point p);
     void findShapes();
     void findParentPaths();
+    bool isDense(HexId hex);
+    
     void setSampleSize(int num)
         {m_maxSample = num; }
     std::vector<Path *> const& rootPaths() const
@@ -29,11 +32,16 @@ public:
     void setGrid(std::pair<HexId, int> cell)
         { m_counts.insert(cell); }
     void findPossibleRoots();
+    const std::unordered_map<HexId, int> &getMap()
+        { return m_counts; }
+    
+    virtual Point findPoint(Segment& s) = 0;
 
 protected:
     BaseGrid(int dense_limit) : m_denseLimit{dense_limit}
     {}
     int increment(HexId hex);
+    
     int m_maxSample;
     /// @brief map of cells bordering paths at side 0 or 3
     std::unordered_map<HexId, Path *> m_hexPaths;
@@ -46,7 +54,6 @@ private:
     virtual HexId findHexagon(Point p) = 0;
     virtual HexId edgeHex(HexId hex, int edge) const = 0;
     virtual void processHeight(double height) = 0;
-    virtual Point findPoint(Segment& s) = 0;
     virtual bool inGrid(int i) = 0;
     virtual void parentOrChild(Path& p) = 0;
 
@@ -54,7 +61,6 @@ private:
     void handleSamplePoint(Point p);
     void addRoot(HexId hex);
     void removeRoot(HexId hex);
-    bool isDense(HexId hex);
     void findShape(HexId root, int pathNum);
     double distance(const Point& p1, const Point& p2);
     double computeHexSize();
@@ -62,7 +68,7 @@ private:
 
     std::vector<Point> m_sample;
     std::unordered_set<HexId> m_possibleRoots;
-    std::vector<Path> m_paths;
+    std::list<Path> m_paths;
     std::vector<Path *> m_roots;
     int m_denseLimit;
 };
