@@ -30,6 +30,19 @@ void BaseGrid::addPoint(Point& p)
     }
 }
 
+void BaseGrid::setHexes(const std::vector<HexId>& ids)
+{
+    for (HexId h : ids)
+    {
+        m_counts[h] = m_denseLimit + 1;
+        HexId above = edgeHex(h, 0);
+        HexId below = edgeHex(h, 3);
+        if (!isDense(above))
+            addRoot(h);
+        removeRoot(below);
+    }
+}
+
 void BaseGrid::handleSamplePoint(Point& p)
 {
     m_sample.push_back(p);
@@ -88,10 +101,10 @@ void BaseGrid::findShapes()
     int shapeNum = 0;
     while (m_possibleRoots.size())
     {
-        std::cout << m_possibleRoots.size() << "\n";
         HexId root = *m_possibleRoots.begin();
         findShape(root, shapeNum++);
     }
+    std::cerr << "Found " << m_paths.size() << " shapes!\n";
     std::cerr << "-findShapes()!\n";
 }
 
@@ -105,14 +118,15 @@ void BaseGrid::findShape(HexId root, int pathNum)
     do {
         if (cur.horizontal())
         {
-            m_possibleRoots.erase(cur.hex);
+            if (cur.edge == 0)
+                m_possibleRoots.erase(cur.hex);
             HexId pathHex = (cur.edge == 0 ? cur.hex : edgeHex(cur.hex, 3));
             m_hexPaths.insert({pathHex, &path});
         }
         path.add(cur);
         path.addPoint(findPoint(cur));
         const auto& [left, right] = nextSegments(cur);
-        cur = isDense(left.hex) ? left : right;
+        cur = isDense(right.hex) ? right : left;
     } while (cur != first);
     path.addPoint(findPoint(first));
 }

@@ -20,6 +20,8 @@ class H3Grid;
 class BaseGrid
 {
 public:
+    //ABELL
+    void setHexes(const std::vector<HexId>& hexes);
     void addPoint(Point& p);
     void findShapes();
     void findParentPaths();

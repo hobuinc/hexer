@@ -66,6 +66,7 @@ namespace hexer
 
 void processLaz(HexGrid *grid, std::ifstream& file)
 {
+    /**
     lazperf::reader::generic_file l(file);
 
     size_t count = l.pointCount();
@@ -74,7 +75,6 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     uint16_t len = h.point_record_length;
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
-    std::cout << "adding points: ";
     if(count < 10000)
         grid->setSampleSize(count);
     else
@@ -94,6 +94,23 @@ void processLaz(HexGrid *grid, std::ifstream& file)
         grid->addPoint(p);
     }
     std::cerr << "Points = " << count << "!\n";
+    **/
+    grid->setHexes(
+    /**
+    { {3, 3}, {4, 4}, {4, 5}, {3, 5}, {2, 5}, {2, 4} }
+    **/
+    { {0, 3}, {0, 4}, {0, 5}, {0, 6},
+                    {1, 2}, {1, 6},
+                    {2, 2}, {2, 4}, {2, 5}, {2, 7},
+                    {3, 1}, {3, 3}, {3, 5}, {3, 7},
+                    {4, 1}, {4, 2}, {4, 4}, {4, 5}, {4, 8},
+                    {5, 0}, {5, 2}, {5, 6}, {5, 8},
+                    {6, 1}, {6, 3}, {6, 4}, {6, 8},
+                    {7, 1}, {7, 3}, {7, 4}, {7, 5}, {7, 7},
+                    {8, 2}, {8, 3}, {8, 4}, {8, 5}, {8, 6}, {8, 7} }
+    /**
+    **/
+    );
     grid->findShapes();
     grid->findParentPaths();
 }
