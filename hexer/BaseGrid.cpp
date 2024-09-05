@@ -7,7 +7,7 @@
 namespace hexer
 {
 
-void BaseGrid::addPoint(Point p)
+void BaseGrid::addPoint(Point& p)
 {
     if (sampling())
     {
@@ -27,14 +27,14 @@ void BaseGrid::addPoint(Point p)
     }
 }
 
-void BaseGrid::handleSamplePoint(Point p)
+void BaseGrid::handleSamplePoint(Point& p)
 {
     m_sample.push_back(p);
     if (m_sample.size() >= m_maxSample) {
         double height = computeHexSize();
         processHeight(height);
-        for (auto it = m_sample.begin(); it != m_sample.end(); ++it) {
-            addPoint(*it);
+        for (Point p : m_sample) {
+            addPoint(p);
         }
         m_sample.clear();
     }

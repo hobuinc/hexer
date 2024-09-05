@@ -20,7 +20,7 @@ class H3Grid;
 class BaseGrid
 {
 public:
-    void addPoint(Point p);
+    void addPoint(Point& p);
     void findShapes();
     void findParentPaths();
     bool isDense(HexId hex);
@@ -45,11 +45,10 @@ protected:
     int m_maxSample;
     /// @brief map of cells bordering paths at side 0 or 3
     std::unordered_map<HexId, Path *> m_hexPaths;
-    /// @brief 
+    /// @brief map of all hexagons containing points, and the number of points within.
     std::unordered_map<HexId, int> m_counts;
 
 private:
-    //ABELL - Fix these.
     virtual bool sampling() const = 0;
     virtual HexId findHexagon(Point p) = 0;
     virtual HexId edgeHex(HexId hex, int edge) const = 0;
@@ -58,7 +57,7 @@ private:
     virtual void parentOrChild(Path& p) = 0;
 
     //void parentOrChild(Path p);
-    void handleSamplePoint(Point p);
+    void handleSamplePoint(Point& p);
     void addRoot(HexId hex);
     void removeRoot(HexId hex);
     void findShape(HexId root, int pathNum);
@@ -66,10 +65,15 @@ private:
     double computeHexSize();
     std::pair<Segment, Segment> nextSegments(const Segment& s) const;
 
+    /// @brief Vector of points to use to determine hex height
     std::vector<Point> m_sample;
+    /// @brief Set of hexagons with non-dense neighbors at side 0
     std::unordered_set<HexId> m_possibleRoots;
+    /// @brief List of all paths 
     std::list<Path> m_paths;
+    /// @brief List of pointers to paths in m_paths to be written as roots
     std::vector<Path *> m_roots;
+    /// @brief Minimum number of points for a cell to be dense
     int m_denseLimit;
 };
 

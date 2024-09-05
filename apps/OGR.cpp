@@ -282,23 +282,6 @@ void OGRWriter::writeDensity(H3Grid *grid)
     }
 }
 
-/* OGRFeatureH OGRWriter::setFieldsH3(OGRFeatureH& hFeature, const HexId& hex, H3Grid *grid)
-{
-    H3Index idx = grid->ij2h3(hex);
-    char id[17];
-    char* id_ptr = id;
-    
-    if (h3ToString(idx, id_ptr, 17) != E_SUCCESS)
-        throw hexer_error("could not convert H3 ID to string!");
-    
-    OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
-        idx);
-    OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_STRING"),
-        id_ptr);
-
-    return hFeature;
-} */
-
 void OGRWriter::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon)
 {
     OGR_F_SetGeometry(feature, polygon);

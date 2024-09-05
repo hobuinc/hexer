@@ -19,7 +19,6 @@
 #include <string>
 #include <vector>
 
-//#include <hexer/HexIter.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
 #include "ProgramArgs.hpp"
@@ -77,6 +76,7 @@ void runHexer(  std::string const& command,
         processLaz(grid.get(), file);
     } else {
         throw hexer_error("input file error");
+        // fix this
     /*  OGRReader o(input);
         o.open();
         process(grid.get(), o.reader); */

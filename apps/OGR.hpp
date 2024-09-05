@@ -148,37 +148,7 @@ private:
     void collectPath(const Path *path, OGRGeometryH polygon);
     void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
 	OGRGeometryH collectHexagon(HexId const& id, BaseGrid *grid);
-    //OGRFeatureH setFieldsH3(OGRFeatureH& hFeature, const HexId& hex, H3Grid *grid);
 
 };
-
-/**
-namespace h3
-{
-class OGR
-{
-
-
-public:
-    OGR(std::string const& filename);
-	~OGR();
-
-    void writeDensity(H3Grid *grid);
-    void writeBoundary(H3Grid *grid);
-
-private:
-    std::string m_filename;
-
-    OGRDataSourceH m_ds;
-	OGRLayerH m_layer;
-    void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
-    void createLayer(std::string const& basename);
-    OGRGeometryH collectH3(CellBoundary b);
-    void collectPath(H3Path* path, OGRGeometryH polygon);
-
-};
-} // namespace h3
-
-**/
 
 } // namespace hexer
