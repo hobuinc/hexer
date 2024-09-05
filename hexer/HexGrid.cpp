@@ -95,12 +95,8 @@ HexId HexGrid::findHexagon(Point p)
 
 HexId HexGrid::edgeHex(HexId hex, int edge) const
 {
-    const HexId even[] = {{0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}, {1, -1}};
-    //static int evenx[] = { 0, -1, -1, 0, 1, 1 };
-    //static int eveny[] = { -1, -1, 0, 1, 0, -1 };
-    const HexId odd[] = {{0, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}};
-    //static int oddx[] = { 0, -1, -1, 0, 1, 1 };
-    //static int oddy[] = { -1, 0, 1, 1, 1, 0 };
+    static const HexId even[] = {{0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}, {1, -1}};
+    static const HexId odd[] = {{0, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}};
 
     if (hex.i % 2 == 0)
         return hex + even[edge];
@@ -141,7 +137,7 @@ Point HexGrid::findPoint(Segment& s)
     pos.m_y = hex.j * m_height;
     if (hex.i % 2 != 0)
         pos.m_y += (m_height / 2);
-    
+
     return pos + offset(s.edge) + m_origin;
 }
 

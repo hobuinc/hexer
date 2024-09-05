@@ -22,17 +22,16 @@ void BaseGrid::addPoint(Point& p)
     int count = increment(h);
     if (count == m_denseLimit)
     {
-        HexId below = edgeHex(h, 0);
-        HexId above = edgeHex(h, 3);
-        if (!isDense(below))
+        HexId above = edgeHex(h, 0);
+        HexId below = edgeHex(h, 3);
+        if (!isDense(above))
             addRoot(h);
-        removeRoot(above);
+        removeRoot(below);
     }
 }
 
 void BaseGrid::handleSamplePoint(Point& p)
 {
-    std::cout << "finding sample points: \n";
     m_sample.push_back(p);
     if (m_sample.size() >= m_maxSample) {
         double height = computeHexSize();
@@ -81,30 +80,19 @@ bool BaseGrid::isDense(HexId h)
 
 void BaseGrid::findShapes()
 {
-    std::cout << "running findShapes(): \n";
+    std::cerr << "+findShapes()!\n";
     if (m_possibleRoots.empty())
         throw hexer_error("No areas of sufficient density - no shapes. "
             "Decrease density or area size.");
 
     int shapeNum = 0;
-    std::cout << m_possibleRoots.size() << "\n";
     while (m_possibleRoots.size())
     {
+        std::cout << m_possibleRoots.size() << "\n";
         HexId root = *m_possibleRoots.begin();
         findShape(root, shapeNum++);
-        Path& p = m_paths.back();
-        std::cerr << "Added path = " << (void *)&p << "!\n";
     }
-    for (Path& p : m_paths)
-        std::cerr << "Path = " << (void *)&p << "!\n";
-
-    std::set<void *> hexPaths;
-    for (auto& [hexId, pathPtr] : m_hexPaths)
-        hexPaths.insert((void *)pathPtr);
-
-    std::cerr << "\n";
-    for (void *v : hexPaths)
-        std::cerr << "Hex path = " << v << "!\n";
+    std::cerr << "-findShapes()!\n";
 }
 
 void BaseGrid::findShape(HexId root, int pathNum)
@@ -115,7 +103,6 @@ void BaseGrid::findShape(HexId root, int pathNum)
     Segment first(root, 0);
     Segment cur(root, 0);
     do {
-        //std::cout << cur.edge << ", (" << cur.hex.i << ", " << cur.hex.j << ") \n";
         if (cur.horizontal())
         {
             m_possibleRoots.erase(cur.hex);
@@ -126,11 +113,6 @@ void BaseGrid::findShape(HexId root, int pathNum)
         path.addPoint(findPoint(cur));
         const auto& [left, right] = nextSegments(cur);
         cur = isDense(left.hex) ? left : right;
-/*         if (isDense(left.hex))
-            std::cout << "left to (" << left.hex.i << ", " << left.hex.j << ") --- ";
-        else
-            std::cout << "right --- ";  */
-
     } while (cur != first);
     path.addPoint(findPoint(first));
 }
@@ -140,8 +122,8 @@ std::pair<Segment, Segment> BaseGrid::nextSegments(const Segment& s) const
     static const int next[] { 1, 2, 3, 4, 5, 0 };
     static const int prev[] { 5, 0, 1, 2, 3, 4 };
 
-    Segment right(s.hex, next[s.edge]);
-    Segment left(edgeHex(right.hex, right.edge), prev[s.edge]);
+    Segment left(s.hex, next[s.edge]);
+    Segment right(edgeHex(left.hex, left.edge), prev[s.edge]);
     return { left, right };
 }
 

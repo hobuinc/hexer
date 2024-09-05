@@ -33,6 +33,8 @@
  ****************************************************************************/
 #pragma once
 
+#include <iostream>
+
 #include "HexId.hpp"
 
 namespace hexer
@@ -60,6 +62,12 @@ inline bool operator == (const Segment& s1, const Segment& s2)
 inline bool operator != (const Segment& s1, const Segment& s2)
 {
     return !(s1 == s2);
+}
+
+inline std::ostream& operator << (std::ostream& out, const Segment& s)
+{
+    out << "(" << s.hex.i << "," << s.hex.j << " - " << s.edge << ")";
+    return out;
 }
 
 } // namespace hexer
