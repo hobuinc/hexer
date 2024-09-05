@@ -10,7 +10,7 @@
 namespace hexer
 {
 
-void BaseGrid::addPoint(Point p)
+void BaseGrid::addPoint(Point& p)
 {
     if (sampling())
     {
@@ -30,15 +30,15 @@ void BaseGrid::addPoint(Point p)
     }
 }
 
-void BaseGrid::handleSamplePoint(Point p)
+void BaseGrid::handleSamplePoint(Point& p)
 {
     std::cout << "finding sample points: \n";
     m_sample.push_back(p);
     if (m_sample.size() >= m_maxSample) {
         double height = computeHexSize();
         processHeight(height);
-        for (auto it = m_sample.begin(); it != m_sample.end(); ++it) {
-            addPoint(*it);
+        for (Point p : m_sample) {
+            addPoint(p);
         }
         m_sample.clear();
     }
@@ -87,7 +87,7 @@ void BaseGrid::findShapes()
             "Decrease density or area size.");
 
     int shapeNum = 0;
-    std::cout << m_possibleRoots.size() << ", " << shapeNum << "\n";
+    std::cout << m_possibleRoots.size() << "\n";
     while (m_possibleRoots.size())
     {
         HexId root = *m_possibleRoots.begin();
@@ -109,13 +109,13 @@ void BaseGrid::findShapes()
 
 void BaseGrid::findShape(HexId root, int pathNum)
 {
-    std::cout << "findShape() " << pathNum << "\n";
     m_paths.push_back(Path(pathNum));
     Path& path = m_paths.back();
 
     Segment first(root, 0);
     Segment cur(root, 0);
     do {
+        //std::cout << cur.edge << ", (" << cur.hex.i << ", " << cur.hex.j << ") \n";
         if (cur.horizontal())
         {
             m_possibleRoots.erase(cur.hex);
@@ -126,6 +126,11 @@ void BaseGrid::findShape(HexId root, int pathNum)
         path.addPoint(findPoint(cur));
         const auto& [left, right] = nextSegments(cur);
         cur = isDense(left.hex) ? left : right;
+/*         if (isDense(left.hex))
+            std::cout << "left to (" << left.hex.i << ", " << left.hex.j << ") --- ";
+        else
+            std::cout << "right --- ";  */
+
     } while (cur != first);
     path.addPoint(findPoint(first));
 }
@@ -142,21 +147,19 @@ std::pair<Segment, Segment> BaseGrid::nextSegments(const Segment& s) const
 
 void BaseGrid::findParentPaths()
 {
-    std::vector<Path> roots;
-    std::cout << m_paths.size() <<" paths\n";
-    for (size_t i = 0; i < m_paths.size(); ++i) {
-        Path p = m_paths[i];
+    int counter(0);
+    for (auto& p : m_paths) {
         // the only difference between parentOrChild in the two grid types
         // is whether they look down i or j, I think.
         parentOrChild(p);
 
-        !p.parent() ?  roots.push_back(p) : p.parent()->addChild(p);
+        !p.parent() ?  m_roots.push_back(&p) : p.parent()->addChild(&p);
+        counter++;
     }
-    std::cout << roots.size() <<" roots\n";
-    for (size_t i = 0; i < roots.size(); ++i) {
-        roots[i].finalize(CLOCKWISE);
+    std::cout << m_roots.size() <<" roots\n";
+    for (size_t i = 0; i < m_roots.size(); ++i) {
+        m_roots[i]->finalize(CLOCKWISE);
     }
-    m_paths = roots;
 }
 
 double BaseGrid::distance(const Point& p1, const Point& p2)

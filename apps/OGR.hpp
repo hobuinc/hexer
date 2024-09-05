@@ -129,53 +129,26 @@ class OGRWriter
 
 
 public:
-    OGRWriter(std::string const& filename);
+    OGRWriter(std::string const& filename, bool h3 = false);
 	~OGRWriter();
 
     void writeBoundary(BaseGrid *grid);
+	void writeDensity(H3Grid *grid);
 	void writeDensity(HexGrid *grid);
 
 private:
     std::string m_filename;
+    bool m_isH3;
 
 
     OGRDataSourceH m_ds;
 	OGRLayerH m_layer;
 
     void createLayer(std::string const& basename);
-    void collectPath(const Path& path, OGRGeometryH polygon);
+    void collectPath(const Path *path, OGRGeometryH polygon);
     void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
-	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
+	OGRGeometryH collectHexagon(HexId const& id, BaseGrid *grid);
 
 };
-
-/**
-namespace h3
-{
-class OGR
-{
-
-
-public:
-    OGR(std::string const& filename);
-	~OGR();
-
-    void writeDensity(H3Grid *grid);
-    void writeBoundary(H3Grid *grid);
-
-private:
-    std::string m_filename;
-
-    OGRDataSourceH m_ds;
-	OGRLayerH m_layer;
-    void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
-    void createLayer(std::string const& basename);
-    OGRGeometryH collectH3(CellBoundary b);
-    void collectPath(H3Path* path, OGRGeometryH polygon);
-
-};
-} // namespace h3
-
-**/
 
 } // namespace hexer

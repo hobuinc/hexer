@@ -110,6 +110,7 @@ void processH3(H3Grid *grid, std::ifstream& file)
     uint16_t len = h.point_record_length;
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
+    std::cout << "adding points: ";
     if(count < 10000)
         grid->setSampleSize(count);
     else
