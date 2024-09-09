@@ -87,7 +87,9 @@ public:
     int pathNum()
         { return m_pathNum; }
     int numChildren()
-        {return m_children.size(); }
+        { return m_children.size(); }
+    int numPoints()
+        { return m_points.size(); }
 
 private:
     /// Parent path (NULL if root)

@@ -101,6 +101,7 @@ void BaseGrid::findShapes()
     int shapeNum = 0;
     while (m_possibleRoots.size())
     {
+        std::cout << m_possibleRoots.size() << "\n";
         HexId root = *m_possibleRoots.begin();
         findShape(root, shapeNum++);
     }

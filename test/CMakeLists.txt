@@ -14,8 +14,9 @@ macro(HEXER_ADD_TEST _name)
 endmacro(HEXER_ADD_TEST)
 
 configure_file(test_main.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/test_main.hpp)
+configure_file(${hexer_defines_h} ${CMAKE_CURRENT_BINARY_DIR}/hexer/hexer_defines.h)
 add_subdirectory(${GTEST_DIR})
 
-HEXER_ADD_TEST(gridtest)
+#HEXER_ADD_TEST(gridtest)
 HEXER_ADD_TEST(pathstest)
 

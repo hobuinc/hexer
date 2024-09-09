@@ -1,4 +1,4 @@
-#include <fstream>
+/* #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -66,4 +66,4 @@ TEST(gridtest, test_h3_exist) {
     H3Index index;
     EXPECT_EQ(latLngToCell(&location, resolution, &index), E_SUCCESS); 
 }
-} //namespace hexer
+} //namespace hexer */

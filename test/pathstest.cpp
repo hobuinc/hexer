@@ -4,9 +4,9 @@
 
 namespace hexer 
 {
-std::vector<Path> insertGrid(H3Grid *grid) 
+std::vector<Path*> insertGrid(H3Grid *grid) 
 {
-    for (HexId ij : std::vector<HexId>(
+    grid->setHexes(
             {
                 {5, 2}, {5, 3},
                 {6, 2}, {6, 4},
@@ -20,8 +20,7 @@ std::vector<Path> insertGrid(H3Grid *grid)
                 {9, 3}, {9, 5}, {9, 7}, {9, 8},
                 {10, 4}, {10, 8},
                 {11, 5}, {11, 6}, {11, 7}, {11, 8},
-            }))
-        grid->setGrid(std::make_pair(ij, 1));
+            });
     LatLng location;
     location.lat = degsToRads(40.689167);
     location.lng = degsToRads(-74.044444);
@@ -29,36 +28,43 @@ std::vector<Path> insertGrid(H3Grid *grid)
     H3Index index;
     EXPECT_EQ(latLngToCell(&location, resolution, &index), E_SUCCESS); 
     grid->setOrigin(index);
-    grid->findPossibleRoots();
+    //grid->findPossibleRoots();
     grid->findShapes();
     grid->findParentPaths();
-    const std::vector<Path> paths = grid->rootPaths();
+    const std::vector<Path*> paths = grid->rootPaths();
     return paths;
 }
 
 TEST(pathstest, test_paths) 
 {
     std::unique_ptr<H3Grid> grid;
-    grid.reset(new H3Grid(1, 10));
-    std::vector<Path> paths = insertGrid(grid.get());
+    grid.reset(new H3Grid(10, 1));
+    std::vector<Path*> paths = insertGrid(grid.get());
+    
+    int counter(0);
+    for (auto p : paths)
+    {
+        std::cout << "path " << counter <<" num points: " << p->numPoints();
+        std::cout << " -- numChildren: " << p->numChildren() << "\n"; 
+    }
 
-    EXPECT_EQ(paths[0]->numSegs(), 54);
+    EXPECT_EQ(paths[0]->numPoints(), 55);
     EXPECT_EQ(paths[0]->numChildren(), 2);
     
-    std::vector<H3Path *> child_0 = paths[0]->subPaths();
-    EXPECT_EQ(child_0[0]->numSegs(), 38);
-    EXPECT_EQ(child_0[1]->numSegs(), 14);
+    std::vector<Path *> child_0 = paths[0]->subPaths();
+    EXPECT_EQ(child_0[0]->numPoints(), 39);
+    EXPECT_EQ(child_0[1]->numPoints(), 15);
     EXPECT_EQ(child_0[0]->numChildren(), 2);
     EXPECT_EQ(child_0[1]->numChildren(), 0);
     
-    std::vector<H3Path *> child_0_0 = child_0[0]->subPaths();
-    EXPECT_EQ(child_0_0[0]->numSegs(), 18);
-    EXPECT_EQ(child_0_0[1]->numSegs(), 6);
+    std::vector<Path *> child_0_0 = child_0[0]->subPaths();
+    EXPECT_EQ(child_0_0[0]->numPoints(), 19);
+    EXPECT_EQ(child_0_0[1]->numPoints(), 7);
     EXPECT_EQ(child_0_0[0]->numChildren(), 1);
     EXPECT_EQ(child_0_0[1]->numChildren(), 0);
     
-    std::vector<H3Path *> child_0_0_0 = child_0_0[0]->subPaths();
-    EXPECT_EQ(child_0_0_0[0]->numSegs(), 6);
+    std::vector<Path *> child_0_0_0 = child_0_0[0]->subPaths();
+    EXPECT_EQ(child_0_0_0[0]->numPoints(), 7);
     EXPECT_EQ(child_0_0_0[0]->numChildren(), 0);
 }
 } // namespace hexer 
