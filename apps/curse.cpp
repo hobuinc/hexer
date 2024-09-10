@@ -75,11 +75,9 @@ void runHexer(  std::string const& command,
         std::ifstream file(input, std::ios::binary);
         processLaz(grid.get(), file);
     } else {
-        throw hexer_error("input file error");
-        // fix this
-    /*  OGRReader o(input);
+        OGRReader o(input);
         o.open();
-        process(grid.get(), o.reader); */
+        process(grid.get(), o.reader, o.count());
     }
 
     if (hexer::Utils::iequals(command, "BOUNDARY"))
@@ -130,10 +128,12 @@ void runH3(     std::string const& command,
     FormatType t = getDriver(input);
     if (t == Format_LAS) {
         std::ifstream file(input, std::ios::binary);
-        processH3(grid.get(), file);
+        processLazH3(grid.get(), file);
     }
     else {
-        throw hexer_error("H3 processing only supported for '.las' and '.laz' files!");
+        OGRReader o(input);
+        o.open();
+        process(grid.get(), o.reader, o.count(), true);
     }
 
     if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {

@@ -53,16 +53,27 @@
 namespace hexer
 {
 
-/* void process(HexGrid *grid, PointReader reader)
+void process(BaseGrid *grid, PointReader reader, int count, bool h3)
 {
     double x, y;
     void* context;
 
+    grid->setSampleSize(count);
+
     while (reader(x, y, context))
-        grid->addPoint(x, y);
+    {
+        if (h3) {
+            Point p{degsToRads(x), degsToRads(y)};
+            grid->addPoint(p);
+        }
+        else {
+            Point p{x, y};
+            grid->addPoint(p);
+        }
+    }
     grid->findShapes();
     grid->findParentPaths();
-} */
+}
 
 void processLaz(HexGrid *grid, std::ifstream& file)
 {
@@ -75,6 +86,7 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     uint16_t len = h.point_record_length;
     std::vector<char> buf(len, 0);
     char* buf_data = buf.data();
+
     if(count < 10000)
         grid->setSampleSize(count);
     else
@@ -98,7 +110,7 @@ void processLaz(HexGrid *grid, std::ifstream& file)
     grid->findParentPaths();
 }
 
-void processH3(H3Grid *grid, std::ifstream& file)
+void processLazH3(H3Grid *grid, std::ifstream& file)
 {
     lazperf::reader::generic_file l(file);
 

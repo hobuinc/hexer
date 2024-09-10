@@ -30,14 +30,13 @@ void inputTest(std::string const& input) {
     int minY = 1000000;
     int cnt = 0;
     const std::unordered_map<HexId, int>& hexes = grid->getMap();
-    for (auto it = hexes.begin(); it != hexes.end();) {
+    for (auto it = hexes.begin(); it != hexes.end(); it++) {
         if (grid->isDense(it->first)){
             maxX = std::max(it->first.i, maxX);
             minX = std::min(it->first.i, minX);
             maxY = std::max(it->first.j, maxY);
             minY = std::min(it->first.j, minY);
         }
-        it++;
     }
     EXPECT_EQ(maxX, 0);
     EXPECT_EQ(minX, -23);
