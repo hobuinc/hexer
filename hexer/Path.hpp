@@ -55,6 +55,8 @@ public:
     Path(HexId root_hex) : m_rootHex(root_hex), m_parent(NULL)
     {}
 
+    void toWKT(std::ostream& output) const;
+
     void addChild(Path *path)
         { m_children.push_back(path); }
     void setParent(Path *p)
@@ -98,6 +100,5 @@ private:
     /// @brief points that make up the path
     std::vector<Point> m_points;
 };
-
 
 } //namespace hexer

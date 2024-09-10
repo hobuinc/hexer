@@ -187,4 +187,28 @@ double BaseGrid::computeHexSize()
     return ((m_denseLimit * dist) / m_sample.size());
 }
 
+void BaseGrid::toWKT(std::ostream& output) const
+{
+    auto outputPath = [this,&output](Path *p)
+    {
+        output << "(";
+        p->toWKT(output);
+        output << ")";
+    };
+
+    std::vector<Path *> paths = rootPaths();
+
+    output << "MULTIPOLYGON (";
+
+    auto it = paths.begin();
+    if (it != paths.end())
+        outputPath(*it++);
+    for (; it != paths.end(); ++it)
+    {
+        output << ",";
+        outputPath(*it);
+    }
+    output << ")";
+}
+
 } // namespace hexer

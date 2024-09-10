@@ -84,13 +84,12 @@ void runHexer(  std::string const& command,
     {
         if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
         {
-            throw hexer_error("STDOUT not supported.");
-/*            std::ostringstream multi;
+            std::ostringstream multi;
             multi.setf(std::ios::fixed);
             multi.precision(8);
 
             grid->toWKT(multi);
-            std::cout << multi.str() << std::endl; */
+            std::cout << multi.str() << std::endl;
         }
         else
         {
@@ -136,15 +135,26 @@ void runH3(     std::string const& command,
         process(grid.get(), o.reader, o.count(), true);
     }
 
-    if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
-        throw hexer_error("Provide a filename for output!");
-    }
-
-    OGRWriter o(output, true);
     if (hexer::Utils::iequals(command, "BOUNDARY"))
-        o.writeBoundary(grid.get());
-    else if (hexer::Utils::iequals(command, "DENSITY"))
+    {
+        if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
+            std::ostringstream multi;
+            multi.setf(std::ios::fixed);
+            multi.precision(8);
+
+            grid->toWKT(multi);
+            std::cout << multi.str() << std::endl;
+        }
+        else {
+            OGRWriter o(output, true);
+            o.writeBoundary(grid.get());
+        }
+    }
+    else if (hexer::Utils::iequals(command, "DENSITY")) 
+    {
+        OGRWriter o(output, true);
         o.writeDensity(grid.get());
+    }
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)

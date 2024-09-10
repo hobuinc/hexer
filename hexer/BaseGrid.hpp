@@ -25,6 +25,7 @@ public:
     void findShapes();
     void findParentPaths();
     bool isDense(HexId hex);
+    void toWKT(std::ostream& output) const;
 
     void setSampleSize(int num)
         {m_maxSample = num; }
