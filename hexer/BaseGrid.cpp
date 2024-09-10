@@ -1,4 +1,3 @@
-//ABELL
 #include <set>
 
 #include <hexer/BaseGrid.hpp>

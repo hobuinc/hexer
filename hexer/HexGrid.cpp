@@ -116,7 +116,6 @@ HexId HexGrid::edgeHex(HexId hex, int edge) const
 
 void HexGrid::parentOrChild(Path& p)
 {
-    // p.rootHex() might need tweaks to return a useful hexagon
     HexId hex = p.rootHex();
     // j (should be) equivalent to y
     int j = hex.j;
