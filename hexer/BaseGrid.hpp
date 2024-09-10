@@ -20,7 +20,6 @@ class H3Grid;
 class BaseGrid
 {
 public:
-    //ABELL
     void setHexes(const std::vector<HexId>& hexes);
     void addPoint(Point& p);
     void findShapes();
@@ -62,11 +61,10 @@ private:
     void handleSamplePoint(Point& p);
     void addRoot(HexId hex);
     void removeRoot(HexId hex);
-    void findShape(HexId root, int pathNum);
+    void findShape(HexId root);
     double distance(const Point& p1, const Point& p2);
     double computeHexSize();
     std::pair<Segment, Segment> nextSegments(const Segment& s) const;
-    double computeHexSize() const;
 
     /// @brief Vector of points to use to determine hex height
     std::vector<Point> m_sample;

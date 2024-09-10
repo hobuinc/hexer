@@ -95,6 +95,15 @@ HexId HexGrid::findHexagon(Point p)
 
 HexId HexGrid::edgeHex(HexId hex, int edge) const
 {
+    //               (+ Y)
+    //                __3_
+    //             2 /    \ 4 
+    //              /      \
+    //              \      /
+    //             1 \____/ 5  
+    //                  0
+    //               (- Y)
+
     static const HexId even[] = {{0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}, {1, -1}};
     static const HexId odd[] = {{0, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}};
 

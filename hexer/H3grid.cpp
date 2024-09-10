@@ -51,22 +51,16 @@ HexId H3Grid::findHexagon(Point p)
 void H3Grid::parentOrChild(Path& p)
 {
     // need to think about whether this can go in basegrid
-    std::cout << " /// /// parentOrChild " << p.pathNum() << std::endl;
     HexId hex = p.rootHex();
     int i = hex.i;
-    std::cout << "root hex (" << i << ", " <<hex.j << ") \n";
     while (i >= m_minI) {
         auto it = m_hexPaths.find(hex);
         if (it != m_hexPaths.end()) {
-            std::cout << "pathfinding hex (" << hex.i << ", " <<hex.j << ") \n";
             Path *parentPath = it->second;
-            std::cout << "pathfinding hex pathNum " << parentPath->pathNum() << "\n";
             if (parentPath == p.parent()) {
-                std::cout <<"root path \n";
                 p.setParent(NULL);
             }
             else if (!p.parent() && parentPath != &p) {
-                std::cout << "child path \n";
                 p.setParent(parentPath);
             }
         }
@@ -99,14 +93,14 @@ HexId H3Grid::edgeHex(HexId hex, int edge) const
     //
     //               (+ I)
     //                __0_
-    // (+ I, + J)  1 /    \ 5  (- J)
+    // (+ I, + J)  5 /    \ 1  (- J)
     //              /      \
     //              \      /
-    //      (+ J)  2 \____/ 4   (- I, - J)
+    //      (+ J)  4 \____/ 2   (- I, - J)
     //                  3
     //               (- I)
     //
-    const HexId offsets[] {{1, 0}, {1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {0, -1}};
+    const HexId offsets[] {{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
     return hex + offsets[edge];
 }
 

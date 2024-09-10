@@ -118,6 +118,16 @@ void OGRWriter::createLayer(std::string const& basename)
         throw hexer_error(oss.str());
     }
     OGR_Fld_Destroy(hFieldDefn);
+    
+    hFieldDefn = OGR_Fld_Create("COORDS", OFTString);
+    if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
+    {
+        std::ostringstream oss;
+        oss << "Could not create IJ field on layer with error '"
+            << CPLGetLastErrorMsg() << "'";
+        throw hexer_error(oss.str());
+    }
+    OGR_Fld_Destroy(hFieldDefn);
 
     if (m_isH3)
     {
@@ -235,6 +245,10 @@ void OGRWriter::writeDensity(HexGrid *grid)
     {
         if (grid->isDense(iter->first))
         {
+            HexId c = iter->first;
+            std::ostringstream coords;
+            coords << "(" << (int)c.i <<
+                    ", " << (int)c.j << ")";
             OGRGeometryH polygon = collectHexagon(iter->first, grid);
             OGRFeatureH hFeature;
 
@@ -243,6 +257,8 @@ void OGRWriter::writeDensity(HexGrid *grid)
                 counter);
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
                 iter->second);
+            OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "COORDS"),
+                coords.str().c_str());
             processGeometry(m_layer, hFeature, polygon);
             counter++;
         }
@@ -260,6 +276,11 @@ void OGRWriter::writeDensity(H3Grid *grid)
             OGRGeometryH polygon = collectHexagon(iter->first, grid);
             OGRFeatureH hFeature;
 
+            HexId c = iter->first;
+            std::ostringstream coords;
+            coords << "(" << (int)c.i <<
+                    ", " << (int)c.j << ")";
+
             H3Index idx = grid->ij2h3(iter->first);
             char id[17];
             char* id_ptr = id;
@@ -276,6 +297,8 @@ void OGRWriter::writeDensity(H3Grid *grid)
                 idx);
             OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_STRING"),
                 id_ptr);
+            OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "COORDS"),
+                coords.str().c_str());
             processGeometry(m_layer, hFeature, polygon);
             counter++;
         }

@@ -52,11 +52,9 @@ enum Orientation
 class Path
 {
 public:
-    Path(int pathNum) : m_pathNum(pathNum), m_parent(NULL)
+    Path(HexId root_hex) : m_rootHex(root_hex), m_parent(NULL)
     {}
 
-    void add(const Segment& s)
-        { m_segments.push_back(s); }
     void addChild(Path *path)
         { m_children.push_back(path); }
     void setParent(Path *p)
@@ -70,7 +68,7 @@ public:
         return m_points;
     }
     const HexId rootHex() const
-        { return m_segments[0].hex; }
+        { return m_rootHex; }
     void addPoint(Point p)
         { m_points.push_back(p); }
     void finalize(Orientation o)
@@ -79,30 +77,24 @@ public:
         for (size_t i = 0; i < m_children.size(); ++i)
             m_children[i]->finalize(o == CLOCKWISE ? ANTICLOCKWISE : CLOCKWISE);
         if (o == ANTICLOCKWISE){
-            std::cout << "path " << m_pathNum << " writing anticlockwise \n";
-            std::reverse(m_segments.begin(), m_segments.end());
             std::reverse(m_points.begin(), m_points.end());
         }
     }
-    int pathNum()
-        { return m_pathNum; }
     int numChildren()
         { return m_children.size(); }
     int numPoints()
         { return m_points.size(); }
 
 private:
+    /// Hexagon associated with path, used for finding child paths
+    HexId m_rootHex;
     /// Parent path (NULL if root)
     Path *m_parent;
     /// Children
     std::vector<Path *> m_children;
-    /// Orientation of path AT EXTRACTION - segments are ALWAYS ordered
-    /// clockwise.
+    /// Orientation of path AT EXTRACTION - points are ordered clockwise
+    /// until finalize() sets orientation.
     Orientation m_orientation;
-    /// List of segments that make up the path.
-    std::vector<Segment> m_segments;
-    /// ABELL - ?
-    int m_pathNum;
     /// @brief points that make up the path
     std::vector<Point> m_points;
 };
