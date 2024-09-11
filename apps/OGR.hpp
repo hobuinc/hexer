@@ -133,8 +133,7 @@ public:
 	~OGRWriter();
 
     void writeBoundary(BaseGrid *grid);
-	void writeDensity(H3Grid *grid);
-	void writeDensity(HexGrid *grid);
+	void writeDensity(BaseGrid *grid);
 
 private:
     std::string m_filename;

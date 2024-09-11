@@ -73,11 +73,11 @@ private:
     void parentOrChild(Path& p);
     void processHeight(double height);
 
-    /// @brief H3 resolution of the grid (0-15)
+    /// H3 resolution of the grid (0-15)
     int m_res;
-    /// @brief minimum I value for iterating through parent paths
+    /// minimum I value for iterating through parent paths
     int m_minI;
-    /// @brief origin index for converting between H3Index and CoordIJ
+    /// origin index for converting between H3Index and CoordIJ
     H3Index m_origin;
 
 };

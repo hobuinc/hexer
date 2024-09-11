@@ -97,7 +97,7 @@ private:
     /// Orientation of path AT EXTRACTION - points are ordered clockwise
     /// until finalize() sets orientation.
     Orientation m_orientation;
-    /// @brief points that make up the path
+    /// points that make up the path
     std::vector<Point> m_points;
 };
 

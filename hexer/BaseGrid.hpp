@@ -40,15 +40,20 @@ public:
     virtual void addXY(double& x, double& y) = 0;
     virtual Point findPoint(Segment& s) = 0;
 
+    virtual H3Index ij2h3(HexId ij)
+        { return 0; }
+    virtual HexId h32ij(H3Index h3)
+        { return {0,0}; }
+
 protected:
     BaseGrid(int dense_limit) : m_denseLimit{dense_limit}
     {}
     int increment(HexId hex);
 
     int m_maxSample;
-    /// @brief map of cells bordering paths at side 0 or 3
+    ///   map of cells bordering paths at side 0 or 3
     std::unordered_map<HexId, Path *> m_hexPaths;
-    /// @brief map of all hexagons containing points, and the number of points within.
+    ///   map of all hexagons containing points, and the number of points within.
     std::unordered_map<HexId, int> m_counts;
 
 private:
@@ -68,15 +73,15 @@ private:
     double computeHexSize();
     std::pair<Segment, Segment> nextSegments(const Segment& s) const;
 
-    /// @brief Vector of points to use to determine hex height
+    ///   Vector of points to use to determine hex height
     std::vector<Point> m_sample;
-    /// @brief Set of hexagons with non-dense neighbors at side 0
+    ///   Set of hexagons with non-dense neighbors at side 0
     std::unordered_set<HexId> m_possibleRoots;
-    /// @brief List of all paths
+    ///   List of all paths
     std::list<Path> m_paths;
-    /// @brief List of pointers to paths in m_paths to be written as roots
+    ///   List of pointers to paths in m_paths to be written as roots
     std::vector<Path *> m_roots;
-    /// @brief Minimum number of points for a cell to be dense
+    ///   Minimum number of points for a cell to be dense
     int m_denseLimit;
 };
 

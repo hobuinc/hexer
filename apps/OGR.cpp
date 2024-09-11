@@ -118,16 +118,6 @@ void OGRWriter::createLayer(std::string const& basename)
         throw hexer_error(oss.str());
     }
     OGR_Fld_Destroy(hFieldDefn);
-    
-    hFieldDefn = OGR_Fld_Create("COORDS", OFTString);
-    if (OGR_L_CreateField(m_layer, hFieldDefn, TRUE) != OGRERR_NONE)
-    {
-        std::ostringstream oss;
-        oss << "Could not create IJ field on layer with error '"
-            << CPLGetLastErrorMsg() << "'";
-        throw hexer_error(oss.str());
-    }
-    OGR_Fld_Destroy(hFieldDefn);
 
     if (m_isH3)
     {
@@ -237,73 +227,38 @@ OGRGeometryH OGRWriter::collectHexagon(HexId const& id, BaseGrid *grid)
 }
 
 
-void OGRWriter::writeDensity(HexGrid *grid)
+void OGRWriter::writeDensity(BaseGrid *grid)
 {
     int counter(0);
-    const std::unordered_map<HexId, int>& hexes = grid->getMap();
-    for (auto iter = hexes.begin(); iter != hexes.end(); ++iter)
-    {
-        if (grid->isDense(iter->first))
+    for (auto& [coord, count] : grid->getMap()) {
+        if (grid->isDense(coord))
         {
-            HexId c = iter->first;
-            std::ostringstream coords;
-            coords << "(" << (int)c.i <<
-                    ", " << (int)c.j << ")";
-            OGRGeometryH polygon = collectHexagon(iter->first, grid);
+            OGRGeometryH polygon = collectHexagon(coord, grid);
             OGRFeatureH hFeature;
 
             hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
                 counter);
             OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
-                iter->second);
-            OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "COORDS"),
-                coords.str().c_str());
+                count);
+
+            if (m_isH3)
+            {
+                H3Index idx = grid->ij2h3(coord);
+                char id[17];
+                char* id_ptr = id;
+
+                OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
+                    idx);
+                OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_STRING"),
+                    id_ptr);
+            }
             processGeometry(m_layer, hFeature, polygon);
             counter++;
         }
     }
 }
 
-void OGRWriter::writeDensity(H3Grid *grid)
-{
-    int counter(0);
-    const std::unordered_map<HexId, int>& hexes = grid->getMap();
-    for (auto iter = hexes.begin(); iter != hexes.end(); ++iter)
-    {
-        if (grid->isDense(iter->first))
-        {
-            OGRGeometryH polygon = collectHexagon(iter->first, grid);
-            OGRFeatureH hFeature;
-
-            HexId c = iter->first;
-            std::ostringstream coords;
-            coords << "(" << (int)c.i <<
-                    ", " << (int)c.j << ")";
-
-            H3Index idx = grid->ij2h3(iter->first);
-            char id[17];
-            char* id_ptr = id;
-
-            if (h3ToString(idx, id_ptr, 17) != E_SUCCESS)
-                throw hexer_error("could not convert H3 ID to string!");
-
-            hFeature = OGR_F_Create(OGR_L_GetLayerDefn(m_layer));
-            OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "ID"),
-                counter);
-            OGR_F_SetFieldInteger( hFeature, OGR_F_GetFieldIndex(hFeature, "COUNT"),
-                iter->second);
-            OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
-                idx);
-            OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_STRING"),
-                id_ptr);
-            OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "COORDS"),
-                coords.str().c_str());
-            processGeometry(m_layer, hFeature, polygon);
-            counter++;
-        }
-    }
-}
 
 void OGRWriter::processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon)
 {

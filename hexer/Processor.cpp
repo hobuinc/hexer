@@ -53,22 +53,22 @@
 namespace hexer
 {
 
-void process(BaseGrid *grid, PointReader reader, int count)
+void process(BaseGrid& grid, PointReader reader, int count)
 {
     double x, y;
     void* context;
 
-    grid->setSampleSize(count);
+    grid.setSampleSize(count);
 
     while (reader(x, y, context))
     {
-        grid->addXY(x, y);
+        grid.addXY(x, y);
     }
-    grid->findShapes();
-    grid->findParentPaths();
+    grid.findShapes();
+    grid.findParentPaths();
 }
 
-void processLaz(BaseGrid *grid, std::ifstream& file)
+void processLaz(BaseGrid& grid, std::ifstream& file)
 {
 
     lazperf::reader::generic_file l(file);
@@ -81,9 +81,9 @@ void processLaz(BaseGrid *grid, std::ifstream& file)
     char* buf_data = buf.data();
 
     if(count < 10000)
-        grid->setSampleSize(count);
+        grid.setSampleSize(count);
     else
-        grid->setSampleSize(10000);
+        grid.setSampleSize(10000);
 
     for(size_t i = 0; i < count; i ++) {
         l.readPoint(buf_data);
@@ -96,11 +96,11 @@ void processLaz(BaseGrid *grid, std::ifstream& file)
         double x = (x_int * h.scale.x + h.offset.x);
         double y = (y_int * h.scale.y + h.offset.y);
         
-        grid->addXY(x, y);
+        grid.addXY(x, y);
     }
 
-    grid->findShapes();
-    grid->findParentPaths();
+    grid.findShapes();
+    grid.findParentPaths();
 }
 
 std::string GetFullVersion( void )

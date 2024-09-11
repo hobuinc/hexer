@@ -95,7 +95,6 @@ void BaseGrid::findShapes()
         throw hexer_error("No areas of sufficient density - no shapes. "
             "Decrease density or area size.");
 
-    int shapeNum = 0;
     while (m_possibleRoots.size())
     {
         HexId root = *m_possibleRoots.begin();
@@ -124,7 +123,7 @@ void BaseGrid::findShape(HexId root)
 
         const auto& [left, right] = nextSegments(cur);
         cur = isDense(left.hex) ? left : right;
-    } while (!(cur.hex == first.hex && cur.edge == 0));
+    } while (cur != first);
 
     path.addPoint(findPoint(cur));
 }

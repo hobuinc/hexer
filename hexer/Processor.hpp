@@ -50,8 +50,8 @@ namespace hexer
     typedef std::function<bool(double&, double&, void*&)> PointReader;
     typedef std::function<bool(int&, int&, void*&)> HexReader;
 
-    void process(BaseGrid *grid, PointReader, int count);
-    void processLaz(BaseGrid *grid, std::ifstream& file);
+    void process(BaseGrid& grid, PointReader, int count);
+    void processLaz(BaseGrid& grid, std::ifstream& file);
 
     std::string GetFullVersion( void );
 } // namespace hexer

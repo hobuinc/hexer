@@ -35,17 +35,17 @@ private:
     HexId edgeHex(HexId hex, int edge) const;
     void parentOrChild(Path& p);
 
-    /// @brief Height of the hexagons in the grid (2x apothem)
+    /// Height of the hexagons in the grid (2x apothem)
     double m_height;
-    /// @brief Width of the hexagons in the grid
+    /// Width of the hexagons in the grid
     double m_width;
-    /// @brief Minimum y - 1.
+    /// Minimum y - 1.
     int m_minY;
-    /// @brief Offsets of vertices of hexagon, going anti-clockwise from upper-left
+    /// Offsets of vertices of hexagon, going anti-clockwise from upper-left
     Point m_offsets[6];
-    /// @brief Offset of the center of the hexagons.
+    /// Offset of the center of the hexagons.
     Point m_centerOffset;
-    /// @brief Origin of the hex grid in point coordinates
+    /// Origin of the hex grid in point coordinates
     Point m_origin;
 
 };

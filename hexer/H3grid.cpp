@@ -99,7 +99,7 @@ HexId H3Grid::edgeHex(HexId hex, int edge) const
     //                  3
     //               (- I)
     //
-    const HexId offsets[] {{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
+    static const HexId offsets[] {{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}};
     return hex + offsets[edge];
 }
 

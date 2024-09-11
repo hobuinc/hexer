@@ -22,7 +22,7 @@ void inputTest(std::string const& input) {
     grid.reset(new HexGrid(density));
 
     std::ifstream file(input, std::ios::binary);
-    processLaz(grid.get(), file);
+    processLaz(*grid, file);
 
     int maxX = -1000000;
     int minX = 1000000;
