@@ -37,6 +37,7 @@ public:
     const std::unordered_map<HexId, int> &getMap()
         { return m_counts; }
 
+    virtual void addXY(double& x, double& y) = 0;
     virtual Point findPoint(Segment& s) = 0;
 
 protected:

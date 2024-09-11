@@ -15,6 +15,12 @@ public:
     HexGrid(int denseLimit) : BaseGrid(denseLimit), m_width{-1.0}
         {}
 
+
+    void addXY(double& x, double& y)
+        { 
+          Point p{x, y};
+          addPoint(p);        
+        }
     bool sampling() const
         { return m_width < 0; }
     Point offset(int idx) const

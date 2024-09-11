@@ -53,7 +53,7 @@
 namespace hexer
 {
 
-void process(BaseGrid *grid, PointReader reader, int count, bool h3)
+void process(BaseGrid *grid, PointReader reader, int count)
 {
     double x, y;
     void* context;
@@ -62,20 +62,13 @@ void process(BaseGrid *grid, PointReader reader, int count, bool h3)
 
     while (reader(x, y, context))
     {
-        if (h3) {
-            Point p{degsToRads(x), degsToRads(y)};
-            grid->addPoint(p);
-        }
-        else {
-            Point p{x, y};
-            grid->addPoint(p);
-        }
+        grid->addXY(x, y);
     }
     grid->findShapes();
     grid->findParentPaths();
 }
 
-void processLaz(HexGrid *grid, std::ifstream& file)
+void processLaz(BaseGrid *grid, std::ifstream& file)
 {
 
     lazperf::reader::generic_file l(file);
@@ -100,48 +93,12 @@ void processLaz(HexGrid *grid, std::ifstream& file)
         pos++;
         int32_t y_int = *pos;
 
-        double x = x_int * h.scale.x + h.offset.x;
-        double y = y_int * h.scale.y + h.offset.y;
-        Point p{x, y};
-        grid->addPoint(p);
+        double x = (x_int * h.scale.x + h.offset.x);
+        double y = (y_int * h.scale.y + h.offset.y);
+        
+        grid->addXY(x, y);
     }
 
-    grid->findShapes();
-    grid->findParentPaths();
-}
-
-void processLazH3(H3Grid *grid, std::ifstream& file)
-{
-    lazperf::reader::generic_file l(file);
-
-    size_t count = l.pointCount();
-
-    lazperf::header14 h = l.header();
-    uint16_t len = h.point_record_length;
-    std::vector<char> buf(len, 0);
-    char* buf_data = buf.data();
-
-    if(count < 10000)
-        grid->setSampleSize(count);
-    else
-        grid->setSampleSize(10000);
-
-    // add: verify WGS84 w/ gdal
-
-    for(size_t i = 0; i < count; i ++) {
-        l.readPoint(buf_data);
-
-        int32_t *pos = (int32_t *)buf_data;
-        int32_t x_int = *pos;
-        pos++;
-        int32_t y_int = *pos;
-
-        double x_rad = degsToRads(x_int * h.scale.x + h.offset.x);
-        double y_rad = degsToRads(y_int * h.scale.y + h.offset.y);
-        Point p{x_rad, y_rad};
-
-        grid->addPoint(p);
-    }
     grid->findShapes();
     grid->findParentPaths();
 }

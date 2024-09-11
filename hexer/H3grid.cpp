@@ -12,6 +12,7 @@
 
 namespace hexer
 {
+
 void H3Grid::processHeight(double height)
 {
     // bins for H3 auto resolution:

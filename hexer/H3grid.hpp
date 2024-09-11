@@ -53,6 +53,11 @@ public:
     HexId edgeHex(HexId hex, int edge) const;
     Point findPoint(Segment& s);
 
+    void addXY(double& x, double& y)
+        { 
+          Point p{degsToRads(x), degsToRads(y)};
+          addPoint(p);        
+        }
     bool sampling() const
         { return m_res < 0; }
     int getRes() const

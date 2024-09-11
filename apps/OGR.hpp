@@ -140,7 +140,6 @@ private:
     std::string m_filename;
     bool m_isH3;
 
-
     OGRDataSourceH m_ds;
 	OGRLayerH m_layer;
 
@@ -150,9 +149,5 @@ private:
 	OGRGeometryH collectHexagon(HexId const& id, BaseGrid *grid);
 
 };
-namespace h3
-{
-class OGR
-{
 
 } // namespace hexer

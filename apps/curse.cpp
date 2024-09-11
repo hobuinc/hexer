@@ -127,12 +127,12 @@ void runH3(     std::string const& command,
     FormatType t = getDriver(input);
     if (t == Format_LAS) {
         std::ifstream file(input, std::ios::binary);
-        processLazH3(grid.get(), file);
+        processLaz(grid.get(), file);
     }
     else {
         OGRReader o(input);
         o.open();
-        process(grid.get(), o.reader, o.count(), true);
+        process(grid.get(), o.reader, o.count());
     }
 
     if (hexer::Utils::iequals(command, "BOUNDARY"))
