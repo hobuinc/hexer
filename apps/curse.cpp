@@ -19,14 +19,14 @@
 #include <string>
 #include <vector>
 
-#include <hexer/HexGrid.hpp>
-#include <hexer/HexIter.hpp>
 #include <hexer/Processor.hpp>
 #include <hexer/Utils.hpp>
 #include "ProgramArgs.hpp"
 #include <lazperf/readers.hpp>
 #include <lazperf/las.hpp>
+#include <hexer/BaseGrid.hpp>
 #include <hexer/H3grid.hpp>
+#include <hexer/HexGrid.hpp>
 
 
 #include "OGR.hpp"
@@ -48,7 +48,7 @@ FormatType getDriver(std::string filename)
         return Format_LAS;
     else if (hexer::Utils::iequals(filename.substr(idx), ".LAS") || hexer::Utils::iequals(filename.substr(idx), ".LAZ"))
         return Format_LAS;
-    else 
+    else
         return Format_OGR;
 }
 
@@ -75,12 +75,12 @@ void runHexer(  std::string const& command,
         std::ifstream file(input, std::ios::binary);
         processLaz(grid.get(), file);
     } else {
-        reader::OGR o(input);
+        OGRReader o(input);
         o.open();
-        process(grid.get(), o.reader);
+        process(grid.get(), o.reader, o.count());
     }
 
-    if (hexer::Utils::iequals(command, "BOUNDARY")) 
+    if (hexer::Utils::iequals(command, "BOUNDARY"))
     {
         if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
         {
@@ -93,14 +93,14 @@ void runHexer(  std::string const& command,
         }
         else
         {
-            writer::OGR o(output);
+            OGRWriter o(output);
             o.writeBoundary(grid.get());
         }
     }
     else
     {
-        writer::OGR o(output);
-        o.writeDensity(grid.get()); 
+        OGRWriter o(output);
+        o.writeDensity(grid.get());
     }
 
 }
@@ -109,7 +109,7 @@ void runH3(     std::string const& command,
                 std::string const& input,
                 std::string const& output,
                 int res,
-                int density) 
+                int density)
 {
     using namespace hexer;
 
@@ -118,30 +118,43 @@ void runH3(     std::string const& command,
     if (density == 0)
         density = 10;
     if (res > 15 || res < -1) {
-        throw hexer_error("Input an H3 grid cell size between 0 and 15." 
+        throw hexer_error("Input an H3 grid cell size between 0 and 15."
         "Info on H3 cell specifications can be found at https://h3geo.org/docs/core-library/restable");
     }
     else
-        grid.reset(new H3Grid(density, res));
+        grid.reset(new H3Grid(res, density));
 
     FormatType t = getDriver(input);
     if (t == Format_LAS) {
         std::ifstream file(input, std::ios::binary);
-        processH3(grid.get(), file);
+        processLazH3(grid.get(), file);
     }
     else {
-        throw hexer_error("H3 processing only supported for '.las' and '.laz' files!");
+        OGRReader o(input);
+        o.open();
+        process(grid.get(), o.reader, o.count(), true);
     }
 
-    if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
-        throw hexer_error("Provide a filename for output!");
-    }
-
-    writer::h3::OGR o(output);
     if (hexer::Utils::iequals(command, "BOUNDARY"))
-        o.writeBoundary(grid.get());
-    else if (hexer::Utils::iequals(command, "DENSITY"))
+    {
+        if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
+            std::ostringstream multi;
+            multi.setf(std::ios::fixed);
+            multi.precision(8);
+
+            grid->toWKT(multi);
+            std::cout << multi.str() << std::endl;
+        }
+        else {
+            OGRWriter o(output, true);
+            o.writeBoundary(grid.get());
+        }
+    }
+    else if (hexer::Utils::iequals(command, "DENSITY")) 
+    {
+        OGRWriter o(output, true);
         o.writeDensity(grid.get());
+    }
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
@@ -227,15 +240,15 @@ int main(int argc, char* argv[])
     {
         if (hexer::Utils::iequals(command, "DENSITY") || hexer::Utils::iequals(command, "BOUNDARY"))
         {
-            if (hexer::Utils::iequals(grid, "H3")) 
+            if (hexer::Utils::iequals(grid, "H3"))
             {
                 runH3(command, input, output, res, count);
                 return 0;
             }
 
-            if (hexer::Utils::iequals(grid, "HEXGRID")) 
+            if (hexer::Utils::iequals(grid, "HEXGRID"))
             {
-                runHexer(command, input, output, res, count);
+                runHexer(command, input, output, edge, count);
                 return 0;
             }
         }
@@ -243,7 +256,7 @@ int main(int argc, char* argv[])
         {
             std::cerr << "Command not accepted! Enter 'density' or 'boundary'\n";
             OutputHelp(std::cout, args);
-            return 1; 
+            return 1;
         }
 
 
