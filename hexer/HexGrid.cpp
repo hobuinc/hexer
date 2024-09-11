@@ -8,7 +8,7 @@ void HexGrid::processHeight(double height)
 {
     m_maxSample = 10000;
     m_height = height;
-    m_minY = 1;
+    m_maxY = 1;
     m_width = (3 / (2 * SQRT_3)) * m_height;
     m_offsets[0] = Point(0, 0);
     m_offsets[1] = Point(-m_width / 3, m_height / 2);
@@ -88,7 +88,9 @@ HexId HexGrid::findHexagon(Point p)
         }
     }
 
-    m_minY = std::min(m_minY, y - 1);
+    // maximum Y (HexId.j) value, used in inGrid() for finding root/child paths in parentOrChild(); 
+    // set as y + 1 to account for m_hexPaths containing hexagons across edge 3 (+y direction)
+    m_maxY = std::max(m_maxY, y + 1);
 
     return HexId{x, y};
 }
@@ -112,27 +114,6 @@ HexId HexGrid::edgeHex(HexId hex, int edge) const
     else
         return hex + odd[edge];
 
-}
-
-void HexGrid::parentOrChild(Path& p)
-{
-    HexId hex = p.rootHex();
-    // j (should be) equivalent to y
-    int j = hex.j;
-    while (j >= m_minY) {
-        std::unordered_map<HexId, Path *>::iterator it = m_hexPaths.find(hex);
-        if (it != m_hexPaths.end()) {
-            Path *parentPath = it->second;
-            if (parentPath == p.parent()) {
-                p.setParent(NULL);
-            }
-            else if (!p.parent() && parentPath != &p) {
-                p.setParent(parentPath);
-            }
-        }
-        --j;
-        hex = HexId{hex.i, j};
-    }
 }
 
 Point HexGrid::findPoint(Segment& s)

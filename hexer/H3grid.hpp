@@ -32,8 +32,8 @@ public:
         {   H3Index h3;
             if (localIjToCell(m_origin, &ij, 0, &h3) != E_SUCCESS) {
                 std::ostringstream oss;
-                oss << "Can't convert IJ (" << std::to_string(ij.i) <<
-                    ", " << std::to_string(ij.j) <<") to H3Index.";
+                oss << "Can't convert IJ (" << ij.i <<
+                    ", " << ij.j <<") to H3Index.";
                 throw hexer_error(oss.str());
             }
             return h3;  }
@@ -43,7 +43,7 @@ public:
         {   HexId ij;
             if (cellToLocalIj(m_origin, h3, 0, &ij) != E_SUCCESS) {
                 std::ostringstream oss;
-                oss << "Can't convert H3 index " << std::to_string(h3) <<
+                oss << "Can't convert H3 index " << h3 <<
                     " to IJ.";
                 throw hexer_error(oss.str());
             }
@@ -62,21 +62,19 @@ public:
         { return m_res < 0; }
     int getRes() const
         { return m_res; }
+    bool inGrid(int j)
+        { return j <= m_maxJ; }
+    // used for inserting pre-defined grids in tests
     void setOrigin(H3Index idx)
         { m_origin = idx; }
-    H3Index getOrigin()
-        { return m_origin; }
-    bool inGrid(int i)
-        { return i >= m_minI; }
 
 private:
-    void parentOrChild(Path& p);
     void processHeight(double height);
 
     /// H3 resolution of the grid (0-15)
     int m_res;
     /// minimum I value for iterating through parent paths
-    int m_minI;
+    int m_maxJ;
     /// origin index for converting between H3Index and CoordIJ
     H3Index m_origin;
 

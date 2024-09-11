@@ -20,12 +20,14 @@ class H3Grid;
 class BaseGrid
 {
 public:
-    void setHexes(const std::vector<HexId>& hexes);
     void addPoint(Point& p);
     void findShapes();
     void findParentPaths();
     bool isDense(HexId hex);
     void toWKT(std::ostream& output) const;
+    
+    // test function: adds pre-defined hexagon coordinates to the grid 
+    void setHexes(const std::vector<HexId>& hexes);
 
     void setSampleSize(int num)
         {m_maxSample = num; }
@@ -33,7 +35,6 @@ public:
         { return m_roots; }
     void setGrid(std::pair<HexId, int> cell)
         { m_counts.insert(cell); }
-    void findPossibleRoots();
     const std::unordered_map<HexId, int> &getMap()
         { return m_counts; }
 
@@ -61,16 +62,15 @@ private:
     virtual HexId findHexagon(Point p) = 0;
     virtual HexId edgeHex(HexId hex, int edge) const = 0;
     virtual void processHeight(double height) = 0;
-    virtual bool inGrid(int i) = 0;
-    virtual void parentOrChild(Path& p) = 0;
+    virtual bool inGrid(int j) = 0;
 
-    //void parentOrChild(Path p);
     void handleSamplePoint(Point& p);
     void addRoot(HexId hex);
     void removeRoot(HexId hex);
     void findShape(HexId root);
     double distance(const Point& p1, const Point& p2);
     double computeHexSize();
+    void parentOrChild(Path& p);
     std::pair<Segment, Segment> nextSegments(const Segment& s) const;
 
     ///   Vector of points to use to determine hex height

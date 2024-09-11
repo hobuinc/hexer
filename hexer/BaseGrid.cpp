@@ -55,17 +55,6 @@ void BaseGrid::handleSamplePoint(Point& p)
     }
 }
 
-// debug function
-void BaseGrid::findPossibleRoots()
-{
-    for (auto it = m_counts.begin(); it != m_counts.end(); ++it) {
-        HexId hex = it->first;
-        HexId below = edgeHex(hex, 0);
-        if (!isDense(below))
-            addRoot(hex);
-    }
-}
-
 void BaseGrid::addRoot(HexId h)
 {
     m_possibleRoots.insert(h);
@@ -131,6 +120,7 @@ void BaseGrid::findShape(HexId root)
 // Finds the possibilities for the next boundary segment, moving clockwise
 std::pair<Segment, Segment> BaseGrid::nextSegments(const Segment& s) const
 {
+    //             (example with HexGrid coordinates)
     //    ____
     //   /    \  <---- Current segment: edge 4 of (0,0)
     //  / 0,0  \__v----------- Possible next segment, left: edge 3 of (1,-1)
@@ -161,6 +151,26 @@ void BaseGrid::findParentPaths()
     }
     for (size_t i = 0; i < m_roots.size(); ++i) {
         m_roots[i]->finalize(CLOCKWISE);
+    }
+}
+
+void BaseGrid::parentOrChild(Path& p)
+{
+    HexId hex = p.rootHex();
+    int j = hex.j;
+    while (inGrid(j)) {
+        auto it = m_hexPaths.find(hex);
+        if (it != m_hexPaths.end()) {
+            Path *parentPath = it->second;
+            if (parentPath == p.parent()) {
+                p.setParent(NULL);
+            }
+            else if (!p.parent() && parentPath != &p) {
+                p.setParent(parentPath);
+            }
+        }
+        hex = edgeHex(hex, 3);
+        j = hex.j;
     }
 }
 
