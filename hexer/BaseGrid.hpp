@@ -35,7 +35,8 @@ public:
         { return m_roots; }
     void setGrid(std::pair<HexId, int> cell)
         { m_counts.insert(cell); }
-    const std::unordered_map<HexId, int> &getMap()
+    // returns all hexagons in the grid and their counts
+    std::unordered_map<HexId, int> const& getHexes()
         { return m_counts; }
 
     virtual void addXY(double& x, double& y) = 0;

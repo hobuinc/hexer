@@ -5,7 +5,8 @@
 
 namespace hexer 
 {
-std::vector<Path*> insertGrid(H3Grid *grid) 
+
+const std::vector<Path*> insertGrid(H3Grid *grid) 
 {
     grid->setHexes(
             {
@@ -32,7 +33,7 @@ std::vector<Path*> insertGrid(H3Grid *grid)
     //grid->findPossibleRoots();
     grid->findShapes();
     grid->findParentPaths();
-    const std::vector<Path*> paths = grid->rootPaths();
+    auto paths = grid->rootPaths();
     return paths;
 }
 
@@ -63,7 +64,7 @@ TEST(pathstest, test_paths_h3)
     EXPECT_EQ(child_0_0_0[0]->numChildren(), 0);
 }
 
-std::vector<Path*> insertGrid(HexGrid *grid) 
+const std::vector<Path*> insertGrid(HexGrid *grid) 
 {
     grid->setHexes(
             {
@@ -79,7 +80,7 @@ std::vector<Path*> insertGrid(HexGrid *grid)
             });
     grid->findShapes();
     grid->findParentPaths();
-    const std::vector<Path*> paths = grid->rootPaths();
+    auto paths = grid->rootPaths();
     return paths;
 }
 

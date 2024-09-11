@@ -230,7 +230,7 @@ OGRGeometryH OGRWriter::collectHexagon(HexId const& id, BaseGrid *grid)
 void OGRWriter::writeDensity(BaseGrid *grid)
 {
     int counter(0);
-    for (auto& [coord, count] : grid->getMap()) {
+    for (auto& [coord, count] : grid->getHexes()) {
         if (grid->isDense(coord))
         {
             OGRGeometryH polygon = collectHexagon(coord, grid);

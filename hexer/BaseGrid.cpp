@@ -16,9 +16,16 @@ void BaseGrid::addPoint(Point& p)
         handleSamplePoint(p);
         return;
     }
-
+    // find the hexagon that the point is contained within 
     HexId h = findHexagon(p);
+
+    // add the hexagon to the grid, and increment its count if it exists.
     int count = increment(h);
+
+    // if the hexagon of interest has reached the density threshold, we see if it
+    // has neighbors at edge 0. If not, it's added to our list of possible starting points
+    // for path finding (m_possibleRoots). If the hexagon at edge 3 was in m_possibleRoots we 
+    // remove it since it no longer has a non-dense neighbor at edge 0.
     if (count == m_denseLimit)
     {
         HexId above = edgeHex(h, 0);
@@ -101,16 +108,24 @@ void BaseGrid::findShape(HexId root)
     Segment cur(root, 0);
 
     do {
+        // removes possible roots that are passed over, and sets information 
+        // to be used in parentOrChild()
         if (cur.horizontal())
         {
+            // all hexagons with non-dense neighbors at edge 0 are possible roots.
             if (cur.edge == 0)
                 m_possibleRoots.erase(cur.hex);
+
+            // if path is at edge 3, normalize to edge 0 of hex across edge 3
+            // so hexagons can be processed separately in parentOrChild()
             HexId pathHex = (cur.edge == 0 ? cur.hex : edgeHex(cur.hex, 3));
             m_hexPaths.insert({pathHex, &path});
         }
         path.addPoint(findPoint(cur));
 
         const auto& [left, right] = nextSegments(cur);
+        // left.hex: the hexagon we would "walk into" moving clockwise from the
+        // current segment.
         cur = isDense(left.hex) ? left : right;
     } while (cur != first);
 
@@ -154,20 +169,24 @@ void BaseGrid::findParentPaths()
     }
 }
 
+// Finds whether a path should be a root path or child path
 void BaseGrid::parentOrChild(Path& p)
 {
+    // Determines how many paths are walked through in the direction of +J
     HexId hex = p.rootHex();
     int j = hex.j;
-    while (inGrid(j)) {
+    while (inGrid(j)) 
+    {
         auto it = m_hexPaths.find(hex);
-        if (it != m_hexPaths.end()) {
+        if (it != m_hexPaths.end()) 
+        {
             Path *parentPath = it->second;
-            if (parentPath == p.parent()) {
+
+            if (parentPath == p.parent())
                 p.setParent(NULL);
-            }
-            else if (!p.parent() && parentPath != &p) {
+
+            else if (!p.parent() && parentPath != &p)
                 p.setParent(parentPath);
-            }
         }
         hex = edgeHex(hex, 3);
         j = hex.j;

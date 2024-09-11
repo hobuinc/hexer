@@ -5,7 +5,7 @@ namespace hexer
 
 void Path::toWKT(std::ostream& output) const
 {
-    std::vector<Point> pts = points();
+    std::vector<Point> pts = m_points;
 
     auto outputPoint = [&output](Point& p)
     {

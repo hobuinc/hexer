@@ -19,6 +19,41 @@ void HexGrid::processHeight(double height)
     m_centerOffset = Point(m_width / 3, m_height / 2);
 }
 
+//  first point (origin) and start of column 0
+//   |
+//   |
+//   |  ------- column 0
+//   |  |
+//   |  |   end of column 0 - start of column 1
+//   |  |   |
+//   |  v   |                             _____
+//   v____  v                            |\    |
+//   /    \                              | \   |  Here's an expansion of what
+//  / 0,0  \____                         |  \  |  I'm calling a mini-column,
+//  \      /    \                        |   \ |  showing two half rows.
+//   \____/ 1,0  \                       |____\|
+//   /    \      /                       |    /|  The top rectangle is the
+//  / 0,1  \____/                        |   / |  negative slope case and
+//  \      /    \                        |  /  |  the lower rectangle is the
+//   \____/      \                       | /   |  positive slope case.
+//                                       |/____|
+//        ** <--  The area above these
+//                asterisks are the "mini-column"
+//                The mini-column is 1/3 the total width of the column.
+//
+// We are creating a tesselated plane of hexagons where one side of each
+// hexagon is parallel with the X axis.  We think of the columns of
+// hexagons as all having the same X value.  Hexagons lower than their
+// neighbor have successive Y values.
+//
+// The hexagon in the second column but just below the hexagon in the first
+// column as the same Y value as the hexagon above and to the left.  The third
+// column's Y values are the one less than the hexagon below and to the left
+// as the second column.
+//
+// The first point, whatever it's X/Y location, is made the origin, and is
+// placed at the top-left edge of hexagon 0,0.
+//
 HexId HexGrid::findHexagon(Point p)
 {
     int x, y;
@@ -109,22 +144,21 @@ HexId HexGrid::edgeHex(HexId hex, int edge) const
     static const HexId even[] = {{0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}, {1, -1}};
     static const HexId odd[] = {{0, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}};
 
-    if (hex.i % 2 == 0)
-        return hex + even[edge];
-    else
+    if (hex.i % 2)
         return hex + odd[edge];
+    else
+        return hex + even[edge];
 
 }
 
 Point HexGrid::findPoint(Segment& s)
 {
-    // inefficient? Re-calculates hex center position every time it's called
     HexId hex = s.hex;
     Point pos;
 
     pos.m_x = hex.i * m_width;
     pos.m_y = hex.j * m_height;
-    if (hex.i % 2 != 0)
+    if (hex.i % 2)
         pos.m_y += (m_height / 2);
 
     return pos + offset(s.edge) + m_origin;

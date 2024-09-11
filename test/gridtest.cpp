@@ -29,7 +29,7 @@ void inputTest(std::string const& input) {
     int maxY = -1000000;
     int minY = 1000000;
     int cnt = 0;
-    const std::unordered_map<HexId, int>& hexes = grid->getMap();
+    const std::unordered_map<HexId, int>& hexes = grid->getHexes();
     for (auto it = hexes.begin(); it != hexes.end(); it++) {
         if (grid->isDense(it->first)){
             maxX = std::max(it->first.i, maxX);

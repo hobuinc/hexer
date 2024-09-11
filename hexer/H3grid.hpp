@@ -60,13 +60,16 @@ public:
         }
     bool sampling() const
         { return m_res < 0; }
-    int getRes() const
-        { return m_res; }
     bool inGrid(int j)
         { return j <= m_maxJ; }
-    // used for inserting pre-defined grids in tests
+
+    // test function: used when inserting pre-defined grids in tests, 
+    // sets origin outside of findHexagon()
     void setOrigin(H3Index idx)
         { m_origin = idx; }
+    // test function: used to get grid resolution to run h3 latLngToCell()
+    int getRes() const
+        { return m_res; }
 
 private:
     void processHeight(double height);

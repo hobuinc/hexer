@@ -97,7 +97,7 @@ void runHexer(  std::string const& command,
             o.writeBoundary(grid.get());
         }
     }
-    else
+    else if (hexer::Utils::iequals(command, "DENSITY"))
     {
         OGRWriter o(output);
         o.writeDensity(grid.get());

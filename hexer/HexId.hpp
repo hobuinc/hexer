@@ -8,8 +8,6 @@ namespace hexer
 struct HexId : public CoordIJ
 {};
 
-// we need to think if these operators are needed & if they work w/ HexGrid coords
-
 inline bool operator<(HexId const& c1, HexId const& c2)
 {
     return (c1.i < c2.i) || ((c1.i == c2.i) && (c1.j < c2.j));

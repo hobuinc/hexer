@@ -38,8 +38,12 @@ HexId H3Grid::findHexagon(Point p)
 {
     H3Index index(0);
     LatLng ll{p.m_y, p.m_x};
-    if (latLngToCell(&ll, m_res, &index) != E_SUCCESS)
-        throw hexer_error("H3 index not found!");
+    if (latLngToCell(&ll, m_res, &index) != E_SUCCESS) {
+            std::ostringstream oss;
+            oss << "Can't convert LatLng (" << ll.lat <<
+                ", " << ll.lng <<") to H3Index.";
+            throw hexer_error(oss.str());
+    }
     if (m_origin == 0) {
         m_origin = index;
         m_maxJ = h32ij(index).j;
@@ -55,8 +59,13 @@ HexId H3Grid::findHexagon(Point p)
 Point H3Grid::findPoint(Segment& s)
 {
     DirEdge dir_edge;
-    if (cellsToDirectedEdge(ij2h3(s.hex), ij2h3(edgeHex(s.hex, s.edge)), &dir_edge) != E_SUCCESS)
-        throw hexer_error("Couldn't get directed edge.");
+    if (cellsToDirectedEdge(ij2h3(s.hex), ij2h3(edgeHex(s.hex, s.edge)), &dir_edge) != E_SUCCESS) {
+        std::ostringstream oss;
+        oss << "Can't get directed edge between hexagons (" << s.hex.i <<
+            ", " << s.hex.j <<") and (" << edgeHex(s.hex, s.edge).i <<", " << 
+            edgeHex(s.hex, s.edge).j << ").";
+        throw hexer_error(oss.str());
+    }
 
     CellBoundary edge_bound;
 
