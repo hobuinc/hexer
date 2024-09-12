@@ -63,9 +63,9 @@ public:
         { m_parent = p; }
     Path *parent()
         { return m_parent; }
-    const std::vector<Path *> subPaths() const
+    const std::vector<Path*>& subPaths() const
         { return m_children; }
-    const std::vector<Point> points() const
+    const std::vector<Point>& points() const
     {
         return m_points;
     }

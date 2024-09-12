@@ -92,10 +92,7 @@ void BaseGrid::findShapes()
             "Decrease density or area size.");
 
     while (m_possibleRoots.size())
-    {
-        HexId root = *m_possibleRoots.begin();
-        findShape(root);
-    }
+        findShape(*m_possibleRoots.begin());
 }
 
 // Walk one contiguous segment of the boundary

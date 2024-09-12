@@ -143,7 +143,7 @@ private:
 	OGRLayerH m_layer;
 
     void createLayer(std::string const& basename);
-    void collectPath(const Path *path, OGRGeometryH polygon);
+    void collectPath(const Path& path, OGRGeometryH polygon);
     void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
 	OGRGeometryH collectHexagon(HexId const& id, BaseGrid *grid);
 

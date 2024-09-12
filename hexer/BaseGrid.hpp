@@ -33,8 +33,6 @@ public:
         {m_maxSample = num; }
     std::vector<Path *> const& rootPaths() const
         { return m_roots; }
-    void setGrid(std::pair<HexId, int> cell)
-        { m_counts.insert(cell); }
     // returns all hexagons in the grid and their counts
     std::unordered_map<HexId, int> const& getHexes()
         { return m_counts; }

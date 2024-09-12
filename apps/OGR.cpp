@@ -149,11 +149,10 @@ void OGRWriter::writeBoundary(BaseGrid *grid)
 {
     OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
 
-    const std::vector<Path *> paths = grid->rootPaths();
-    for (const Path *path : paths)
+    for (const Path *path : grid->rootPaths())
     {
         OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
-        collectPath(path, polygon);
+        collectPath(*path, polygon);
 
         if( OGR_G_AddGeometryDirectly(multi, polygon) != OGRERR_NONE )
         {
@@ -182,11 +181,11 @@ void OGRWriter::writeBoundary(BaseGrid *grid)
     OGR_F_Destroy( hFeature );
 }
 
-void OGRWriter::collectPath(const Path *path, OGRGeometryH polygon)
+void OGRWriter::collectPath(const Path& path, OGRGeometryH polygon)
 {
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
 
-    for (const Point& p : path->points())
+    for (const Point& p : path.points())
         OGR_G_AddPoint_2D(ring, p.m_x, p.m_y);
 
     if( OGR_G_AddGeometryDirectly(polygon, ring) != OGRERR_NONE )
@@ -197,8 +196,8 @@ void OGRWriter::collectPath(const Path *path, OGRGeometryH polygon)
         throw hexer_error(oss.str());
     }
 
-    for (const Path *path : path->subPaths())
-        collectPath(path, polygon);
+    for (const Path *path : path.subPaths())
+        collectPath(*path, polygon);
 }
 
 OGRGeometryH OGRWriter::collectHexagon(HexId const& id, BaseGrid *grid)

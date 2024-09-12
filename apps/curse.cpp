@@ -52,6 +52,46 @@ FormatType getDriver(std::string filename)
         return Format_OGR;
 }
 
+void runProcesses(  std::string const& command,
+                    std::string const& input,
+                    std::string const& output,
+                    hexer::BaseGrid& grid)
+{
+    using namespace hexer;
+
+    FormatType t = getDriver(input);
+    if (t == Format_LAS) {
+        std::ifstream file(input, std::ios::binary);
+        processLaz(grid, file);
+    }
+    else {
+        OGRReader o(input);
+        o.open();
+        process(grid, o.reader, o.count());
+    }
+
+    if (hexer::Utils::iequals(command, "BOUNDARY"))
+    {
+        if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
+            std::ostringstream multi;
+            multi.setf(std::ios::fixed);
+            multi.precision(8);
+
+            grid.toWKT(multi);
+            std::cout << multi.str() << std::endl;
+        }
+        else {
+            OGRWriter o(output, true);
+            o.writeBoundary(&grid);
+        }
+    }
+    else if (hexer::Utils::iequals(command, "DENSITY")) 
+    {
+        OGRWriter o(output, true);
+        o.writeDensity(&grid);
+    }
+}
+
 void runHexer(  std::string const& command,
                 std::string const& input,
                 std::string const& output,
@@ -69,39 +109,7 @@ void runHexer(  std::string const& command,
     else
         grid.reset(new HexGrid(edge, density));
 
-    FormatType t = getDriver(input);
-    if (t == Format_LAS)
-    {
-        std::ifstream file(input, std::ios::binary);
-        processLaz(*grid, file);
-    } else {
-        OGRReader o(input);
-        o.open();
-        process(*grid, o.reader, o.count());
-    }
-
-    if (hexer::Utils::iequals(command, "BOUNDARY"))
-    {
-        if (output.empty() || hexer::Utils::iequals(output, "STDOUT"))
-        {
-            std::ostringstream multi;
-            multi.setf(std::ios::fixed);
-            multi.precision(8);
-
-            grid->toWKT(multi);
-            std::cout << multi.str() << std::endl;
-        }
-        else
-        {
-            OGRWriter o(output);
-            o.writeBoundary(grid.get());
-        }
-    }
-    else if (hexer::Utils::iequals(command, "DENSITY"))
-    {
-        OGRWriter o(output);
-        o.writeDensity(grid.get());
-    }
+    runProcesses(command, input, output, *grid);
 
 }
 
@@ -124,37 +132,8 @@ void runH3(     std::string const& command,
     else
         grid.reset(new H3Grid(res, density));
 
-    FormatType t = getDriver(input);
-    if (t == Format_LAS) {
-        std::ifstream file(input, std::ios::binary);
-        processLaz(*grid, file);
-    }
-    else {
-        OGRReader o(input);
-        o.open();
-        process(*grid, o.reader, o.count());
-    }
+    runProcesses(command, input, output, *grid);
 
-    if (hexer::Utils::iequals(command, "BOUNDARY"))
-    {
-        if (output.empty() || hexer::Utils::iequals(output, "STDOUT")) {
-            std::ostringstream multi;
-            multi.setf(std::ios::fixed);
-            multi.precision(8);
-
-            grid->toWKT(multi);
-            std::cout << multi.str() << std::endl;
-        }
-        else {
-            OGRWriter o(output, true);
-            o.writeBoundary(grid.get());
-        }
-    }
-    else if (hexer::Utils::iequals(command, "DENSITY")) 
-    {
-        OGRWriter o(output, true);
-        o.writeDensity(grid.get());
-    }
 }
 
 void OutputHelp( std::ostream & oss, hexer::ProgramArgs& args)
