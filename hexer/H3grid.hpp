@@ -60,8 +60,12 @@ public:
         }
     bool sampling() const
         { return m_res < 0; }
-    bool inGrid(int j)
-        { return j <= m_maxJ; }
+    bool inGrid(HexId& h)
+        { return h.i >= m_minI; }
+    HexId moveCoord(HexId& h)
+        { return edgeHex(h, 3); }
+    bool isH3()
+        { return true; }
 
     // test function: used when inserting pre-defined grids in tests, 
     // sets origin outside of findHexagon()
@@ -77,7 +81,7 @@ private:
     /// H3 resolution of the grid (0-15)
     int m_res;
     /// minimum I value for iterating through parent paths
-    int m_maxJ;
+    int m_minI;
     /// origin index for converting between H3Index and CoordIJ
     H3Index m_origin;
 

@@ -169,24 +169,30 @@ void BaseGrid::findParentPaths()
 // Finds whether a path should be a root path or child path
 void BaseGrid::parentOrChild(Path& p)
 {
-    // Determines how many paths are walked through in the direction of +J
+    // Determines how many paths are walked through in the direction of
+    // a path's parent is always null to start
     HexId hex = p.rootHex();
-    int j = hex.j;
-    while (inGrid(j)) 
+    // get the i or j component of the hexagon, depending on which indexing
+    // system is being moved through (-I for H3Grid, -J for HexGrid)
+    while (inGrid(hex)) 
     {
+        // see if the current hexagon has a path at edge 0 or 3.
         auto it = m_hexPaths.find(hex);
         if (it != m_hexPaths.end()) 
         {
+            // get the path associated with the current hexagon
             Path *parentPath = it->second;
-
+            // if we pass through another path an even number of times,
+            // it can't be our path's parent
             if (parentPath == p.parent())
                 p.setParent(NULL);
-
+            // if a unique path is passed through an odd # of times, it's
+            // set as our path's parent if our doesn't have one already.
             else if (!p.parent() && parentPath != &p)
                 p.setParent(parentPath);
         }
-        hex = edgeHex(hex, 3);
-        j = hex.j;
+        // move to the next hexagon
+        hex = moveCoord(hex);
     }
 }
 

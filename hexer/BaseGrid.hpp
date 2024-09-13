@@ -39,6 +39,7 @@ public:
 
     virtual void addXY(double& x, double& y) = 0;
     virtual Point findPoint(Segment& s) = 0;
+    virtual bool isH3() = 0;
 
     virtual H3Index ij2h3(HexId ij)
         { return 0; }
@@ -61,7 +62,8 @@ private:
     virtual HexId findHexagon(Point p) = 0;
     virtual HexId edgeHex(HexId hex, int edge) const = 0;
     virtual void processHeight(double height) = 0;
-    virtual bool inGrid(int j) = 0;
+    virtual bool inGrid(HexId& h) = 0;
+    virtual HexId moveCoord(HexId& h) = 0;
 
     void handleSamplePoint(Point& p);
     void addRoot(HexId hex);

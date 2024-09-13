@@ -25,8 +25,12 @@ public:
         { return m_width < 0; }
     Point offset(int idx) const
         { return m_offsets[idx]; }
-    bool inGrid(int j)
-        { return j <= m_maxY; }
+    bool inGrid(HexId& h)
+        { return h.j >= m_minY; }
+    bool isH3()
+        { return false; }
+    HexId moveCoord(HexId& h)
+        { return edgeHex(h, 0); }
     Point findPoint(Segment& s);
 
 private:
@@ -39,7 +43,7 @@ private:
     /// Width of the hexagons in the grid
     double m_width;
     /// Minimum y - 1.
-    int m_maxY;
+    int m_minY;
     /// Offsets of vertices of hexagon, going anti-clockwise from upper-left
     Point m_offsets[6];
     /// Offset of the center of the hexagons.

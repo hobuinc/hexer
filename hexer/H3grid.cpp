@@ -46,13 +46,13 @@ HexId H3Grid::findHexagon(Point p)
     }
     if (m_origin == 0) {
         m_origin = index;
-        m_maxJ = h32ij(index).j;
+        m_minI = h32ij(index).i;
     }
     HexId ij = h32ij(index);
 
-    // maximum j value, used in inGrid() for finding root/child paths in parentOrChild(); 
-    // set as i + 1 to account for m_hexPaths containing hexagons across edge 3 (+j direction)
-    m_maxJ = std::max(m_maxJ, ij.j + 1 );
+    // minimum i value, used in inGrid() for finding root/child paths in parentOrChild(); 
+    // set as i - 1 to account for m_hexPaths containing hexagons across edge 3 (-i direction)
+    m_minI = std::min(m_minI, ij.i - 1 );
     return ij;
 }
 
@@ -81,14 +81,14 @@ HexId H3Grid::edgeHex(HexId hex, int edge) const
 {
     // Relative to H3 IJ coordinates, hexagon sides are labeled:
     //
-    //               (+ J)
-    //                __3_
-    //      (- I)  2 /    \ 4  (+I, +J)
+    //               (+ I)
+    //                __0_
+    // (+ I, + J)  5 /    \ 1  (- J)
     //              /      \
     //              \      /
-    //   (-I, -J)  1 \____/ 5   (+I)
-    //                  0
-    //               (- J)
+    //      (+ J)  4 \____/ 2   (- I, - J)
+    //                  3
+    //               (- I)
     //
     static const HexId offsets[] {{0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 1}, {1, 0}};
     return hex + offsets[edge];

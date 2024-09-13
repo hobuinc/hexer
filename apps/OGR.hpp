@@ -132,8 +132,8 @@ public:
     OGRWriter(std::string const& filename, bool h3 = false);
 	~OGRWriter();
 
-    void writeBoundary(BaseGrid *grid);
-	void writeDensity(BaseGrid *grid);
+    void writeBoundary(BaseGrid& grid);
+	void writeDensity(BaseGrid& grid);
 
 private:
     std::string m_filename;
@@ -145,7 +145,7 @@ private:
     void createLayer(std::string const& basename);
     void collectPath(const Path& path, OGRGeometryH polygon);
     void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
-	OGRGeometryH collectHexagon(HexId const& id, BaseGrid *grid);
+	OGRGeometryH collectHexagon(HexId const& id, BaseGrid& grid);
 
 };
 

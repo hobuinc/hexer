@@ -69,7 +69,7 @@ public:
     {
         return m_points;
     }
-    HexId rootHex()
+    HexId rootHex() const
         { return m_rootHex; }
     void addPoint(Point p)
         { m_points.push_back(p); }

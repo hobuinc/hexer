@@ -145,11 +145,11 @@ void OGRWriter::createLayer(std::string const& basename)
 
 }
 
-void OGRWriter::writeBoundary(BaseGrid *grid)
+void OGRWriter::writeBoundary(BaseGrid& grid)
 {
     OGRGeometryH multi = OGR_G_CreateGeometry(wkbMultiPolygon);
 
-    for (const Path *path : grid->rootPaths())
+    for (const Path *path : grid.rootPaths())
     {
         OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
         collectPath(*path, polygon);
@@ -200,17 +200,17 @@ void OGRWriter::collectPath(const Path& path, OGRGeometryH polygon)
         collectPath(*path, polygon);
 }
 
-OGRGeometryH OGRWriter::collectHexagon(HexId const& id, BaseGrid *grid)
+OGRGeometryH OGRWriter::collectHexagon(HexId const& id, BaseGrid& grid)
 {
     OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
 
     for (int i = 0; i <= 5; ++i) {
         Segment s(id, i);
-        Point p = grid->findPoint(s);
+        Point p = grid.findPoint(s);
         OGR_G_AddPoint_2D(ring, p.m_x, p.m_y);
     }
     Segment s(id, 0);
-    Point p = grid->findPoint(s);
+    Point p = grid.findPoint(s);
     OGR_G_AddPoint_2D(ring, p.m_x, p.m_y);
 
     OGRGeometryH polygon = OGR_G_CreateGeometry(wkbPolygon);
@@ -226,11 +226,11 @@ OGRGeometryH OGRWriter::collectHexagon(HexId const& id, BaseGrid *grid)
 }
 
 
-void OGRWriter::writeDensity(BaseGrid *grid)
+void OGRWriter::writeDensity(BaseGrid& grid)
 {
     int counter(0);
-    for (auto& [coord, count] : grid->getHexes()) {
-        if (grid->isDense(coord))
+    for (auto& [coord, count] : grid.getHexes()) {
+        if (grid.isDense(coord))
         {
             OGRGeometryH polygon = collectHexagon(coord, grid);
             OGRFeatureH hFeature;
@@ -243,14 +243,15 @@ void OGRWriter::writeDensity(BaseGrid *grid)
 
             if (m_isH3)
             {
-                H3Index idx = grid->ij2h3(coord);
+                H3Index idx = grid.ij2h3(coord);
                 char id[17];
-                char* id_ptr = id;
+                if (h3ToString(idx, id, 17) != E_SUCCESS)
+                    throw hexer_error("could not convert H3 ID to string!");
 
                 OGR_F_SetFieldInteger64( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_ID"),
                     idx);
                 OGR_F_SetFieldString( hFeature, OGR_F_GetFieldIndex(hFeature, "H3_STRING"),
-                    id_ptr);
+                    id);
             }
             processGeometry(m_layer, hFeature, polygon);
             counter++;
