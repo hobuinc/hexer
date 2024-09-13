@@ -1,74 +1,11 @@
-/******************************************************************************
- * Copyright (c) 2014, Hobu Inc. (howard@hobu.co)
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following
- * conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in
- *       the documentation and/or other materials provided
- *       with the distribution.
- *     * Neither the name of the Howard Butler or Hobu, Inc.
- *       the names of its contributors may be
- *       used to endorse or promote products derived from this software
- *       without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
- * OF SUCH DAMAGE.
- ****************************************************************************/
-
 #include <hexer/Path.hpp>
 
-using namespace std;
-
-namespace hexer
+namespace hexer 
 {
 
-Point Path::getPoint(size_t pointnum) const
+void Path::toWKT(std::ostream& output) const
 {
-    pointnum = (m_orientation == ANTICLOCKWISE) ?
-        m_segs.size() - pointnum - 1 : pointnum;
-    return m_segs[pointnum].startPos(m_grid);
-}
-
-vector<Point> Path::points() const
-{
-    vector<Point> points;
-    if (m_orientation == CLOCKWISE)
-    {
-        for (size_t i = 0; i < m_segs.size(); ++i)
-            points.push_back(m_segs[i].startPos(m_grid));
-        points.push_back(m_segs[0].startPos(m_grid));
-    }
-    else
-    {
-        // Note that i will wrap to max of size_t when decrementing 0.
-        for (size_t i = m_segs.size() - 1; i < m_segs.size(); --i)
-            points.push_back(m_segs[i].startPos(m_grid));
-        points.push_back(m_segs[m_segs.size()-1].startPos(m_grid));
-
-    }
-    return points;
-}
-
-void Path::toWKT( std::ostream& output) const
-{
-    vector<Point> pts = points();
+    std::vector<Point> pts = m_points;
 
     auto outputPoint = [&output](Point& p)
     {
@@ -88,13 +25,11 @@ void Path::toWKT( std::ostream& output) const
 
     output << ")";
 
-    vector<Path *> paths = subPaths();
-    for (int pi = 0; pi != paths.size(); ++pi)
+    std::vector<Path *> paths = subPaths();
+    for (auto p : paths)
     {
-        Path* p = paths[pi];
         output <<",";
         p->toWKT(output);
     }
 }
-
-} // namespace
+} // namespace hexer

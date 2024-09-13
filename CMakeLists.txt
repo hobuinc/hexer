@@ -25,12 +25,6 @@ SET_INSTALL_DIRS()
 
 SET(HEXER_LIB_SOVERSION "1.1.0")
 
-# Name of C++ library
-set(HEXER_LIB_NAME hexer)
-set(H3_LIB_NAME h3)
-
-message(STATUS "Configuring Hexer library - ${HEXER_LIB_NAME}")
-
 set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 # Path to additional CMake modules
@@ -57,16 +51,8 @@ endif()
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-set(WITH_DRAWING FALSE CACHE BOOL "Choose to build Cairo-based SVG drawing")
-if(WITH_DRAWING)
-    find_package(Cairo)
-    set(HEXER_HAVE_CAIRO 1)
-endif(WITH_DRAWING)
-
 find_package(GDAL 1.9.0 REQUIRED)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ###############################################################################
 # Installation settings
@@ -92,13 +78,15 @@ endif(WIN32)
 ###############################################################################
 # Processing of project directories
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(hexer_defines_h_in "${CMAKE_CURRENT_SOURCE_DIR}/hexer_defines.h.in")
 set(hexer_defines_h "${CMAKE_CURRENT_BINARY_DIR}/include/hexer/hexer_defines.h")
 include(CheckIncludeFiles)
 check_include_files(execinfo.h HEXER_HAVE_EXECINFO_H)
 configure_file(${hexer_defines_h_in} ${hexer_defines_h})
 HEXER_ADD_INCLUDES("" "" ${hexer_defines_h})
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 file(GLOB LAZPERF_SRCS
     lazperf/*.cpp
@@ -117,9 +105,26 @@ file(GLOB H3SRCS
     h3/lib/*.c
 )
 
-add_library(${H3_LIB_NAME} OBJECT ${H3SRCS}) 
+set(H3_LIB_NAME h3)
+set(H3_DIR h3)
+set(H3_INCLUDE_DIR ${H3_DIR}/include)
+add_library(${H3_LIB_NAME} OBJECT ${H3SRCS})
+target_include_directories(${H3_LIB_NAME}
+    PRIVATE
+        ${H3_INCLUDE_DIR}
+)
 
-add_executable(curse ${APP_SRCS} ${LIB_SRCS} ${LAZPERF_SRCS})
+set(HEXER_LIB_NAME hexer)
+set(HEXER_INCLUDE_DIR .)
+add_library(${HEXER_LIB_NAME} ${LIB_SRCS})
+target_include_directories(${HEXER_LIB_NAME}
+    PRIVATE
+        ${H3_INCLUDE_DIR}
+        ${HEXER_INCLUDE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}/include
+)
+
+add_executable(curse ${HEXER_LIB_NAME} ${APP_SRCS} ${LAZPERF_SRCS})
 
 target_include_directories(${H3_LIB_NAME}
     PRIVATE
@@ -128,16 +133,19 @@ target_include_directories(${H3_LIB_NAME}
 
 target_include_directories(curse
     PRIVATE
-        .
+        ${H3_INCLUDE_DIR}
+        ${HEXER_INCLUDE_DIR}
         ${GDAL_INCLUDE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}/include
 )
-
 target_link_libraries(curse
     PRIVATE
-        ${CAIRO_LIBRARIES}
         ${GDAL_LIBRARY}
         ${H3_LIB_NAME}
+        ${HEXER_LIB_NAME}
 )
 
-enable_testing()
-add_subdirectory(test)
+if(WITH_TESTS)
+  enable_testing()
+  add_subdirectory(test)
+endif()

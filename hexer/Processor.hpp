@@ -39,6 +39,9 @@
 #include <functional>
 
 #include <hexer/Path.hpp>
+#include <hexer/BaseGrid.hpp>
+#include <hexer/H3grid.hpp>
+#include <hexer/HexGrid.hpp>
 #include <hexer/export.hpp>
 
 
@@ -47,15 +50,9 @@ namespace hexer
     typedef std::function<bool(double&, double&, void*&)> PointReader;
     typedef std::function<bool(int&, int&, void*&)> HexReader;
 
-    HEXER_DLL void process(HexGrid *grid, PointReader);
-    HEXER_DLL void processHexes(HexGrid *grid, HexReader);
-    HEXER_DLL void processLaz(HexGrid *grid, std::ifstream& file);
-    HEXER_DLL void processH3(H3Grid *grid, std::ifstream& file);
+    void process(BaseGrid& grid, PointReader, int count);
+    void processLaz(BaseGrid& grid, std::ifstream& file);
 
-    HEXER_DLL double computeHexSize(const std::vector<Point>& samples,
-        int density);
-    HEXER_DLL double computeHexSize(const std::vector<LatLng>& samples,
-        int density);
-    HEXER_DLL std::string GetFullVersion( void );
+    std::string GetFullVersion( void );
 } // namespace hexer
 

@@ -15,12 +15,10 @@
 #pragma once
 
 #include <hexer/hexer.hpp>
-
+#include <hexer/Path.hpp>
 #include <hexer/Processor.hpp>
-
 #include <hexer/hexer_defines.h>
 #include <hexer/Mathpair.hpp>
-#include <hexer/export.hpp>
 
 #include "ogr_api.h"
 #include "ogr_srs_api.h"
@@ -31,10 +29,7 @@ namespace hexer
 
 class HexInfo;
 
-namespace reader
-{
-
-class OGR
+class OGRReader
 {
 public:
 
@@ -91,7 +86,7 @@ public:
 
     inline static bool read(double&x, double& y, void* ctx)
     {
-		OGR* l = static_cast<OGR*>(ctx);
+		OGRReader* l = static_cast<OGRReader*>(ctx);
 
         if (l->getIndex() == l->count())
         {
@@ -125,65 +120,33 @@ private:
 
 
 public:
-    OGR(std::string filename);
-	~OGR();
+    OGRReader(std::string filename);
+	~OGRReader();
 };
 
-} // reader
-
-namespace writer
-{
-
-
-class OGR
+class OGRWriter
 {
 
 
 public:
-    OGR(std::string const& filename);
-	~OGR();
+    OGRWriter(std::string const& filename, bool h3 = false);
+	~OGRWriter();
 
-    void writeBoundary(HexGrid *grid);
-	void writeDensity(HexGrid *grid);
+    void writeBoundary(BaseGrid& grid);
+	void writeDensity(BaseGrid& grid);
 
 private:
     std::string m_filename;
-
+    bool m_isH3;
 
     OGRDataSourceH m_ds;
 	OGRLayerH m_layer;
 
     void createLayer(std::string const& basename);
-    void collectPath(Path* path, OGRGeometryH polygon);
-    void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon); 
-	OGRGeometryH collectHexagon(HexInfo const& info, HexGrid const* grid);
-
-};
-namespace h3
-{
-class OGR
-{
-
-
-public:
-    OGR(std::string const& filename);
-	~OGR();
-
-    void writeDensity(H3Grid *grid);
-    void writeBoundary(H3Grid *grid);
-
-private:
-    std::string m_filename;
-
-    OGRDataSourceH m_ds;
-	OGRLayerH m_layer;
+    void collectPath(const Path& path, OGRGeometryH polygon);
     void processGeometry(OGRLayerH layer, OGRFeatureH feature, OGRGeometryH polygon);
-    void createLayer(std::string const& basename);
-    OGRGeometryH collectH3(CellBoundary b);
-    void collectPath(H3Path* path, OGRGeometryH polygon);
+	OGRGeometryH collectHexagon(HexId const& id, BaseGrid& grid);
 
-}; 
-} // namespace h3
-} // namespace writer
+};
 
 } // namespace hexer
