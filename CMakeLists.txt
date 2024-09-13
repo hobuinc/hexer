@@ -145,7 +145,5 @@ target_link_libraries(curse
         ${HEXER_LIB_NAME}
 )
 
-if(WITH_TESTS)
-  enable_testing()
-  add_subdirectory(test)
-endif()
+enable_testing()
+add_subdirectory(test)

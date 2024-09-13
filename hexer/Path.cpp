@@ -1,23 +1,21 @@
 #include <hexer/Path.hpp>
 
-namespace hexer 
+namespace hexer
 {
 
 void Path::toWKT(std::ostream& output) const
 {
-    std::vector<Point> pts = m_points;
-
-    auto outputPoint = [&output](Point& p)
+    auto outputPoint = [&output](const Point& p) -> void
     {
         output << p.m_x << " " << p.m_y;
     };
 
     output << "(";
 
-    auto pi = pts.begin();
-    if (pi != pts.end())
+    auto pi = m_points.begin();
+    if (pi != m_points.end())
         outputPoint(*pi++);
-    for (; pi != pts.end(); ++pi)
+    for (; pi != m_points.end(); ++pi)
     {
         output << ", ";
         outputPoint(*pi);
