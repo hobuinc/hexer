@@ -52,8 +52,6 @@ namespace hexer
 
     void process(BaseGrid& grid, PointReader, int count);
     void processLaz(BaseGrid& grid, std::ifstream& file);
-    void troubleshootH3(H3Grid& grid);
-    void troubleshootHexer(HexGrid& grid);
 
     std::string GetFullVersion( void );
 } // namespace hexer

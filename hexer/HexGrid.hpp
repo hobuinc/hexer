@@ -30,7 +30,7 @@ public:
     bool isH3()
         { return false; }
     HexId moveCoord(HexId& h)
-        { return edgeHex(h, 0); }
+        { return HexId{h.i, h.j - 1}; }
     Point findPoint(Segment& s);
 
 private:

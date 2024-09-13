@@ -63,7 +63,7 @@ public:
     bool inGrid(HexId& h)
         { return h.i >= m_minI; }
     HexId moveCoord(HexId& h)
-        { return edgeHex(h, 3); }
+        { return HexId{h.i - 1, h.j}; }
     bool isH3()
         { return true; }
 

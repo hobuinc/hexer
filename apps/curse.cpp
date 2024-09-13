@@ -55,14 +55,14 @@ FormatType getDriver(std::string filename)
 void runProcesses(  std::string const& command,
                     std::string const& input,
                     std::string const& output,
-                    hexer::H3Grid& grid)
+                    hexer::BaseGrid& grid)
 {
     using namespace hexer;
 
     FormatType t = getDriver(input);
     if (t == Format_LAS) {
         std::ifstream file(input, std::ios::binary);
-        troubleshootH3(grid);
+        processLaz(grid, file);
     }
     else {
         OGRReader o(input);
@@ -92,7 +92,7 @@ void runProcesses(  std::string const& command,
     }
 }
 
-/* void runHexer(  std::string const& command,
+void runHexer(  std::string const& command,
                 std::string const& input,
                 std::string const& output,
                 double edge,
@@ -111,7 +111,7 @@ void runProcesses(  std::string const& command,
 
     runProcesses(command, input, output, *grid);
 
-} */
+}
 
 void runH3(     std::string const& command,
                 std::string const& input,
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
 
             if (hexer::Utils::iequals(grid, "HEXGRID"))
             {
-                //runHexer(command, input, output, edge, count);
+                runHexer(command, input, output, edge, count);
                 return 0;
             }
         }
