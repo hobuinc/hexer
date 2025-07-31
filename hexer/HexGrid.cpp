@@ -1,5 +1,6 @@
 #include <hexer/BaseGrid.hpp>
 #include <hexer/HexGrid.hpp>
+#include <cmath>
 
 namespace hexer
 {
