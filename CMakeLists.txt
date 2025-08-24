@@ -36,6 +36,7 @@ endif()
 # Platform and compiler specific settings
 
 if(WIN32)
+  add_definitions(-DNOMINMAX)
   if (MSVC)
     if (MSVC80 OR MSVC90 OR MSVC10 OR MSVC11 OR MSVC12 OR MSVC13 OR MSVC14 OR MSVC15)
       add_definitions(-D_CRT_SECURE_NO_WARNINGS)

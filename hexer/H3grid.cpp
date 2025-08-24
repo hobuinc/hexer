@@ -2,6 +2,7 @@
 #include <map>
 #include <iostream>
 #include <sstream>
+#include <array>
 
 #include <hexer/BaseGrid.hpp>
 #include <hexer/H3grid.hpp>
