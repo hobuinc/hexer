@@ -1,3 +1,4 @@
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(GTEST_DIR gtest/gtest-10-06-21)
 
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
