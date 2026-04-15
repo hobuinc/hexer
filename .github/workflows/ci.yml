@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            runner: ubuntu-latest
+          - name: macOS ARM
+            runner: macos-14
+          - name: Windows
+            runner: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: hexer
+          auto-activate-base: false
+          channels: conda-forge
+          channel-priority: strict
+          miniforge-variant: Miniforge3
+          miniforge-version: latest
+          mamba-version: "*"
+          python-version: "3.12"
+
+      - name: Install build dependencies
+        shell: pwsh
+        run: mamba install -n hexer -y cmake ninja gdal
+
+      - name: Configure
+        shell: pwsh
+        run: conda run -n hexer cmake -S . -B build -G Ninja -DWITH_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        shell: pwsh
+        run: conda run -n hexer cmake --build build --parallel
+
+      - name: Run tests
+        shell: pwsh
+        run: conda run -n hexer ctest --test-dir build --output-on-failure
