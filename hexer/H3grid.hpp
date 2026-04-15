@@ -22,10 +22,10 @@ class H3Grid : public BaseGrid
 {
 public:
     H3Grid(int dense_limit)
-        : BaseGrid{dense_limit}, m_res{-1}, m_origin{0}
+        : BaseGrid{dense_limit}, m_res{-1}, m_minI{0}, m_origin{0}
         {}
     H3Grid(int res, int dense_limit)
-        : BaseGrid{dense_limit}, m_res{res}, m_origin{0}
+        : BaseGrid{dense_limit}, m_res{res}, m_minI{0}, m_origin{0}
         {}
 
     H3Index ij2h3(HexId ij)
@@ -70,7 +70,12 @@ public:
     // test function: used when inserting pre-defined grids in tests, 
     // sets origin outside of findHexagon()
     void setOrigin(H3Index idx)
-        { m_origin = idx; }
+        {
+            m_origin = idx;
+            // local IJ coordinates are relative to the origin, so start one
+            // column to the left to match the normal findHexagon() setup path.
+            m_minI = h32ij(idx).i - 1;
+        }
     // test function: used to get grid resolution to run h3 latLngToCell()
     int getRes() const
         { return m_res; }
@@ -88,5 +93,4 @@ private:
 };
 
 } // namepsace hexer
-
 
