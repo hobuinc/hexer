@@ -68,3 +68,14 @@ $ curse density mylasfile.las --output myhexagons.shp --edge 100
 
 [map]: http://a.tiles.mapbox.com/v3/hobu.serpent-mound.html#16.00/39.0346/-83.4353
 
+## Building
+
+An example debug build using the `hexer` conda environment is:
+
+```bash
+conda run -n hexer ./hobu.sh
+```
+
+The `hobu.sh` script configures a Ninja build in `build/`, enables the test
+suite, installs against `${CONDA_PREFIX}`, and builds the project. The first
+configure will also download GoogleTest from GitHub.

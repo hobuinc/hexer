@@ -1,6 +1,6 @@
 ###############################################################################
 # CMake settings
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.16...4.3)
 
 set(CMAKE_COLOR_MAKEFILE ON)
 
@@ -15,6 +15,7 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 include(${HEXER_SOURCE_DIR}/cmake/hexer_utils.cmake)
 
 set(CMAKE_MODULE_PATH "${HEXER_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
@@ -26,11 +27,6 @@ SET_INSTALL_DIRS()
 SET(HEXER_LIB_SOVERSION "1.1.0")
 
 set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
-
-# Path to additional CMake modules
-if (CMAKE_MAJOR_VERSION GREATER 2)
-    cmake_policy(SET CMP0042 NEW) # osx rpath
-endif()
 
 ###############################################################################
 # Platform and compiler specific settings
@@ -52,7 +48,10 @@ endif()
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-find_package(GDAL 1.9.0 REQUIRED)
+find_package(GDAL CONFIG REQUIRED)
+if (GDAL_VERSION VERSION_LESS 1.9.0)
+    message(FATAL_ERROR "GDAL 1.9.0 or newer is required.")
+endif()
 
 
 ###############################################################################
@@ -81,6 +80,8 @@ endif(WIN32)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+option(WITH_TESTS "Build the hexer test suite" ON)
 
 set(hexer_defines_h_in "${CMAKE_CURRENT_SOURCE_DIR}/hexer_defines.h.in")
 set(hexer_defines_h "${CMAKE_CURRENT_BINARY_DIR}/include/hexer/hexer_defines.h")
@@ -136,15 +137,16 @@ target_include_directories(curse
     PRIVATE
         ${H3_INCLUDE_DIR}
         ${HEXER_INCLUDE_DIR}
-        ${GDAL_INCLUDE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 target_link_libraries(curse
     PRIVATE
-        ${GDAL_LIBRARY}
+        GDAL::GDAL
         ${H3_LIB_NAME}
         ${HEXER_LIB_NAME}
 )
 
-enable_testing()
-add_subdirectory(test)
+if (WITH_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
