@@ -52,7 +52,7 @@ endif()
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-find_package(GDAL 1.9.0 REQUIRED)
+find_package(GDAL REQUIRED)
 
 
 ###############################################################################
