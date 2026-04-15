@@ -6,6 +6,16 @@
 namespace hexer 
 {
 
+Path *findChild(const std::vector<Path *>& paths, int numPoints, int numChildren)
+{
+    for (Path *path : paths)
+    {
+        if (path->numPoints() == numPoints && path->numChildren() == numChildren)
+            return path;
+    }
+    return nullptr;
+}
+
 const std::vector<Path*> insertGrid(H3Grid *grid) 
 {
     grid->setHexes(
@@ -44,22 +54,26 @@ TEST(pathstest, test_paths_h3)
 
     std::vector<Path*> paths = insertGrid(grid.get());
 
+    ASSERT_EQ(paths.size(), 1u);
     EXPECT_EQ(paths[0]->numPoints(), 55);
     EXPECT_EQ(paths[0]->numChildren(), 2);
     
     std::vector<Path *> child_0 = paths[0]->subPaths();
-    EXPECT_EQ(child_0[0]->numPoints(), 39);
-    EXPECT_EQ(child_0[1]->numPoints(), 15);
-    EXPECT_EQ(child_0[0]->numChildren(), 2);
-    EXPECT_EQ(child_0[1]->numChildren(), 0);
+    ASSERT_EQ(child_0.size(), 2u);
+    Path *branch_39 = findChild(child_0, 39, 2);
+    Path *branch_15 = findChild(child_0, 15, 0);
+    ASSERT_NE(branch_39, nullptr);
+    ASSERT_NE(branch_15, nullptr);
     
-    std::vector<Path *> child_0_0 = child_0[0]->subPaths();
-    EXPECT_EQ(child_0_0[0]->numPoints(), 19);
-    EXPECT_EQ(child_0_0[1]->numPoints(), 7);
-    EXPECT_EQ(child_0_0[0]->numChildren(), 1);
-    EXPECT_EQ(child_0_0[1]->numChildren(), 0);
+    std::vector<Path *> child_0_0 = branch_39->subPaths();
+    ASSERT_EQ(child_0_0.size(), 2u);
+    Path *branch_19 = findChild(child_0_0, 19, 1);
+    Path *branch_7 = findChild(child_0_0, 7, 0);
+    ASSERT_NE(branch_19, nullptr);
+    ASSERT_NE(branch_7, nullptr);
     
-    std::vector<Path *> child_0_0_0 = child_0_0[0]->subPaths();
+    std::vector<Path *> child_0_0_0 = branch_19->subPaths();
+    ASSERT_EQ(child_0_0_0.size(), 1u);
     EXPECT_EQ(child_0_0_0[0]->numPoints(), 7);
     EXPECT_EQ(child_0_0_0[0]->numChildren(), 0);
 }
@@ -91,22 +105,26 @@ TEST(pathstest, test_paths_hexer)
 
     std::vector<Path*> paths = insertGrid(grid.get());
 
+    ASSERT_EQ(paths.size(), 1u);
     EXPECT_EQ(paths[0]->numPoints(), 55);
     EXPECT_EQ(paths[0]->numChildren(), 2);
 
     std::vector<Path *> child_0 = paths[0]->subPaths();
-    EXPECT_EQ(child_0[0]->numPoints(), 39);
-    EXPECT_EQ(child_0[1]->numPoints(), 15);
-    EXPECT_EQ(child_0[0]->numChildren(), 2);
-    EXPECT_EQ(child_0[1]->numChildren(), 0);
+    ASSERT_EQ(child_0.size(), 2u);
+    Path *branch_39 = findChild(child_0, 39, 2);
+    Path *branch_15 = findChild(child_0, 15, 0);
+    ASSERT_NE(branch_39, nullptr);
+    ASSERT_NE(branch_15, nullptr);
 
-    std::vector<Path *> child_0_0 = child_0[0]->subPaths();
-    EXPECT_EQ(child_0_0[0]->numPoints(), 7);
-    EXPECT_EQ(child_0_0[1]->numPoints(), 19);
-    EXPECT_EQ(child_0_0[0]->numChildren(), 0);
-    EXPECT_EQ(child_0_0[1]->numChildren(), 1);
+    std::vector<Path *> child_0_0 = branch_39->subPaths();
+    ASSERT_EQ(child_0_0.size(), 2u);
+    Path *branch_7 = findChild(child_0_0, 7, 0);
+    Path *branch_19 = findChild(child_0_0, 19, 1);
+    ASSERT_NE(branch_7, nullptr);
+    ASSERT_NE(branch_19, nullptr);
 
-    std::vector<Path *> child_0_0_1 = child_0_0[1]->subPaths();
+    std::vector<Path *> child_0_0_1 = branch_19->subPaths();
+    ASSERT_EQ(child_0_0_1.size(), 1u);
     EXPECT_EQ(child_0_0_1[0]->numPoints(), 7);
     EXPECT_EQ(child_0_0_1[0]->numChildren(), 0);
 }
